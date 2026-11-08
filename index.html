@@ -128,6 +128,22 @@ ol.steps li > div{min-width:0}
   #prompt{bottom:calc(200px + env(safe-area-inset-bottom,0px))}
   #tQ{left:max(16px,env(safe-area-inset-left,0px));bottom:calc(98px + env(safe-area-inset-bottom,0px));width:52px;height:52px;font-size:11px;font-weight:600}
 }
+@media (pointer:coarse){
+  #placeSub,#bLoad,#bHelp,#tQ,#clock,#mBonus{display:none}
+  #place{font-size:24px}
+  #bl{top:calc(78px + env(safe-area-inset-top,0px));left:max(16px,env(safe-area-inset-left,0px));right:auto;bottom:auto}
+  #mini{width:104px;height:104px}
+  #mission{min-width:0;max-width:min(230px,52vw);padding:6px 10px}
+  #mTarget{font-size:16px}
+  #street{font-size:20px}
+  #toast{top:34%;font-size:22px}
+  #toast span{font-size:13px}
+  #credit{left:max(16px,env(safe-area-inset-left,0px));right:auto;bottom:calc(98px + env(safe-area-inset-bottom,0px));font-size:9px;opacity:.55;max-width:45vw}
+}
+@media (pointer:coarse) and (orientation:landscape){
+  #br{bottom:calc(16px + env(safe-area-inset-bottom,0px));right:calc(max(16px,env(safe-area-inset-right,0px)) + 168px)}
+  #credit{bottom:calc(94px + env(safe-area-inset-bottom,0px))}
+}
 @media (max-width:520px){
   #place{font-size:26px}
   #cash{font-size:30px}
@@ -926,6 +942,8 @@ function buildWorld(ways,meta){
     for(let i=trees.length;i--;){const t=trees[i];if(pb.some(([q,a,b,c,d])=>t[0]>a&&t[0]<b&&t[1]>c&&t[1]<d&&(pip(t[0],t[1],q)||q.some((v,k)=>{const w=q[(k+1)%q.length],dx=w[0]-v[0],dz=w[1]-v[1],u=Math.max(0,Math.min(1,((t[0]-v[0])*dx+(t[1]-v[1])*dz)/(dx*dx+dz*dz||1)));return Math.hypot(t[0]-v[0]-dx*u,t[1]-v[1]-dz*u)<t[3]+1;}))))trees.splice(i,1);}}
   {const S=sqLayout(P),inPond=(x,z)=>W.ponds.some(o=>pip(x,z,o.p)&&!o.H.some(r=>pip(x,z,r)));
     for(let i=trees.length;i--;){const [x,z]=trees[i];if(inPond(x,z)||(S&&pip(x,z,S.p)&&!S.lawns.some(l=>pip(x,z,l))))trees.splice(i,1);}}
+  W.treesOnRoad=0;for(let i=trees.length;i--;){const [x,z]=trees[i];
+    if(W.roadSegs(x,z).some(s=>{const dx=s[2]-s[0],dz=s[3]-s[1],t=clamp(((x-s[0])*dx+(z-s[1])*dz)/(dx*dx+dz*dz||1),0,1);return Math.hypot(x-s[0]-dx*t,z-s[1]-dz*t)<s[4].w/2+.4;})){trees.splice(i,1);W.treesOnRoad++;}}
   if(trees.length){
     // chunked so each block of trees is culled on its own, for the camera and for the sun's shadow map
     const CH=320,chunks=new Map(),leafMk=det=>{const g=new THREE.IcosahedronGeometry(1,det),p=g.attributes.position,v=new THREE.Vector3(),L=[];for(let i=0;i<7;i++){const a=i*2.4,y=i/6*1.4-.5,r=Math.sqrt(1-y*y*.6);L.push(new THREE.Vector3(Math.cos(a)*r,y,Math.sin(a)*r).normalize());}for(let i=0;i<p.count;i++){v.fromBufferAttribute(p,i).normalize();let s=.72;for(const l of L)s+=.42*Math.pow(Math.max(0,v.dot(l)),6);s+=.06*Math.sin(v.x*17+v.y*11)*Math.sin(v.z*13);v.multiplyScalar(s);p.setXYZ(i,v.x,v.y,v.z);}g.computeVertexNormals();return g;},leafG=leafMk(3),leafLo=[leafMk(1),leafMk(0)],coneG=new THREE.ConeGeometry(1,1,7),trunkG=new THREE.CylinderGeometry(.6,1,1,5);
@@ -3616,7 +3634,7 @@ function stepPed(p,dt,M){
     if(L.mode==='hide'){p.mode='hide';p.lead=null;return;}
     if(!CALM[L.mode]){if(L.mode==='flee')pedFlee(p,L.vx,L.vz,L.timer,6);else pedFlee(p,p.x-L.x,p.z-L.z,2,6);p.lead=null;p.nerv=20;return;}
     const k=Math.min(1,dt*4),px=p.x,pz=p.z;
-    p.x+=(L.x+Math.cos(L.h)*.65-p.x)*k;p.z+=(L.z-Math.sin(L.h)*.65-p.z)*k;p.h=lerpAngle(p.h,L.h,Math.min(1,dt*6));p.yaw=L.yaw;
+    {const ex=(L.x+Math.cos(L.h)*.65-p.x)*k,ez=(L.z-Math.sin(L.h)*.65-p.z)*k,el=Math.hypot(ex,ez),cap=Math.max(p.sp,L.sp)*1.8*dt,f=el>cap?cap/el:1;p.x+=ex*f;p.z+=ez*f;}p.h=lerpAngle(p.h,L.h,Math.min(1,dt*6));p.yaw=L.yaw;
     const mv=Math.hypot(p.x-px,p.z-pz)/Math.max(dt,1e-3);p.gait=mv>.3?.5:0;p.phase+=(mv>.3?5.4*p.sp:0)*dt;
     dodge(p,M);return;
   }
@@ -3626,7 +3644,7 @@ function stepPed(p,dt,M){
     const prev=[p.x,p.z],q0=pedTarget(p);p.t+=p.dir*p.sp*fast*dt/q0[2];
     if(p.t>1||p.t<0){const at=p.t>1?p.e.b:p.e.a;p.t=clamp(p.t,0,1);pedAtNode(p,at,false);}
     if(p.mode==='walk'){
-      const q=pedTarget(p),k=Math.min(1,dt*3);p.x+=(q[0]-p.x)*k;p.z+=(q[1]-p.z)*k;
+      const q=pedTarget(p),k=Math.min(1,dt*3),ex=(q[0]-p.x)*k,ez=(q[1]-p.z)*k,el=Math.hypot(ex,ez),cap=p.sp*fast*1.6*dt,f=el>cap?cap/el:1;p.x+=ex*f;p.z+=ez*f;
       const mx=p.x-prev[0],mz=p.z-prev[1];if(mx*mx+mz*mz>1e-5)p.h=lerpAngle(p.h,Math.atan2(mx,mz),Math.min(1,dt*6));
       rate=5.4*p.sp*fast;gait=.5;
       if(p.dest&&Math.hypot(p.x-p.dest.x,p.z-p.dest.z)<(p.dest.kind==='shop'?45:8)){
@@ -4990,6 +5008,7 @@ $('#bMap').addEventListener('click',()=>toggleMap());
 $('#bMapClose').addEventListener('click',()=>toggleMap(false));
 $('#bLoad').addEventListener('click',()=>{$('#loader').hidden=false;$('#loadErr').hidden=true;});
 if(matchMedia('(max-width:700px)').matches)$('#help').hidden=true;
+if(PHONE)$('#credit').textContent='© OpenStreetMap (ODbL) · NŽT · TUM (CC BY-NC) · Copernicus';
 
 // ---------- loading ----------
 function idb(){return new Promise((res,rej)=>{try{const r=indexedDB.open('raseiniai-streets',1);r.onupgradeneeded=()=>r.result.createObjectStore('kv');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);}catch(e){rej(e);}});}
