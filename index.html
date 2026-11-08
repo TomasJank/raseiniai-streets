@@ -3199,8 +3199,8 @@ function feelAudio(inCar,c,s){
   easeG(snd.grav,inCar&&c.gnd<2?clamp(s/18,0,1)*(c.gnd===0?.16:.12)*(.85+.3*Math.random()):0);
 }
 // ---------- water: cars can't swim ----------
-// off the road over a pond, lake or river the car glides on a little, noses down and goes under; the screen fades
-// and a repaired car waits at the start, the police gone (as GTA respawns you after drowning)
+// off the road over a pond, lake or river the car glides on a little, noses down and goes under; the screen fades and,
+// as GTA does after drowning, you wake up on foot at Raseinių ligoninė with a bill, the police gone, the car towed outside
 let sinkS=null,splash=null,fadeEl=null,fadeT=0;
 function inWater(x,z){
   const W=world,near=(s,m)=>{const dx=s[2]-s[0],dz=s[3]-s[1],t=clamp(((x-s[0])*dx+(z-s[1])*dz)/(dx*dx+dz*dz||1),0,1);return Math.hypot(x-s[0]-dx*t,z-s[1]-dz*t)<m;};
@@ -3210,9 +3210,24 @@ function inWater(x,z){
   return false;
 }
 function fade(a){if(!fadeEl){fadeEl=document.createElement('div');fadeEl.style.cssText='position:fixed;inset:0;background:#05090c;opacity:0;pointer-events:none;z-index:4';document.body.appendChild(fadeEl);}fadeEl.style.opacity=a;}
-function sinkStep(c,dt){
+// the hospital door: middle of the outline wall that faces the nearest road; the car goes to that road's kerb
+function hospitalSpot(){
+  const W=world,b=W.buildings.find(q=>q.name==='Raseinių ligoninė');if(!b)return null;
+  const P=b.pts;let c=[0,0];for(const q of P){c[0]+=q[0]/P.length;c[1]+=q[1]/P.length;}
+  let best=null;
+  for(let i=0;i<P.length;i++){const a=P[i],e=P[(i+1)%P.length],l=Math.hypot(e[0]-a[0],e[1]-a[1]);if(l<6)continue;
+    let nx=(e[1]-a[1])/l,nz=-(e[0]-a[0])/l;const mx=(a[0]+e[0])/2,mz=(a[1]+e[1])/2;if((mx-c[0])*nx+(mz-c[1])*nz<0){nx=-nx;nz=-nz;}
+    const dx=mx+nx*2.5,dz=mz+nz*2.5;if(W.inBuilding(dx,dz))continue;
+    for(const sg of W.roadSegs(dx,dz)){if(sg[4].cls>2)continue;const vx=sg[2]-sg[0],vz=sg[3]-sg[1],t=clamp(((dx-sg[0])*vx+(dz-sg[1])*vz)/(vx*vx+vz*vz||1),0,1),px=sg[0]+vx*t,pz=sg[1]+vz*t,d=Math.hypot(dx-px,dz-pz);
+      if(!best||d<best.d){const vl=Math.hypot(vx,vz)||1,o=sg[4].w/2-1.2,kx=(dx-px)/(d||1),kz=(dz-pz)/(d||1);best={d,door:[dx,dz,Math.atan2(nx,nz)],car:[px+kx*o+vx/vl*6,pz+kz*o+vz/vl*6,Math.atan2(vx/vl,vz/vl)]};}}}
+  return best;
+}
+function waterTick(dt){
   if(fadeT>0){fadeT=Math.max(0,fadeT-dt);fade(fadeT/.8);}
   if(splash){splash.t+=dt;const k=splash.t/1.1;splash.m.scale.setScalar(1+k*5);splash.m.material.opacity=.7*(1-k);if(k>=1){worldGroup.remove(splash.m);splash.m.geometry.dispose();splash.m.material.dispose();splash=null;}}
+}
+function sinkStep(c,dt){
+  waterTick(dt);
   if(!sinkS){
     if(!inWater(c.x,c.z))return false;
     sinkS={t:0,v:c.speed,y:c.g.position.y,rx:c.g.rotation.x};
@@ -3226,10 +3241,11 @@ function sinkStep(c,dt){
   c.g.position.set(c.x,s.y-Math.min(3,.3*t+.5*t*t),c.z);c.g.rotation.x=s.rx+Math.min(.5,t*.22);
   if(t>2.2)fade(Math.min(1,(t-2.2)/.8));
   if(t>3.2){
-    const [x,z,h]=world.start;sinkS=null;
-    c.x=x;c.z=z;c.h=h;c.trav=h;c.speed=0;c.ride=null;c.hp=1;c.dead=false;fixCar(c);syncCar(c);player.x=x;player.z=z;player.h=h;
-    heat=0;showWanted();while(cops.length)removeCop(cops[0]);snapCamera();fadeT=.8;
-    toast('Back on dry land','A new car at the start. The police lost you.');
+    sinkS=null;const H=hospitalSpot(),bill=Math.min(cash,100);
+    const [x,z,h]=H?H.car:world.start;c.x=x;c.z=z;c.h=h;c.trav=h;c.speed=0;c.ride=null;c.hp=1;c.dead=false;fixCar(c);syncCar(c);
+    if(H){player.mode='foot';player.car=null;personMesh.visible=true;[player.x,player.z,player.h]=H.door;}else{player.x=x;player.z=z;player.h=h;}
+    cash-=bill;money();store();heat=0;showWanted();while(cops.length)removeCop(cops[0]);snapCamera();fadeT=.8;
+    toast(H?'Raseinių ligoninė':'Back on dry land',(bill?'Hospital bill −€'+bill+'. ':'')+(H?'Your car was towed outside.':'The police lost you.'));
   }
   return true;
 }
@@ -3282,7 +3298,7 @@ function driveCar(c,dt){if(sinkStep(c,dt))return;
   player.x=c.x;player.z=c.z;player.h=c.h;
   stuckCheck(c,up,dn,dt);
 }
-function walk(dt){
+function walk(dt){waterTick(dt);
   const run=down('ShiftLeft','ShiftRight'),sp=run?7:3.3;
   const st=(down('KeyA','ArrowLeft')?1:0)-(down('KeyD','ArrowRight')?1:0);
   player.h+=st*2.8*dt;
