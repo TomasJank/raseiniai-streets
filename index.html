@@ -502,7 +502,7 @@ const BRICK=[[.89,.88,.84],[.84,.74,.48],[.65,.36,.25],[.80,.79,.75],[.90,.89,.8
 const WOOD=[[.85,.72,.38],[.49,.60,.42],[.66,.75,.80],[.55,.37,.24],[.79,.56,.29],[.91,.90,.87]];
 const SLATE=[[.55,.56,.55],[.47,.48,.47]];
 // hand-picked looks from photos, keyed by built-in building id
-const LOOK={c1826:{wall:[.86,.83,.73],roof:[.55,.56,.55],sty:STY.brick,pitched:true,hip:false,rh:2.2},c2661:{wall:[.93,.77,.16],roof:[.17,.3,.6],sty:STY.sheet,windows:false},c2663:{wall:[.74,.76,.77],sty:STY.sheet,windows:false},c2135:{wall:[.2,.21,.23],roof:[.3,.3,.31],sty:STY.sheet,windows:false},c1583:{wall:[1,1,1],gable:[.56,.16,.17],roof:[.68,.21,.14],h:3,rh:6,windows:false,hip:false,front:[55.3757589,23.1210282],fence:2.7}, // Vyšnių g. 5A
+const LOOK={c1826:{wall:[.86,.83,.73],roof:[.55,.56,.55],sty:STY.brick,pitched:true,hip:false,rh:2.2},c708:{wall:[.45,.27,.22],roof:[.66,.27,.16],sty:STY.brick,pitched:true,hip:false,h:3.8,rh:4.7},c2661:{wall:[.93,.77,.16],roof:[.17,.3,.6],sty:STY.sheet,windows:false},c2663:{wall:[.74,.76,.77],sty:STY.sheet,windows:false},c2135:{wall:[.2,.21,.23],roof:[.3,.3,.31],sty:STY.sheet,windows:false},c1583:{wall:[1,1,1],gable:[.56,.16,.17],roof:[.68,.21,.14],h:3,rh:6,windows:false,hip:false,front:[55.3757589,23.1210282],fence:2.7}, // Vyšnių g. 5A
   c2134:{wall:[.56,.57,.58],roof:[.36,.37,.36],sty:STY.sheet,windows:false,h:10.85}, // Maxima XX
   c2220:{wall:[.86,.87,.85],sty:-1,windows:false},c92:{roof:[.55,.27,.2],towerRoof:[.56,.26,.18],towerAt:[55.37866,23.12278],towerW:8,towerH:9,spire:.9},c219:{wall:[.95,.95,.93],roof:[.33,.38,.37],towerRoof:[.2,.22,.24],towerW:5,towerH:14,spire:2.4},c171:{wall:[.93,.93,.91],roof:[.5,.5,.49],pitched:false,hip:false,skel:null,tops:null,sty:STY.plaster,h:10,towerW:18,towerH:7,spire:.02,towerRoof:[.6,.6,.59]},c5689:{roofOnly:1,wall:[.12,.17,.36],roof:[.86,.86,.86],stripe:[.95,.78,.12]},c5255:{wall:[.27,.29,.32],roof:[.4,.4,.4],sty:STY.sheet,windows:false,pitched:false,hip:false,skel:null,tops:null,h:4.8},c5688:{roofOnly:1,wall:[.1,.3,.64],roof:[.92,.92,.92],stripe:[.95,.95,.95]},c251:{wall:[.92,.93,.93],roof:[.6,.6,.6],sty:-1,windows:false,pitched:false,hip:false,skel:null,tops:null,h:4.2},c250:{wall:[.93,.94,.94],roof:[.6,.6,.6],sty:STY.sheet,windows:false,pitched:false,hip:false,skel:null,tops:null,h:5.5},c7969:{wall:[.24,.27,.31],roof:[.3,.3,.3],sty:STY.sheet,windows:false,pitched:false,hip:false,skel:null,tops:null},c7167:{roofOnly:1,pumps:0,wall:[.55,.57,.58],roof:[.6,.6,.6]},c3293:{wall:[.7,.66,.58],roof:[.42,.42,.42],sty:-1,windows:false,pitched:false,hip:false,skel:null,tops:null,h:7.2,wing:[0,1,2,[5,0,.6]],wingH:9,wingWall:[.78,.8,.81],wingSty:STY.sheet},c3246:{wall:[.88,.89,.88],roof:[.6,.6,.6],sty:STY.sheet,windows:false,pitched:false,hip:false,skel:null,tops:null,h:3.6},c3235:{wall:[.72,.67,.57],sty:STY.brick,pitched:false,hip:false,skel:null,tops:null},c2159:{wall:[.66,.66,.65],roof:[.40,.40,.40],sty:STY.plaster,h:11,wing:[4,5,6,7,[3,4,.42]],wingH:15,gables:[7,8,5],canopy:[5,6,0,1,4.5],gableRoof:[.42,.27,.21]}}; // next to Maxima XX
 
@@ -4177,7 +4177,7 @@ function updateMore(dt){
   if(streak>save.best)store();
   if((saveT+=dt)>5){saveT=0;store();}
 }
-const MARKS=()=>[...garages.map(g=>[g.x,g.z,MARK_COL.garage]),...races.map(r=>[r.x,r.z,MARK_COL.race]),...storyMarks.map(m=>[m.x,m.z,MARK_COL.story])];
+const MARKS=()=>[...garages.map(g=>[g.x,g.z,MARK_COL.garage]),...races.map(r=>[r.x,r.z,MARK_COL.race]),...storyMarks.map(m=>[m.x,m.z,MARK_COL.story]),...(poker?[[poker.x,poker.z,MARK_COL.poker]]:[])];
 // ---------- story missions: errands for friends, started from green rings ----------
 MARK_COL.story='#2fd47a';LABEL_COL.story=MARK_COL.story;
 const SPOTS={gvidas:[55.3726278,23.1208895,'Pas Gvidą'],energy:[55.3891249,23.1278722,'Energy gym'],gimn:[55.3849963,23.1076177,'Žemaičio gimnazija'],
@@ -4209,6 +4209,26 @@ const STORY=[
     {at:'gvidas',do:'drop',lbl:'Vežk visus',say:['Kompanija vietoje','Gvidas jau atšaldė alų.']}]},
 ];
 let storyPts={},storyMarks=[],storyAway=true;
+// poker at Aivaras's (Gintaro g. 18): drive up, play a hand, lose every time
+MARK_COL.poker='#ff5a4f';LABEL_COL.poker=MARK_COL.poker;
+const POKER_MINE=['pora dvejukų','aukščiausia dama','dvi poros','trys septynetai','tiesė iki devynetų'],
+  POKER_HIS=['karališkas flešas','ketveri tūzai','pilnas namas','flešas','spalvota tiesė'];
+let poker=null,pokerAway=true;
+function buildPoker(){
+  if(poker)worldGroup.remove(poker.ring,poker.sp);poker=null;
+  const [x,z]=LL(55.3724073,23.1402232),n=onRoad(x,z,2,120);if(!n)return;
+  const r=ringOf(MARK_COL.poker,6);r.position.set(n.x,GY(n.x,n.z)+.3,n.z);worldGroup.add(r);
+  poker={x:n.x,z:n.z,ring:r,sp:sign('Pokeris su Aivaru','poker',n.x,n.z,5)};
+}
+function playPoker(){
+  const mine=pick(POKER_MINE),his=pick(POKER_HIS),loss=Math.min(cash,10*Math.round(5+Math.random()*25));
+  save.poker=(save.poker||0)+1;const n=save.poker;
+  toast('Pokeris su Aivaru','Tavo ranka: '+mine+'.');notes([[392,.1],[440,.1]],'triangle',.1);
+  setTimeout(()=>toast('Aivaras: '+his,'Jis net nesišypso.'),2600);
+  setTimeout(()=>{cash=Math.max(0,cash-loss);money();store();
+    toast(loss?'Pralošei €'+loss:'Neturi nė euro',loss?(n>1?'Aivaras laimėjo jau '+n+' kartus iš eilės.':'Gal kitą kartą.'):'Aivaras užrašė skolą.');
+    notes([[330,.15],[262,.3]],'sawtooth',.1);},5200);
+}
 const storyRuns=id=>(save.story||{})[id]||0;
 // ---------- L klubas (Dominikonų g. 6), AUTODALYS next door and Norfa XL, by eye from street photos; no pixels used ----------
 let club=null;
@@ -4249,8 +4269,18 @@ function buildGvidas(){
   const out=(n.x-f.mx)*f.nx+(n.z-f.mz)*f.nz-5.3;
   if(out>5)box(f.L+6,1.8,1.1,0,out,.9,0x3e5a2c);
 }
+function buildAivaras(){
+  // Gintaro g. 18: a row of thujas behind a dark mesh fence on brown posts, along the street 5 m off its centreline
+  const [ax,az]=LL(55.3724752,23.1399376),[bx,bz]=LL(55.3722469,23.1401895),[hx,hz]=LL(55.3724073,23.1402232),L=Math.hypot(bx-ax,bz-az),ux=(bx-ax)/L,uz=(bz-az)/L;
+  let nx=-uz,nz=ux;if((hx-ax)*nx+(hz-az)*nz<0){nx=-nx;nz=-nz;}
+  const thuja=new THREE.ConeGeometry(.5,1,8),green=new THREE.MeshLambertMaterial({color:0x2f4f24}),post=new THREE.MeshLambertMaterial({color:0x5a3a24}),mesh=new THREE.MeshLambertMaterial({color:0x2a2a2a,transparent:true,opacity:.55});
+  const put=(m,s,o,y)=>{const x=ax+ux*s+nx*o,z=az+uz*s+nz*o;m.position.set(x,GY(x,z)+y,z);m.castShadow=true;worldGroup.add(m);return m;};
+  for(let s=0,i=0;s<=L;s+=.95,i++){const h=3.2+hash(i*3.3+.4)*.9,m=new THREE.Mesh(thuja,green);m.scale.set(1,h,1);put(m,s,.7,h/2);}
+  for(let s=0;s<=L+.01;s+=2.5)put(new THREE.Mesh(new THREE.BoxGeometry(.1,1.6,.1),post),s,0,.8);
+  put(new THREE.Mesh(new THREE.BoxGeometry(L,1.5,.03),mesh),L/2,0,.8).rotation.y=Math.atan2(nx,nz);
+}
 function buildClub(){
-  club=null;buildGvidas();
+  club=null;buildGvidas();buildAivaras();
   const f=clubFacade(55.3797531,23.1172891);if(!f)return;
   const top=f.top,band=Math.min(f.L-2,30);
   clubSign(f,band,1.7,0,top-1.1,(g,w,h)=>{g.fillStyle='#1d4c9e';g.fillRect(0,0,w,h);g.fillStyle='#f1c21b';g.fillRect(0,h-26,w,26);signText(g,'BALDŲ CENTRAS',w*.2,h*.45,120,'#fff');signText(g,'PRINTEMA · PREKYVIETĖ',w*.68,h*.45,96,'#fff');});
@@ -4315,7 +4345,7 @@ function buildStory(){
     const dx=p[0]-n.x,dz=p[1]-n.z,d=Math.hypot(dx,dz)||1,k=Math.min(4,d);
     storyPts[st.at]={x:n.x,z:n.z,px:n.x+dx/d*k,pz:n.z+dz/d*k,name};
   }
-  placeStoryMarks();
+  placeStoryMarks();buildPoker();
 }
 const storyOk=s=>s.steps.every(st=>storyPts[st.at])&&(!s.need||STORY.filter(q=>storyRuns(q.id)).length>=s.need);
 function placeStoryMarks(){
@@ -4376,6 +4406,8 @@ function storyTick(c,slow){
     if(!busy&&m.s.steps[0].do==='pick'&&d<150&&(!waiting||d<waiting.d))waiting={m,d};
     if(!busy&&storyAway&&d<7&&(m.s.steps[0].do==='pick'?c&&slow:!c||slow)){startStory(m.s);return;}}
   if(!near)storyAway=true;
+  if(poker){const d=Math.hypot(poker.x-player.x,poker.z-player.z);poker.ring.visible=poker.sp.visible=!busy&&d<600;
+    if(d>15)pokerAway=true;else if(!busy&&pokerAway&&d<7&&(!c||slow)){pokerAway=false;playPoker();}}
   // the friend waiting at a pick-up ring stands on the kerb, unless a taxi fare is using the same figure
   if(taxiWait)return;
   if(busy){if(fare&&fare.mark)fare=null;}
@@ -4879,7 +4911,7 @@ function buildStadium(){
       for(const y of[.55,.98])rr.push([mx,(g0+g1)/2+y,mz,h,.045,.045,L]);
       addWall(x0,z0,x1,z1);}
     if(rp.length){instances(unit,0x7f8588,rp);instances(unit,0x7f8588,rr);}}
-  {const [X,Z]=LL(55.38119,23.11704),G=GY(X,Z),hd=(([fx,fz])=>Math.atan2(X-fx,Z-fz))(LL(55.3813717,23.1174048)),c=Math.cos(hd),s=Math.sin(hd),st=[],fg=[];
+  {const [X,Z]=LL(55.38119,23.11704),G=GY(X,Z),hd=(([sx,sz])=>Math.atan2(sz-Z,X-sx))(LL(55.3808209,23.1160864)),c=Math.cos(hd),s=Math.sin(hd),st=[],fg=[];
     const b=(ox,y,oz,sx,sy,sz,tilt=0,L=st)=>L.push([X+ox*c+oz*s,G+y,Z-ox*s+oz*c,hd,sx,sy,sz,tilt]);
     b(0,.45,0,7.5,.9,7.5);b(0,1.5,0,5,1.2,5);for(const u of[-1,1])for(const v of[-1,1]){b(u*1.95,2.55,v*1.95,1.1,.9,1.1);b(u*1.45,3.85,v*1.45,.7,3.5,.7);}
     b(0,3.85,0,3,3.5,3);b(0,5.8,0,3.9,.4,3.9);b(0,4.3,1.52,1.9,1.3,.06,0,fg);
