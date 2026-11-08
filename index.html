@@ -916,13 +916,14 @@ function buildWorld(ways,meta){
   // Raseinių parkas is wooded throughout (survey photos 2015-26); fill between the paths where the LiDAR tree list is thin
   for(const [name,g] of FAC.parks){if(name!=='Raseinių parkas')continue;const p=g.map(q=>P(q)),pit=FAC.pitches.map(f=>f[3].map(q=>P(q)));
     let mnx=1e9,mxx=-1e9,mnz=1e9,mxz=-1e9;for(const q of p){mnx=Math.min(mnx,q[0]);mxx=Math.max(mxx,q[0]);mnz=Math.min(mnz,q[1]);mxz=Math.max(mxz,q[1]);}
-    for(let i=trees.length;i--;){const t=trees[i];if(t[0]>mnx&&t[0]<mxx&&t[1]>mnz&&t[1]<mxz&&pit.some(q=>pip(t[0],t[1],q)))trees.splice(i,1);}
     const near=trees.filter(t=>t[0]>mnx-10&&t[0]<mxx+10&&t[1]>mnz-10&&t[1]<mxz+10),paths=[];
     for(const r of roadsAll)for(let i=0;i<r.pts.length-1;i++){const a=r.pts[i],b=r.pts[i+1];if(Math.max(a[0],b[0])>mnx-10&&Math.min(a[0],b[0])<mxx+10&&Math.max(a[1],b[1])>mnz-10&&Math.min(a[1],b[1])<mxz+10)paths.push([a,b,r.w/2+2.5]);}
     const ds=(x,z,a,b)=>{const dx=b[0]-a[0],dz=b[1]-a[1],t=Math.max(0,Math.min(1,((x-a[0])*dx+(z-a[1])*dz)/(dx*dx+dz*dz||1)));return Math.hypot(x-a[0]-dx*t,z-a[1]-dz*t);};
     for(let i=0;i<3000;i++){const x=mnx+hash(i*3.1+.7)*(mxx-mnx),z=mnz+hash(i*7.3+.2)*(mxz-mnz);
       if(!pip(x,z,p)||W.inBuilding(x,z)||pit.some(q=>pip(x,z,q))||paths.some(s=>ds(x,z,s[0],s[1])<s[2])||near.some(t=>Math.hypot(t[0]-x,t[1]-z)<9.5))continue;
       const s=.85+hash(i*1.9+.3)*.55,t=[x,z,13*s,3.4*s,hash(i*5.7+.1)<.2];trees.push(t);near.push(t);}}
+  {const pb=FAC.pitches.map(f=>{const q=f[3].map(v=>P(v));return[q,Math.min(...q.map(v=>v[0]))-6,Math.max(...q.map(v=>v[0]))+6,Math.min(...q.map(v=>v[1]))-6,Math.max(...q.map(v=>v[1]))+6];});
+    for(let i=trees.length;i--;){const t=trees[i];if(pb.some(([q,a,b,c,d])=>t[0]>a&&t[0]<b&&t[1]>c&&t[1]<d&&(pip(t[0],t[1],q)||q.some((v,k)=>{const w=q[(k+1)%q.length],dx=w[0]-v[0],dz=w[1]-v[1],u=Math.max(0,Math.min(1,((t[0]-v[0])*dx+(t[1]-v[1])*dz)/(dx*dx+dz*dz||1)));return Math.hypot(t[0]-v[0]-dx*u,t[1]-v[1]-dz*u)<t[3]+1;}))))trees.splice(i,1);}}
   {const S=sqLayout(P),inPond=(x,z)=>W.ponds.some(o=>pip(x,z,o.p)&&!o.H.some(r=>pip(x,z,r)));
     for(let i=trees.length;i--;){const [x,z]=trees[i];if(inPond(x,z)||(S&&pip(x,z,S.p)&&!S.lawns.some(l=>pip(x,z,l))))trees.splice(i,1);}}
   if(trees.length){
@@ -1709,6 +1710,149 @@ const saloonGeo=(()=>{
   }
   return out;
 })();
+const saloonLotGeo=(()=>{
+  const PAINT=[1,1,1],GLASS=[.13,.17,.2],BLACK=[.035,.035,.04],PLASTIC=[.14,.14,.15],CHROME=[.78,.8,.82],WHITE=[.93,.93,.9],LENS=[.2,.2,.21],AMBER=[.86,.36,.07],CLEAR=[.92,.92,.88],RED=[.77,.125,.165],LAMP=[1,.95,.77];
+  const L=()=>({p:[],n:[],c:[]});
+  const paint=L(),trim=L(),head=L(),tail=L(),wheel=L();
+  const tri=(l,a,b,c,na,nb,nc,col)=>{
+    const u=[b[0]-a[0],b[1]-a[1],b[2]-a[2]],v=[c[0]-a[0],c[1]-a[1],c[2]-a[2]];
+    const f=[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]];
+    const flip=f[0]*(na[0]+nb[0]+nc[0])+f[1]*(na[1]+nb[1]+nc[1])+f[2]*(na[2]+nb[2]+nc[2])<0;
+    for(const[q,w]of flip?[[a,na],[c,nc],[b,nb]]:[[a,na],[b,nb],[c,nc]]){l.p.push(...q);l.n.push(...w);l.c.push(...col);}
+  };
+  const mir=q=>[-q[0],q[1],q[2]];
+  // flat panel, mirrored unless it sits on the centre line
+  const quad=(l,A,B,C,D,want,col=PAINT,both=true)=>{
+    tri(l,A,B,C,want,want,want,col);tri(l,A,C,D,want,want,want,col);
+    if(both){const w=mir(want);tri(l,mir(A),mir(B),mir(C),w,w,w,col);tri(l,mir(A),mir(C),mir(D),w,w,w,col);}
+  };
+  const box=(l,x0,x1,y0,y1,z0,z1,col)=>{
+    quad(l,[x1,y0,z0],[x1,y1,z0],[x1,y1,z1],[x1,y0,z1],[1,0,0],col);quad(l,[x0,y0,z0],[x0,y1,z0],[x0,y1,z1],[x0,y0,z1],[-1,0,0],col);
+    quad(l,[x0,y1,z0],[x1,y1,z0],[x1,y1,z1],[x0,y1,z1],[0,1,0],col);quad(l,[x0,y0,z1],[x1,y0,z1],[x1,y1,z1],[x0,y1,z1],[0,0,1],col);quad(l,[x0,y0,z0],[x1,y0,z0],[x1,y1,z0],[x0,y1,z0],[0,0,-1],col);
+  };
+  // smooth skin over stations of right-half sections; pick(i,j) says which list and colour a panel gets
+  const loft=(st,pick)=>{
+    const nor=(i,j)=>{
+      const a=st[Math.min(i+1,st.length-1)][j],b=st[Math.max(i-1,0)][j],c=st[i][Math.min(j+1,st[i].length-1)],d=st[i][Math.max(j-1,0)];
+      const u=[a[0]-b[0],a[1]-b[1],a[2]-b[2]],v=[c[0]-d[0],c[1]-d[1],c[2]-d[2]];
+      const n=[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]];
+      const q=st[i][j],s=(n[0]*q[0]+n[1]*(q[1]-.75)+n[2]*q[2])<0?-1:1,m=Math.hypot(...n)||1;
+      return[n[0]*s/m,n[1]*s/m,n[2]*s/m];
+    };
+    for(let i=0;i<st.length-1;i++)for(let j=0;j<st[i].length-1;j++){
+      const pk=pick(i,j);if(!pk)continue;const[l,col]=pk,A=st[i][j],B=st[i+1][j],C=st[i+1][j+1],D=st[i][j+1],na=nor(i,j),nb=nor(i+1,j),nc=nor(i+1,j+1),nd=nor(i,j+1);
+      tri(l,A,B,C,na,nb,nc,col);tri(l,A,C,D,na,nc,nd,col);
+      tri(l,mir(A),mir(B),mir(C),mir(na),mir(nb),mir(nc),col);tri(l,mir(A),mir(C),mir(D),mir(na),mir(nc),mir(nd),col);
+    }
+  };
+
+  // z, half width, sill, shoulder, crown
+  const LOWER=[[2.2,.76,.3,.68,.72],[2.14,.82,.25,.7,.74],[1.9,.85,.22,.74,.78],[1.715,.85,.22,.765,.805],[1.33,.85,.22,.81,.85],[.945,.85,.22,.855,.895],[.6,.85,.22,.89,.93],[0,.85,.22,.92,.96],[-.6,.85,.22,.94,.98],[-.835,.85,.22,.945,.985],[-1.22,.85,.22,.96,1],[-1.45,.85,.22,.965,1.005],[-1.605,.85,.22,.968,1.008],[-1.9,.84,.22,.975,1.015],[-2.1,.82,.26,.975,1.015],[-2.2,.74,.3,.93,.99]];
+  const ARCH=.385;
+  const sect=([z,w,b,s,t])=>[[0,b,z],[w*.86,b,z],[w*.98,b+.1,z],[w,b+(s-b)*.55,z],[w*.995,s-.03,z],[w*.96,s,z],[w*.86,t-.008,z],[w*.45,t-.001,z],[0,t,z]];
+  const lowerSt=LOWER.map(sect);
+  lowerSt.unshift(lowerSt[0].map(q=>[0,q[1],q[2]]));lowerSt.push(lowerSt[lowerSt.length-1].map(q=>[0,q[1],q[2]]));
+  loft(lowerSt,(i,j)=>{const z=(lowerSt[i][0][2]+lowerSt[i+1][0][2])/2;if(j>=1&&j<=3&&AXLES.some(a=>Math.abs(z-a)<ARCH))return null;return j<2?[trim,PLASTIC]:[paint,PAINT];});
+
+  const belt=z=>{for(let i=0;i<LOWER.length-1;i++){const a=LOWER[i],b=LOWER[i+1];if(z<=a[0]&&z>=b[0])return a[3]+(b[3]-a[3])*(a[0]-z)/(a[0]-b[0]);}return LOWER[0][3];};
+  // z, roof height; 0 closes the end at the shoulder
+  const UPPER=[[1.06,0],[.88,1.03],[.68,1.18],[.5,1.3],[.3,1.39],[.1,1.44],[-.25,1.46],[-.6,1.45],[-.82,1.41],[-1.0,1.34],[-1.18,1.25],[-1.36,1.15],[-1.5,1.08],[-1.62,0]];
+  const upSt=UPPER.map(([z,t])=>{
+    const y=belt(z)-.01,h=t||y+.012,xAt=q=>.77-.17*(q-y)/.44,top=Math.max(y+.001,h-.07),frame=top+Math.min(.015,(h-top)/3);
+    return[[.77,y,z],[xAt(top),top,z],[xAt(frame),frame,z],[xAt(h),h-.008,z],[xAt(h)*.55,h,z],[0,h+.008,z]];
+  });
+  loft(upSt,(i,j)=>{
+    const z=(UPPER[i][0]+UPPER[i+1][0])/2,side=z<.66&&z>-1.08,pillar=(z<-.14&&z>-.22);
+    if(j===0)return side?[trim,pillar?BLACK:GLASS]:[paint,PAINT];
+    if(j===1)return side?[trim,BLACK]:[paint,PAINT];
+    if(j===2)return[paint,PAINT];
+    return z>.36||z<-.86?[trim,GLASS]:[paint,PAINT];
+  });
+  for(const[a,b]of[[[.08,.96,.975],[.6,.96,.915]],[[-.5,.96,.975],[.02,.96,.915]]]){
+    const t=[0,.7,.7];quad(trim,a,b,[b[0],b[1],b[2]+.016],[a[0],a[1],a[2]+.016],t,BLACK,false);}
+
+  // front: black grille, clear lamps, amber corners
+  quad(trim,[-.335,.555,2.206],[.335,.555,2.206],[.335,.69,2.206],[-.335,.69,2.206],[0,0,1],BLACK,false);
+  for(let i=0;i<4;i++)box(trim,-.325,.325,.57+i*.028,.578+i*.028,2.204,2.21,LENS);
+  quad(trim,[.34,.55,2.208],[.735,.55,2.208],[.735,.695,2.208],[.34,.695,2.208],[0,0,1],BLACK);
+  quad(head,[.35,.562,2.212],[.585,.562,2.212],[.585,.683,2.212],[.35,.683,2.212],[0,0,1],[.95,.96,.9]);
+  quad(head,[.595,.562,2.212],[.725,.562,2.212],[.725,.683,2.212],[.595,.683,2.212],[0,0,1],[.8,.85,.85]);
+  quad(head,[.735,.562,2.21],[.805,.562,2.15],[.805,.67,2.15],[.735,.683,2.21],[.65,0,.76],[.93,.6,.28]);
+  // four rings
+  const ring=(cx,cy,z,r,col)=>{const w=[0,0,Math.sign(z)];for(let i=0;i<14;i++){const a=i/14*TAU,b=(i+1)/14*TAU,n=r*.76;
+    quad(trim,[cx+Math.cos(a)*n,cy+Math.sin(a)*n,z],[cx+Math.cos(b)*n,cy+Math.sin(b)*n,z],[cx+Math.cos(b)*r,cy+Math.sin(b)*r,z],[cx+Math.cos(a)*r,cy+Math.sin(a)*r,z],w,col,false);}};
+  
+
+  // rear: boot lid with the rings, then lamps and plate in one band
+  quad(trim,[-.345,.68,-2.206],[.345,.68,-2.206],[.345,.88,-2.206],[-.345,.88,-2.206],[0,0,-1],BLACK,false);
+  quad(trim,[-.27,.72,-2.212],[.27,.72,-2.212],[.27,.84,-2.212],[-.27,.84,-2.212],[0,0,-1],WHITE,false);
+  quad(tail,[.345,.68,-2.206],[.43,.68,-2.206],[.43,.88,-2.206],[.345,.88,-2.206],[0,0,-1],CLEAR);
+  quad(tail,[.43,.68,-2.206],[.68,.68,-2.206],[.68,.885,-2.206],[.43,.88,-2.206],[0,0,-1],RED);
+  quad(tail,[.68,.68,-2.206],[.748,.68,-2.206],[.748,.885,-2.206],[.68,.885,-2.206],[0,0,-1],AMBER);
+  quad(tail,[.748,.68,-2.206],[.834,.68,-2.1],[.834,.885,-2.1],[.748,.885,-2.206],[.7,0,-.7],AMBER);
+  for(const x of[.43,.56,.68])box(trim,x-.005,x+.005,.68,.885,-2.212,-2.206,BLACK);
+  box(trim,.43,.68,.777,.783,-2.212,-2.206,[.22,.02,.03]);
+
+  // deep plastic bumpers running back to the arches, chrome line along the front one
+  const bumper=(pts,y0,y1,col)=>{for(let i=0;i<pts.length-1;i++){const[a,z0]=pts[i],[b,z1]=pts[i+1],nx=z0-z1,nz=b-a,m=Math.hypot(nx,nz),s=z0>0?1:-1,w=[nx/m*s,0,nz/m*s];
+    quad(trim,[a,y0,z0],[b,y0,z1],[b,y1,z1],[a,y1,z0],w,col);quad(trim,[a,y1,z0],[b,y1,z1],[b-.06,y1,z1-.06*s],[a,y1,z0-.06*s],[0,1,0],col);}};
+  const FR=[[0,2.25],[.72,2.24],[.81,2.19],[.858,2.1],[.868,1.9],[.868,1.715]],RR=[[0,-2.25],[.7,-2.24],[.79,-2.19],[.83,-2.1],[.858,-1.6]];
+  bumper(FR,.21,.54,PLASTIC);bumper(RR,.3,.58,PLASTIC);
+  bumper(FR.map(([x,z])=>[x*.995,z-.004*Math.sign(z)]),.54,.556,CHROME);
+  const rib=(x,z)=>[x*1.002,z-.003];
+  bumper(RR.map(([x,z])=>rib(x,z)),.44,.452,BLACK);bumper(RR.map(([x,z])=>rib(x,z)),.35,.36,BLACK);
+  quad(trim,[-.56,.26,2.254],[.56,.26,2.254],[.56,.32,2.254],[-.56,.32,2.254],[0,0,1],BLACK,false);
+  quad(trim,[-.26,.38,2.254],[.26,.38,2.254],[.26,.49,2.254],[-.26,.49,2.254],[0,0,1],WHITE,false);
+
+  // side: wide rub strip between the arches, shut lines, handles at the door ends, mirrors
+  const side=[1,0,0];
+  quad(trim,[.858,.46,.94],[.858,.46,-.83],[.858,.56,-.83],[.858,.56,.94],side,PLASTIC);
+  for(const[z,y0]of[[.72,.33],[-.17,.33],[-1.1,.68]]){
+    if(y0<.6)quad(trim,[.838,y0,z],[.838,y0,z+.012],[.855,.6,z+.012],[.855,.6,z],side,BLACK);
+    quad(trim,[.855,Math.max(y0,.6),z],[.855,Math.max(y0,.6),z+.012],[.83,.92,z+.012],[.83,.92,z],side,BLACK);
+  }
+  for(const z of[-.13,-1.05])quad(trim,[.832,.85,z],[.832,.85,z+.12],[.829,.89,z+.12],[.829,.89,z],side,BLACK);
+  box(trim,.77,.92,.97,1.06,.52,.63,BLACK);
+
+  // arches are cut through the side panel; the dark well behind hides the hollow body
+  const at=z=>{for(let i=0;i<LOWER.length-1;i++){const a=LOWER[i],b=LOWER[i+1];if(z<=a[0]&&z>=b[0]){const t=(a[0]-z)/(a[0]-b[0]);return[a[1]+(b[1]-a[1])*t,a[3]+(b[3]-a[3])*t];}}return[LOWER[0][1],LOWER[0][3]];};
+  for(const az of AXLES){
+    const n=6,col=i=>{const th=-Math.PI/2+i/n*Math.PI;return[az+Math.sin(th)*ARCH,WHEEL_R+Math.cos(th)*ARCH,Math.sin(th),Math.cos(th)];};
+    for(let i=0;i<n;i++){
+      const[z0,y0,s0,c0]=col(i),[z1,y1,s1,c1]=col(i+1),[w0,t0]=at(z0),[w1,t1]=at(z1);
+      quad(paint,[w0,y0,z0],[w1,y1,z1],[w1*.995,t1-.03,z1],[w0*.995,t0-.03,z0],side);
+      quad(trim,[.6,y0,z0],[.6,y1,z1],[w1,y1,z1],[w0,y0,z0],[0,-(c0+c1)/2,-(s0+s1)/2],BLACK);
+      quad(trim,[.6,y0,z0],[.6,y1,z1],[.6,WHEEL_R,z1],[.6,WHEEL_R,z0],side,BLACK);
+    }
+    for(const k of[1,-1])quad(trim,[.6,.22,az+k*ARCH],[.85,.22,az+k*ARCH],[.85,WHEEL_R,az+k*ARCH],[.6,WHEEL_R,az+k*ARCH],[0,0,-k],BLACK);
+    quad(trim,[.6,.22,az-ARCH],[.6,.22,az+ARCH],[.6,WHEEL_R,az+ARCH],[.6,WHEEL_R,az-ARCH],side,BLACK);
+  }
+
+  // one wheel centred on its hub, outer face at +x; ribs and slots make the spin visible
+  const N=32,R=WHEEL_R;
+  for(let i=0;i<N;i++){
+    const a=i/N*TAU,b=(i+1)/N*TAU,s=[Math.cos(a),Math.sin(a)],e=[Math.cos(b),Math.sin(b)],P=(x,r,q)=>[x,q[0]*r,q[1]*r];
+    const ann=(x,r0,r1,col)=>quad(wheel,P(x,r0,s),P(x,r0,e),P(x,r1,e),P(x,r1,s),side,col,false);
+    quad(wheel,P(-.1,R,s),P(-.1,R,e),P(.1,R,e),P(.1,R,s),[0,s[0],s[1]],i%2?[.06,.06,.065]:[.035,.035,.04],false);
+    ann(.1,R,.215,[.045,.045,.05]);
+    quad(wheel,P(-.1,R,s),P(-.1,R,e),P(-.1,.001,e),P(-.1,.001,s),[-1,0,0],BLACK,false);
+    ann(.102,.215,.2,[.52,.53,.54]);
+    ann(.104,.2,.17,[.8,.8,.77]);
+    ann(.106,.17,.04,i%8===0?[.62,.62,.6]:[.9,.9,.87]);
+    ann(.108,.04,.001,[.6,.61,.62]);
+  }
+
+  const out={};
+  // glass darkens towards the door and picks up the sky higher up
+  for(let i=0;i<trim.c.length;i+=3)if(trim.c[i]===GLASS[0]&&trim.c[i+1]===GLASS[1]&&trim.c[i+2]===GLASS[2]){
+    const k=clamp((trim.p[i+1]-.95)/.45,0,1);trim.c[i]=.09+k*.33;trim.c[i+1]=.12+k*.38;trim.c[i+2]=.15+k*.41;}
+  for(const[k,l]of Object.entries({paint,trim,head,tail,wheel})){
+    const g=new THREE.BufferGeometry();
+    g.setAttribute('position',new THREE.Float32BufferAttribute(l.p,3));g.setAttribute('normal',new THREE.Float32BufferAttribute(l.n,3));g.setAttribute('color',new THREE.Float32BufferAttribute(l.c,3));
+    g.userData.keep=true;out[k]=g;
+  }
+  return out;
+})();
 const estateGeo=(()=>{
   const PAINT=[1,1,1],GLASS=[.13,.17,.2],BLACK=[.035,.035,.04],PLASTIC=[.14,.14,.15],CHROME=[.78,.8,.82],WHITE=[.93,.93,.9],LENS=[.2,.2,.21],AMBER=[.86,.36,.07],CLEAR=[.92,.92,.88],RED=[.77,.125,.165],LAMP=[1,.95,.77];
   const L=()=>({p:[],n:[],c:[]});
@@ -1817,6 +1961,149 @@ const estateGeo=(()=>{
   const at=z=>{for(let i=0;i<LOWER.length-1;i++){const a=LOWER[i],b=LOWER[i+1];if(z<=a[0]&&z>=b[0]){const t=(a[0]-z)/(a[0]-b[0]);return[a[1]+(b[1]-a[1])*t,a[3]+(b[3]-a[3])*t];}}return[LOWER[0][1],LOWER[0][3]];};
   for(const az of AXLES){
     const n=20,col=i=>{const th=-Math.PI/2+i/n*Math.PI;return[az+Math.sin(th)*ARCH,WHEEL_R+Math.cos(th)*ARCH,Math.sin(th),Math.cos(th)];};
+    for(let i=0;i<n;i++){
+      const[z0,y0,s0,c0]=col(i),[z1,y1,s1,c1]=col(i+1),[w0,t0]=at(z0),[w1,t1]=at(z1);
+      quad(paint,[w0,y0,z0],[w1,y1,z1],[w1*.995,t1-.03,z1],[w0*.995,t0-.03,z0],side);
+      quad(trim,[.6,y0,z0],[.6,y1,z1],[w1,y1,z1],[w0,y0,z0],[0,-(c0+c1)/2,-(s0+s1)/2],BLACK);
+      quad(trim,[.6,y0,z0],[.6,y1,z1],[.6,WHEEL_R,z1],[.6,WHEEL_R,z0],side,BLACK);
+    }
+    for(const k of[1,-1])quad(trim,[.6,.22,az+k*ARCH],[.85,.22,az+k*ARCH],[.85,WHEEL_R,az+k*ARCH],[.6,WHEEL_R,az+k*ARCH],[0,0,-k],BLACK);
+    quad(trim,[.6,.22,az-ARCH],[.6,.22,az+ARCH],[.6,WHEEL_R,az+ARCH],[.6,WHEEL_R,az-ARCH],side,BLACK);
+  }
+
+  // one wheel centred on its hub, outer face at +x; ribs and slots make the spin visible
+  const N=32,R=WHEEL_R;
+  for(let i=0;i<N;i++){
+    const a=i/N*TAU,b=(i+1)/N*TAU,s=[Math.cos(a),Math.sin(a)],e=[Math.cos(b),Math.sin(b)],P=(x,r,q)=>[x,q[0]*r,q[1]*r];
+    const ann=(x,r0,r1,col)=>quad(wheel,P(x,r0,s),P(x,r0,e),P(x,r1,e),P(x,r1,s),side,col,false);
+    quad(wheel,P(-.1,R,s),P(-.1,R,e),P(.1,R,e),P(.1,R,s),[0,s[0],s[1]],i%2?[.06,.06,.065]:[.035,.035,.04],false);
+    ann(.1,R,.215,[.045,.045,.05]);
+    quad(wheel,P(-.1,R,s),P(-.1,R,e),P(-.1,.001,e),P(-.1,.001,s),[-1,0,0],BLACK,false);
+    ann(.102,.215,.2,[.52,.53,.54]);
+    ann(.104,.2,.17,[.8,.8,.77]);
+    ann(.106,.17,.04,i%8===0?[.62,.62,.6]:[.9,.9,.87]);
+    ann(.108,.04,.001,[.6,.61,.62]);
+  }
+
+  const out={};
+  // glass darkens towards the door and picks up the sky higher up
+  for(let i=0;i<trim.c.length;i+=3)if(trim.c[i]===GLASS[0]&&trim.c[i+1]===GLASS[1]&&trim.c[i+2]===GLASS[2]){
+    const k=clamp((trim.p[i+1]-.95)/.45,0,1);trim.c[i]=.09+k*.33;trim.c[i+1]=.12+k*.38;trim.c[i+2]=.15+k*.41;}
+  for(const[k,l]of Object.entries({paint,trim,head,tail,wheel})){
+    const g=new THREE.BufferGeometry();
+    g.setAttribute('position',new THREE.Float32BufferAttribute(l.p,3));g.setAttribute('normal',new THREE.Float32BufferAttribute(l.n,3));g.setAttribute('color',new THREE.Float32BufferAttribute(l.c,3));
+    g.userData.keep=true;out[k]=g;
+  }
+  return out;
+})();
+const estateLotGeo=(()=>{
+  const PAINT=[1,1,1],GLASS=[.13,.17,.2],BLACK=[.035,.035,.04],PLASTIC=[.14,.14,.15],CHROME=[.78,.8,.82],WHITE=[.93,.93,.9],LENS=[.2,.2,.21],AMBER=[.86,.36,.07],CLEAR=[.92,.92,.88],RED=[.77,.125,.165],LAMP=[1,.95,.77];
+  const L=()=>({p:[],n:[],c:[]});
+  const paint=L(),trim=L(),head=L(),tail=L(),wheel=L();
+  const tri=(l,a,b,c,na,nb,nc,col)=>{
+    const u=[b[0]-a[0],b[1]-a[1],b[2]-a[2]],v=[c[0]-a[0],c[1]-a[1],c[2]-a[2]];
+    const f=[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]];
+    const flip=f[0]*(na[0]+nb[0]+nc[0])+f[1]*(na[1]+nb[1]+nc[1])+f[2]*(na[2]+nb[2]+nc[2])<0;
+    for(const[q,w]of flip?[[a,na],[c,nc],[b,nb]]:[[a,na],[b,nb],[c,nc]]){l.p.push(...q);l.n.push(...w);l.c.push(...col);}
+  };
+  const mir=q=>[-q[0],q[1],q[2]];
+  // flat panel, mirrored unless it sits on the centre line
+  const quad=(l,A,B,C,D,want,col=PAINT,both=true)=>{
+    tri(l,A,B,C,want,want,want,col);tri(l,A,C,D,want,want,want,col);
+    if(both){const w=mir(want);tri(l,mir(A),mir(B),mir(C),w,w,w,col);tri(l,mir(A),mir(C),mir(D),w,w,w,col);}
+  };
+  const box=(l,x0,x1,y0,y1,z0,z1,col)=>{
+    quad(l,[x1,y0,z0],[x1,y1,z0],[x1,y1,z1],[x1,y0,z1],[1,0,0],col);quad(l,[x0,y0,z0],[x0,y1,z0],[x0,y1,z1],[x0,y0,z1],[-1,0,0],col);
+    quad(l,[x0,y1,z0],[x1,y1,z0],[x1,y1,z1],[x0,y1,z1],[0,1,0],col);quad(l,[x0,y0,z1],[x1,y0,z1],[x1,y1,z1],[x0,y1,z1],[0,0,1],col);quad(l,[x0,y0,z0],[x1,y0,z0],[x1,y1,z0],[x0,y1,z0],[0,0,-1],col);
+  };
+  // smooth skin over stations of right-half sections; pick(i,j) says which list and colour a panel gets
+  const loft=(st,pick)=>{
+    const nor=(i,j)=>{
+      const a=st[Math.min(i+1,st.length-1)][j],b=st[Math.max(i-1,0)][j],c=st[i][Math.min(j+1,st[i].length-1)],d=st[i][Math.max(j-1,0)];
+      const u=[a[0]-b[0],a[1]-b[1],a[2]-b[2]],v=[c[0]-d[0],c[1]-d[1],c[2]-d[2]];
+      const n=[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]];
+      const q=st[i][j],s=(n[0]*q[0]+n[1]*(q[1]-.75)+n[2]*q[2])<0?-1:1,m=Math.hypot(...n)||1;
+      return[n[0]*s/m,n[1]*s/m,n[2]*s/m];
+    };
+    for(let i=0;i<st.length-1;i++)for(let j=0;j<st[i].length-1;j++){
+      const pk=pick(i,j);if(!pk)continue;const[l,col]=pk,A=st[i][j],B=st[i+1][j],C=st[i+1][j+1],D=st[i][j+1],na=nor(i,j),nb=nor(i+1,j),nc=nor(i+1,j+1),nd=nor(i,j+1);
+      tri(l,A,B,C,na,nb,nc,col);tri(l,A,C,D,na,nc,nd,col);
+      tri(l,mir(A),mir(B),mir(C),mir(na),mir(nb),mir(nc),col);tri(l,mir(A),mir(C),mir(D),mir(na),mir(nc),mir(nd),col);
+    }
+  };
+
+  // z, half width, sill, shoulder, crown
+  const LOWER=[[2.2,.76,.3,.68,.72],[2.14,.82,.25,.7,.74],[1.9,.85,.22,.74,.78],[1.715,.85,.22,.765,.805],[1.33,.85,.22,.81,.85],[.945,.85,.22,.855,.895],[.6,.85,.22,.89,.93],[0,.85,.22,.92,.96],[-.6,.85,.22,.94,.98],[-.835,.85,.22,.945,.985],[-1.22,.85,.22,.96,1],[-1.45,.85,.22,.965,1.005],[-1.605,.85,.22,.968,1.008],[-1.9,.84,.22,.975,1.015],[-2.1,.82,.26,.975,1.015],[-2.2,.74,.3,.93,.99]];
+  const ARCH=.385;
+  const sect=([z,w,b,s,t])=>[[0,b,z],[w*.86,b,z],[w*.98,b+.1,z],[w,b+(s-b)*.55,z],[w*.995,s-.03,z],[w*.96,s,z],[w*.86,t-.008,z],[w*.45,t-.001,z],[0,t,z]];
+  const lowerSt=LOWER.map(sect);
+  lowerSt.unshift(lowerSt[0].map(q=>[0,q[1],q[2]]));lowerSt.push(lowerSt[lowerSt.length-1].map(q=>[0,q[1],q[2]]));
+  loft(lowerSt,(i,j)=>{const z=(lowerSt[i][0][2]+lowerSt[i+1][0][2])/2;if(j>=1&&j<=3&&AXLES.some(a=>Math.abs(z-a)<ARCH))return null;return j<2?[trim,PLASTIC]:[paint,PAINT];});
+
+  const belt=z=>{for(let i=0;i<LOWER.length-1;i++){const a=LOWER[i],b=LOWER[i+1];if(z<=a[0]&&z>=b[0])return a[3]+(b[3]-a[3])*(a[0]-z)/(a[0]-b[0]);}return LOWER[0][3];};
+  // z, roof height; 0 closes the end at the shoulder
+  const UPPER=[[1.06,0],[.88,1.03],[.68,1.18],[.5,1.3],[.3,1.39],[.1,1.44],[-.3,1.46],[-.9,1.455],[-1.4,1.44],[-1.7,1.42],[-1.88,1.39],[-1.98,1.32],[-2.04,1.2],[-2.08,0]];
+  const upSt=UPPER.map(([z,t])=>{
+    const y=belt(z)-.01,h=t||y+.012,xAt=q=>.77-.17*(q-y)/.44,top=Math.max(y+.001,h-.07),frame=top+Math.min(.015,(h-top)/3);
+    return[[.77,y,z],[xAt(top),top,z],[xAt(frame),frame,z],[xAt(h),h-.008,z],[xAt(h)*.55,h,z],[0,h+.008,z]];
+  });
+  loft(upSt,(i,j)=>{
+    const z=(UPPER[i][0]+UPPER[i+1][0])/2,side=z<.66&&z>-1.9,pillar=(z<-.14&&z>-.22)||(z<-1.12&&z>-1.2);
+    if(j===0)return side?[trim,pillar?BLACK:GLASS]:[paint,PAINT];
+    if(j===1)return side?[trim,BLACK]:[paint,PAINT];
+    if(j===2)return[paint,PAINT];
+    return z>.36||z<-1.95?[trim,GLASS]:[paint,PAINT];
+  });
+  for(const[a,b]of[[[.08,.96,.975],[.6,.96,.915]],[[-.5,.96,.975],[.02,.96,.915]]]){
+    const t=[0,.7,.7];quad(trim,a,b,[b[0],b[1],b[2]+.016],[a[0],a[1],a[2]+.016],t,BLACK,false);}
+
+  // front: black grille, clear lamps, amber corners
+  quad(trim,[-.335,.555,2.206],[.335,.555,2.206],[.335,.69,2.206],[-.335,.69,2.206],[0,0,1],BLACK,false);
+  for(let i=0;i<4;i++)box(trim,-.325,.325,.57+i*.028,.578+i*.028,2.204,2.21,LENS);
+  quad(trim,[.34,.55,2.208],[.735,.55,2.208],[.735,.695,2.208],[.34,.695,2.208],[0,0,1],BLACK);
+  quad(head,[.35,.562,2.212],[.585,.562,2.212],[.585,.683,2.212],[.35,.683,2.212],[0,0,1],[.95,.96,.9]);
+  quad(head,[.595,.562,2.212],[.725,.562,2.212],[.725,.683,2.212],[.595,.683,2.212],[0,0,1],[.8,.85,.85]);
+  quad(head,[.735,.562,2.21],[.805,.562,2.15],[.805,.67,2.15],[.735,.683,2.21],[.65,0,.76],[.93,.6,.28]);
+  // four rings
+  const ring=(cx,cy,z,r,col)=>{const w=[0,0,Math.sign(z)];for(let i=0;i<14;i++){const a=i/14*TAU,b=(i+1)/14*TAU,n=r*.76;
+    quad(trim,[cx+Math.cos(a)*n,cy+Math.sin(a)*n,z],[cx+Math.cos(b)*n,cy+Math.sin(b)*n,z],[cx+Math.cos(b)*r,cy+Math.sin(b)*r,z],[cx+Math.cos(a)*r,cy+Math.sin(a)*r,z],w,col,false);}};
+  
+
+  // rear: boot lid with the rings, then lamps and plate in one band
+  quad(trim,[-.345,.68,-2.206],[.345,.68,-2.206],[.345,.88,-2.206],[-.345,.88,-2.206],[0,0,-1],BLACK,false);
+  quad(trim,[-.27,.72,-2.212],[.27,.72,-2.212],[.27,.84,-2.212],[-.27,.84,-2.212],[0,0,-1],WHITE,false);
+  quad(tail,[.345,.68,-2.206],[.43,.68,-2.206],[.43,.88,-2.206],[.345,.88,-2.206],[0,0,-1],CLEAR);
+  quad(tail,[.43,.68,-2.206],[.68,.68,-2.206],[.68,.885,-2.206],[.43,.88,-2.206],[0,0,-1],RED);
+  quad(tail,[.68,.68,-2.206],[.748,.68,-2.206],[.748,.885,-2.206],[.68,.885,-2.206],[0,0,-1],AMBER);
+  quad(tail,[.748,.68,-2.206],[.834,.68,-2.1],[.834,.885,-2.1],[.748,.885,-2.206],[.7,0,-.7],AMBER);
+  for(const x of[.43,.56,.68])box(trim,x-.005,x+.005,.68,.885,-2.212,-2.206,BLACK);
+  box(trim,.43,.68,.777,.783,-2.212,-2.206,[.22,.02,.03]);
+
+  // deep plastic bumpers running back to the arches, chrome line along the front one
+  const bumper=(pts,y0,y1,col)=>{for(let i=0;i<pts.length-1;i++){const[a,z0]=pts[i],[b,z1]=pts[i+1],nx=z0-z1,nz=b-a,m=Math.hypot(nx,nz),s=z0>0?1:-1,w=[nx/m*s,0,nz/m*s];
+    quad(trim,[a,y0,z0],[b,y0,z1],[b,y1,z1],[a,y1,z0],w,col);quad(trim,[a,y1,z0],[b,y1,z1],[b-.06,y1,z1-.06*s],[a,y1,z0-.06*s],[0,1,0],col);}};
+  const FR=[[0,2.25],[.72,2.24],[.81,2.19],[.858,2.1],[.868,1.9],[.868,1.715]],RR=[[0,-2.25],[.7,-2.24],[.79,-2.19],[.83,-2.1],[.858,-1.6]];
+  bumper(FR,.21,.54,PLASTIC);bumper(RR,.3,.58,PLASTIC);
+  bumper(FR.map(([x,z])=>[x*.995,z-.004*Math.sign(z)]),.54,.556,CHROME);
+  const rib=(x,z)=>[x*1.002,z-.003];
+  bumper(RR.map(([x,z])=>rib(x,z)),.44,.452,BLACK);bumper(RR.map(([x,z])=>rib(x,z)),.35,.36,BLACK);
+  quad(trim,[-.56,.26,2.254],[.56,.26,2.254],[.56,.32,2.254],[-.56,.32,2.254],[0,0,1],BLACK,false);
+  quad(trim,[-.26,.38,2.254],[.26,.38,2.254],[.26,.49,2.254],[-.26,.49,2.254],[0,0,1],WHITE,false);
+
+  // side: wide rub strip between the arches, shut lines, handles at the door ends, mirrors
+  const side=[1,0,0];
+  quad(trim,[.858,.46,.94],[.858,.46,-.83],[.858,.56,-.83],[.858,.56,.94],side,PLASTIC);
+  for(const[z,y0]of[[.72,.33],[-.17,.33],[-1.1,.68]]){
+    if(y0<.6)quad(trim,[.838,y0,z],[.838,y0,z+.012],[.855,.6,z+.012],[.855,.6,z],side,BLACK);
+    quad(trim,[.855,Math.max(y0,.6),z],[.855,Math.max(y0,.6),z+.012],[.83,.92,z+.012],[.83,.92,z],side,BLACK);
+  }
+  for(const z of[-.13,-1.05])quad(trim,[.832,.85,z],[.832,.85,z+.12],[.829,.89,z+.12],[.829,.89,z],side,BLACK);
+  box(trim,.77,.92,.97,1.06,.52,.63,BLACK);
+
+  // arches are cut through the side panel; the dark well behind hides the hollow body
+  const at=z=>{for(let i=0;i<LOWER.length-1;i++){const a=LOWER[i],b=LOWER[i+1];if(z<=a[0]&&z>=b[0]){const t=(a[0]-z)/(a[0]-b[0]);return[a[1]+(b[1]-a[1])*t,a[3]+(b[3]-a[3])*t];}}return[LOWER[0][1],LOWER[0][3]];};
+  for(const az of AXLES){
+    const n=6,col=i=>{const th=-Math.PI/2+i/n*Math.PI;return[az+Math.sin(th)*ARCH,WHEEL_R+Math.cos(th)*ARCH,Math.sin(th),Math.cos(th)];};
     for(let i=0;i<n;i++){
       const[z0,y0,s0,c0]=col(i),[z1,y1,s1,c1]=col(i+1),[w0,t0]=at(z0),[w1,t1]=at(z1);
       quad(paint,[w0,y0,z0],[w1,y1,z1],[w1*.995,t1-.03,z1],[w0*.995,t0-.03,z0],side);
@@ -1995,6 +2282,149 @@ const mpvGeo=(()=>{
   }
   return out;
 })();
+const mpvLotGeo=(()=>{
+  const PAINT=[1,1,1],GLASS=[.13,.17,.2],BLACK=[.035,.035,.04],PLASTIC=[.14,.14,.15],CHROME=[.78,.8,.82],WHITE=[.93,.93,.9],LENS=[.2,.2,.21],AMBER=[.86,.36,.07],CLEAR=[.92,.92,.88],RED=[.77,.125,.165],LAMP=[1,.95,.77];
+  const L=()=>({p:[],n:[],c:[]});
+  const paint=L(),trim=L(),head=L(),tail=L(),wheel=L();
+  const tri=(l,a,b,c,na,nb,nc,col)=>{
+    const u=[b[0]-a[0],b[1]-a[1],b[2]-a[2]],v=[c[0]-a[0],c[1]-a[1],c[2]-a[2]];
+    const f=[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]];
+    const flip=f[0]*(na[0]+nb[0]+nc[0])+f[1]*(na[1]+nb[1]+nc[1])+f[2]*(na[2]+nb[2]+nc[2])<0;
+    for(const[q,w]of flip?[[a,na],[c,nc],[b,nb]]:[[a,na],[b,nb],[c,nc]]){l.p.push(...q);l.n.push(...w);l.c.push(...col);}
+  };
+  const mir=q=>[-q[0],q[1],q[2]];
+  // flat panel, mirrored unless it sits on the centre line
+  const quad=(l,A,B,C,D,want,col=PAINT,both=true)=>{
+    tri(l,A,B,C,want,want,want,col);tri(l,A,C,D,want,want,want,col);
+    if(both){const w=mir(want);tri(l,mir(A),mir(B),mir(C),w,w,w,col);tri(l,mir(A),mir(C),mir(D),w,w,w,col);}
+  };
+  const box=(l,x0,x1,y0,y1,z0,z1,col)=>{
+    quad(l,[x1,y0,z0],[x1,y1,z0],[x1,y1,z1],[x1,y0,z1],[1,0,0],col);quad(l,[x0,y0,z0],[x0,y1,z0],[x0,y1,z1],[x0,y0,z1],[-1,0,0],col);
+    quad(l,[x0,y1,z0],[x1,y1,z0],[x1,y1,z1],[x0,y1,z1],[0,1,0],col);quad(l,[x0,y0,z1],[x1,y0,z1],[x1,y1,z1],[x0,y1,z1],[0,0,1],col);quad(l,[x0,y0,z0],[x1,y0,z0],[x1,y1,z0],[x0,y1,z0],[0,0,-1],col);
+  };
+  // smooth skin over stations of right-half sections; pick(i,j) says which list and colour a panel gets
+  const loft=(st,pick)=>{
+    const nor=(i,j)=>{
+      const a=st[Math.min(i+1,st.length-1)][j],b=st[Math.max(i-1,0)][j],c=st[i][Math.min(j+1,st[i].length-1)],d=st[i][Math.max(j-1,0)];
+      const u=[a[0]-b[0],a[1]-b[1],a[2]-b[2]],v=[c[0]-d[0],c[1]-d[1],c[2]-d[2]];
+      const n=[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]];
+      const q=st[i][j],s=(n[0]*q[0]+n[1]*(q[1]-.75)+n[2]*q[2])<0?-1:1,m=Math.hypot(...n)||1;
+      return[n[0]*s/m,n[1]*s/m,n[2]*s/m];
+    };
+    for(let i=0;i<st.length-1;i++)for(let j=0;j<st[i].length-1;j++){
+      const pk=pick(i,j);if(!pk)continue;const[l,col]=pk,A=st[i][j],B=st[i+1][j],C=st[i+1][j+1],D=st[i][j+1],na=nor(i,j),nb=nor(i+1,j),nc=nor(i+1,j+1),nd=nor(i,j+1);
+      tri(l,A,B,C,na,nb,nc,col);tri(l,A,C,D,na,nc,nd,col);
+      tri(l,mir(A),mir(B),mir(C),mir(na),mir(nb),mir(nc),col);tri(l,mir(A),mir(C),mir(D),mir(na),mir(nc),mir(nd),col);
+    }
+  };
+
+  // z, half width, sill, shoulder, crown
+  const LOWER=[[2.2,.76,.3,.68,.72],[2.14,.82,.25,.7,.74],[1.9,.85,.22,.74,.78],[1.715,.85,.22,.765,.805],[1.33,.85,.22,.81,.85],[.945,.85,.22,.855,.895],[.6,.85,.22,.89,.93],[0,.85,.22,.92,.96],[-.6,.85,.22,.94,.98],[-.835,.85,.22,.945,.985],[-1.22,.85,.22,.96,1],[-1.45,.85,.22,.965,1.005],[-1.605,.85,.22,.968,1.008],[-1.9,.84,.22,.975,1.015],[-2.1,.82,.26,.975,1.015],[-2.2,.74,.3,.93,.99]];
+  const ARCH=.385;
+  const sect=([z,w,b,s,t])=>[[0,b,z],[w*.86,b,z],[w*.98,b+.1,z],[w,b+(s-b)*.55,z],[w*.995,s-.03,z],[w*.96,s,z],[w*.86,t-.008,z],[w*.45,t-.001,z],[0,t,z]];
+  const lowerSt=LOWER.map(sect);
+  lowerSt.unshift(lowerSt[0].map(q=>[0,q[1],q[2]]));lowerSt.push(lowerSt[lowerSt.length-1].map(q=>[0,q[1],q[2]]));
+  loft(lowerSt,(i,j)=>{const z=(lowerSt[i][0][2]+lowerSt[i+1][0][2])/2;if(j>=1&&j<=3&&AXLES.some(a=>Math.abs(z-a)<ARCH))return null;return j<2?[trim,PLASTIC]:[paint,PAINT];});
+
+  const belt=z=>{for(let i=0;i<LOWER.length-1;i++){const a=LOWER[i],b=LOWER[i+1];if(z<=a[0]&&z>=b[0])return a[3]+(b[3]-a[3])*(a[0]-z)/(a[0]-b[0]);}return LOWER[0][3];};
+  // z, roof height; 0 closes the end at the shoulder
+  const UPPER=[[1.38,0],[1.22,1.02],[1.0,1.22],[.78,1.4],[.55,1.53],[.3,1.6],[0,1.63],[-.6,1.63],[-1.2,1.62],[-1.65,1.6],[-1.9,1.56],[-2.02,1.45],[-2.08,1.25],[-2.1,0]];
+  const upSt=UPPER.map(([z,t])=>{
+    const y=belt(z)-.01,h=t||y+.012,xAt=q=>.77-.17*(q-y)/.44,top=Math.max(y+.001,h-.07),frame=top+Math.min(.015,(h-top)/3);
+    return[[.77,y,z],[xAt(top),top,z],[xAt(frame),frame,z],[xAt(h),h-.008,z],[xAt(h)*.55,h,z],[0,h+.008,z]];
+  });
+  loft(upSt,(i,j)=>{
+    const z=(UPPER[i][0]+UPPER[i+1][0])/2,side=z<1.0&&z>-1.95,pillar=(z<-.05&&z>-.13)||(z<-1.0&&z>-1.08);
+    if(j===0)return side?[trim,pillar?BLACK:GLASS]:[paint,PAINT];
+    if(j===1)return side?[trim,BLACK]:[paint,PAINT];
+    if(j===2)return[paint,PAINT];
+    return z>.5||z<-1.95?[trim,GLASS]:[paint,PAINT];
+  });
+  for(const[a,b]of[[[.08,.96,.975],[.6,.96,.915]],[[-.5,.96,.975],[.02,.96,.915]]]){
+    const t=[0,.7,.7];quad(trim,a,b,[b[0],b[1],b[2]+.016],[a[0],a[1],a[2]+.016],t,BLACK,false);}
+
+  // front: black grille, clear lamps, amber corners
+  quad(trim,[-.335,.555,2.206],[.335,.555,2.206],[.335,.69,2.206],[-.335,.69,2.206],[0,0,1],BLACK,false);
+  for(let i=0;i<4;i++)box(trim,-.325,.325,.57+i*.028,.578+i*.028,2.204,2.21,LENS);
+  quad(trim,[.34,.55,2.208],[.735,.55,2.208],[.735,.695,2.208],[.34,.695,2.208],[0,0,1],BLACK);
+  quad(head,[.35,.562,2.212],[.585,.562,2.212],[.585,.683,2.212],[.35,.683,2.212],[0,0,1],[.95,.96,.9]);
+  quad(head,[.595,.562,2.212],[.725,.562,2.212],[.725,.683,2.212],[.595,.683,2.212],[0,0,1],[.8,.85,.85]);
+  quad(head,[.735,.562,2.21],[.805,.562,2.15],[.805,.67,2.15],[.735,.683,2.21],[.65,0,.76],[.93,.6,.28]);
+  // four rings
+  const ring=(cx,cy,z,r,col)=>{const w=[0,0,Math.sign(z)];for(let i=0;i<14;i++){const a=i/14*TAU,b=(i+1)/14*TAU,n=r*.76;
+    quad(trim,[cx+Math.cos(a)*n,cy+Math.sin(a)*n,z],[cx+Math.cos(b)*n,cy+Math.sin(b)*n,z],[cx+Math.cos(b)*r,cy+Math.sin(b)*r,z],[cx+Math.cos(a)*r,cy+Math.sin(a)*r,z],w,col,false);}};
+  
+
+  // rear: boot lid with the rings, then lamps and plate in one band
+  quad(trim,[-.345,.68,-2.206],[.345,.68,-2.206],[.345,.88,-2.206],[-.345,.88,-2.206],[0,0,-1],BLACK,false);
+  quad(trim,[-.27,.72,-2.212],[.27,.72,-2.212],[.27,.84,-2.212],[-.27,.84,-2.212],[0,0,-1],WHITE,false);
+  quad(tail,[.345,.68,-2.206],[.43,.68,-2.206],[.43,.88,-2.206],[.345,.88,-2.206],[0,0,-1],CLEAR);
+  quad(tail,[.43,.68,-2.206],[.68,.68,-2.206],[.68,.885,-2.206],[.43,.88,-2.206],[0,0,-1],RED);
+  quad(tail,[.68,.68,-2.206],[.748,.68,-2.206],[.748,.885,-2.206],[.68,.885,-2.206],[0,0,-1],AMBER);
+  quad(tail,[.748,.68,-2.206],[.834,.68,-2.1],[.834,.885,-2.1],[.748,.885,-2.206],[.7,0,-.7],AMBER);
+  for(const x of[.43,.56,.68])box(trim,x-.005,x+.005,.68,.885,-2.212,-2.206,BLACK);
+  box(trim,.43,.68,.777,.783,-2.212,-2.206,[.22,.02,.03]);
+
+  // deep plastic bumpers running back to the arches, chrome line along the front one
+  const bumper=(pts,y0,y1,col)=>{for(let i=0;i<pts.length-1;i++){const[a,z0]=pts[i],[b,z1]=pts[i+1],nx=z0-z1,nz=b-a,m=Math.hypot(nx,nz),s=z0>0?1:-1,w=[nx/m*s,0,nz/m*s];
+    quad(trim,[a,y0,z0],[b,y0,z1],[b,y1,z1],[a,y1,z0],w,col);quad(trim,[a,y1,z0],[b,y1,z1],[b-.06,y1,z1-.06*s],[a,y1,z0-.06*s],[0,1,0],col);}};
+  const FR=[[0,2.25],[.72,2.24],[.81,2.19],[.858,2.1],[.868,1.9],[.868,1.715]],RR=[[0,-2.25],[.7,-2.24],[.79,-2.19],[.83,-2.1],[.858,-1.6]];
+  bumper(FR,.21,.54,PLASTIC);bumper(RR,.3,.58,PLASTIC);
+  bumper(FR.map(([x,z])=>[x*.995,z-.004*Math.sign(z)]),.54,.556,CHROME);
+  const rib=(x,z)=>[x*1.002,z-.003];
+  bumper(RR.map(([x,z])=>rib(x,z)),.44,.452,BLACK);bumper(RR.map(([x,z])=>rib(x,z)),.35,.36,BLACK);
+  quad(trim,[-.56,.26,2.254],[.56,.26,2.254],[.56,.32,2.254],[-.56,.32,2.254],[0,0,1],BLACK,false);
+  quad(trim,[-.26,.38,2.254],[.26,.38,2.254],[.26,.49,2.254],[-.26,.49,2.254],[0,0,1],WHITE,false);
+
+  // side: wide rub strip between the arches, shut lines, handles at the door ends, mirrors
+  const side=[1,0,0];
+  quad(trim,[.858,.46,.94],[.858,.46,-.83],[.858,.56,-.83],[.858,.56,.94],side,PLASTIC);
+  for(const[z,y0]of[[.72,.33],[-.17,.33],[-1.1,.68]]){
+    if(y0<.6)quad(trim,[.838,y0,z],[.838,y0,z+.012],[.855,.6,z+.012],[.855,.6,z],side,BLACK);
+    quad(trim,[.855,Math.max(y0,.6),z],[.855,Math.max(y0,.6),z+.012],[.83,.92,z+.012],[.83,.92,z],side,BLACK);
+  }
+  for(const z of[-.13,-1.05])quad(trim,[.832,.85,z],[.832,.85,z+.12],[.829,.89,z+.12],[.829,.89,z],side,BLACK);
+  box(trim,.77,.92,.97,1.06,.52,.63,BLACK);
+
+  // arches are cut through the side panel; the dark well behind hides the hollow body
+  const at=z=>{for(let i=0;i<LOWER.length-1;i++){const a=LOWER[i],b=LOWER[i+1];if(z<=a[0]&&z>=b[0]){const t=(a[0]-z)/(a[0]-b[0]);return[a[1]+(b[1]-a[1])*t,a[3]+(b[3]-a[3])*t];}}return[LOWER[0][1],LOWER[0][3]];};
+  for(const az of AXLES){
+    const n=6,col=i=>{const th=-Math.PI/2+i/n*Math.PI;return[az+Math.sin(th)*ARCH,WHEEL_R+Math.cos(th)*ARCH,Math.sin(th),Math.cos(th)];};
+    for(let i=0;i<n;i++){
+      const[z0,y0,s0,c0]=col(i),[z1,y1,s1,c1]=col(i+1),[w0,t0]=at(z0),[w1,t1]=at(z1);
+      quad(paint,[w0,y0,z0],[w1,y1,z1],[w1*.995,t1-.03,z1],[w0*.995,t0-.03,z0],side);
+      quad(trim,[.6,y0,z0],[.6,y1,z1],[w1,y1,z1],[w0,y0,z0],[0,-(c0+c1)/2,-(s0+s1)/2],BLACK);
+      quad(trim,[.6,y0,z0],[.6,y1,z1],[.6,WHEEL_R,z1],[.6,WHEEL_R,z0],side,BLACK);
+    }
+    for(const k of[1,-1])quad(trim,[.6,.22,az+k*ARCH],[.85,.22,az+k*ARCH],[.85,WHEEL_R,az+k*ARCH],[.6,WHEEL_R,az+k*ARCH],[0,0,-k],BLACK);
+    quad(trim,[.6,.22,az-ARCH],[.6,.22,az+ARCH],[.6,WHEEL_R,az+ARCH],[.6,WHEEL_R,az-ARCH],side,BLACK);
+  }
+
+  // one wheel centred on its hub, outer face at +x; ribs and slots make the spin visible
+  const N=32,R=WHEEL_R;
+  for(let i=0;i<N;i++){
+    const a=i/N*TAU,b=(i+1)/N*TAU,s=[Math.cos(a),Math.sin(a)],e=[Math.cos(b),Math.sin(b)],P=(x,r,q)=>[x,q[0]*r,q[1]*r];
+    const ann=(x,r0,r1,col)=>quad(wheel,P(x,r0,s),P(x,r0,e),P(x,r1,e),P(x,r1,s),side,col,false);
+    quad(wheel,P(-.1,R,s),P(-.1,R,e),P(.1,R,e),P(.1,R,s),[0,s[0],s[1]],i%2?[.06,.06,.065]:[.035,.035,.04],false);
+    ann(.1,R,.215,[.045,.045,.05]);
+    quad(wheel,P(-.1,R,s),P(-.1,R,e),P(-.1,.001,e),P(-.1,.001,s),[-1,0,0],BLACK,false);
+    ann(.102,.215,.2,[.52,.53,.54]);
+    ann(.104,.2,.17,[.8,.8,.77]);
+    ann(.106,.17,.04,i%8===0?[.62,.62,.6]:[.9,.9,.87]);
+    ann(.108,.04,.001,[.6,.61,.62]);
+  }
+
+  const out={};
+  // glass darkens towards the door and picks up the sky higher up
+  for(let i=0;i<trim.c.length;i+=3)if(trim.c[i]===GLASS[0]&&trim.c[i+1]===GLASS[1]&&trim.c[i+2]===GLASS[2]){
+    const k=clamp((trim.p[i+1]-.95)/.45,0,1);trim.c[i]=.09+k*.33;trim.c[i+1]=.12+k*.38;trim.c[i+2]=.15+k*.41;}
+  for(const[k,l]of Object.entries({paint,trim,head,tail,wheel})){
+    const g=new THREE.BufferGeometry();
+    g.setAttribute('position',new THREE.Float32BufferAttribute(l.p,3));g.setAttribute('normal',new THREE.Float32BufferAttribute(l.n,3));g.setAttribute('color',new THREE.Float32BufferAttribute(l.c,3));
+    g.userData.keep=true;out[k]=g;
+  }
+  return out;
+})();
 const hatchGeo=(()=>{
   const PAINT=[1,1,1],GLASS=[.13,.17,.2],BLACK=[.035,.035,.04],PLASTIC=[.14,.14,.15],CHROME=[.78,.8,.82],WHITE=[.93,.93,.9],LENS=[.2,.2,.21],AMBER=[.86,.36,.07],CLEAR=[.92,.92,.88],RED=[.77,.125,.165],LAMP=[1,.95,.77];
   const L=()=>({p:[],n:[],c:[]});
@@ -2103,6 +2533,149 @@ const hatchGeo=(()=>{
   const at=z=>{for(let i=0;i<LOWER.length-1;i++){const a=LOWER[i],b=LOWER[i+1];if(z<=a[0]&&z>=b[0]){const t=(a[0]-z)/(a[0]-b[0]);return[a[1]+(b[1]-a[1])*t,a[3]+(b[3]-a[3])*t];}}return[LOWER[0][1],LOWER[0][3]];};
   for(const az of AXLES){
     const n=20,col=i=>{const th=-Math.PI/2+i/n*Math.PI;return[az+Math.sin(th)*ARCH,WHEEL_R+Math.cos(th)*ARCH,Math.sin(th),Math.cos(th)];};
+    for(let i=0;i<n;i++){
+      const[z0,y0,s0,c0]=col(i),[z1,y1,s1,c1]=col(i+1),[w0,t0]=at(z0),[w1,t1]=at(z1);
+      quad(paint,[w0,y0,z0],[w1,y1,z1],[w1*.995,t1-.03,z1],[w0*.995,t0-.03,z0],side);
+      quad(trim,[.6,y0,z0],[.6,y1,z1],[w1,y1,z1],[w0,y0,z0],[0,-(c0+c1)/2,-(s0+s1)/2],BLACK);
+      quad(trim,[.6,y0,z0],[.6,y1,z1],[.6,WHEEL_R,z1],[.6,WHEEL_R,z0],side,BLACK);
+    }
+    for(const k of[1,-1])quad(trim,[.6,.22,az+k*ARCH],[.85,.22,az+k*ARCH],[.85,WHEEL_R,az+k*ARCH],[.6,WHEEL_R,az+k*ARCH],[0,0,-k],BLACK);
+    quad(trim,[.6,.22,az-ARCH],[.6,.22,az+ARCH],[.6,WHEEL_R,az+ARCH],[.6,WHEEL_R,az-ARCH],side,BLACK);
+  }
+
+  // one wheel centred on its hub, outer face at +x; ribs and slots make the spin visible
+  const N=32,R=WHEEL_R;
+  for(let i=0;i<N;i++){
+    const a=i/N*TAU,b=(i+1)/N*TAU,s=[Math.cos(a),Math.sin(a)],e=[Math.cos(b),Math.sin(b)],P=(x,r,q)=>[x,q[0]*r,q[1]*r];
+    const ann=(x,r0,r1,col)=>quad(wheel,P(x,r0,s),P(x,r0,e),P(x,r1,e),P(x,r1,s),side,col,false);
+    quad(wheel,P(-.1,R,s),P(-.1,R,e),P(.1,R,e),P(.1,R,s),[0,s[0],s[1]],i%2?[.06,.06,.065]:[.035,.035,.04],false);
+    ann(.1,R,.215,[.045,.045,.05]);
+    quad(wheel,P(-.1,R,s),P(-.1,R,e),P(-.1,.001,e),P(-.1,.001,s),[-1,0,0],BLACK,false);
+    ann(.102,.215,.2,[.52,.53,.54]);
+    ann(.104,.2,.17,[.8,.8,.77]);
+    ann(.106,.17,.04,i%8===0?[.62,.62,.6]:[.9,.9,.87]);
+    ann(.108,.04,.001,[.6,.61,.62]);
+  }
+
+  const out={};
+  // glass darkens towards the door and picks up the sky higher up
+  for(let i=0;i<trim.c.length;i+=3)if(trim.c[i]===GLASS[0]&&trim.c[i+1]===GLASS[1]&&trim.c[i+2]===GLASS[2]){
+    const k=clamp((trim.p[i+1]-.95)/.45,0,1);trim.c[i]=.09+k*.33;trim.c[i+1]=.12+k*.38;trim.c[i+2]=.15+k*.41;}
+  for(const[k,l]of Object.entries({paint,trim,head,tail,wheel})){
+    const g=new THREE.BufferGeometry();
+    g.setAttribute('position',new THREE.Float32BufferAttribute(l.p,3));g.setAttribute('normal',new THREE.Float32BufferAttribute(l.n,3));g.setAttribute('color',new THREE.Float32BufferAttribute(l.c,3));
+    g.userData.keep=true;out[k]=g;
+  }
+  return out;
+})();
+const hatchLotGeo=(()=>{
+  const PAINT=[1,1,1],GLASS=[.13,.17,.2],BLACK=[.035,.035,.04],PLASTIC=[.14,.14,.15],CHROME=[.78,.8,.82],WHITE=[.93,.93,.9],LENS=[.2,.2,.21],AMBER=[.86,.36,.07],CLEAR=[.92,.92,.88],RED=[.77,.125,.165],LAMP=[1,.95,.77];
+  const L=()=>({p:[],n:[],c:[]});
+  const paint=L(),trim=L(),head=L(),tail=L(),wheel=L();
+  const tri=(l,a,b,c,na,nb,nc,col)=>{
+    const u=[b[0]-a[0],b[1]-a[1],b[2]-a[2]],v=[c[0]-a[0],c[1]-a[1],c[2]-a[2]];
+    const f=[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]];
+    const flip=f[0]*(na[0]+nb[0]+nc[0])+f[1]*(na[1]+nb[1]+nc[1])+f[2]*(na[2]+nb[2]+nc[2])<0;
+    for(const[q,w]of flip?[[a,na],[c,nc],[b,nb]]:[[a,na],[b,nb],[c,nc]]){l.p.push(...q);l.n.push(...w);l.c.push(...col);}
+  };
+  const mir=q=>[-q[0],q[1],q[2]];
+  // flat panel, mirrored unless it sits on the centre line
+  const quad=(l,A,B,C,D,want,col=PAINT,both=true)=>{
+    tri(l,A,B,C,want,want,want,col);tri(l,A,C,D,want,want,want,col);
+    if(both){const w=mir(want);tri(l,mir(A),mir(B),mir(C),w,w,w,col);tri(l,mir(A),mir(C),mir(D),w,w,w,col);}
+  };
+  const box=(l,x0,x1,y0,y1,z0,z1,col)=>{
+    quad(l,[x1,y0,z0],[x1,y1,z0],[x1,y1,z1],[x1,y0,z1],[1,0,0],col);quad(l,[x0,y0,z0],[x0,y1,z0],[x0,y1,z1],[x0,y0,z1],[-1,0,0],col);
+    quad(l,[x0,y1,z0],[x1,y1,z0],[x1,y1,z1],[x0,y1,z1],[0,1,0],col);quad(l,[x0,y0,z1],[x1,y0,z1],[x1,y1,z1],[x0,y1,z1],[0,0,1],col);quad(l,[x0,y0,z0],[x1,y0,z0],[x1,y1,z0],[x0,y1,z0],[0,0,-1],col);
+  };
+  // smooth skin over stations of right-half sections; pick(i,j) says which list and colour a panel gets
+  const loft=(st,pick)=>{
+    const nor=(i,j)=>{
+      const a=st[Math.min(i+1,st.length-1)][j],b=st[Math.max(i-1,0)][j],c=st[i][Math.min(j+1,st[i].length-1)],d=st[i][Math.max(j-1,0)];
+      const u=[a[0]-b[0],a[1]-b[1],a[2]-b[2]],v=[c[0]-d[0],c[1]-d[1],c[2]-d[2]];
+      const n=[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]];
+      const q=st[i][j],s=(n[0]*q[0]+n[1]*(q[1]-.75)+n[2]*q[2])<0?-1:1,m=Math.hypot(...n)||1;
+      return[n[0]*s/m,n[1]*s/m,n[2]*s/m];
+    };
+    for(let i=0;i<st.length-1;i++)for(let j=0;j<st[i].length-1;j++){
+      const pk=pick(i,j);if(!pk)continue;const[l,col]=pk,A=st[i][j],B=st[i+1][j],C=st[i+1][j+1],D=st[i][j+1],na=nor(i,j),nb=nor(i+1,j),nc=nor(i+1,j+1),nd=nor(i,j+1);
+      tri(l,A,B,C,na,nb,nc,col);tri(l,A,C,D,na,nc,nd,col);
+      tri(l,mir(A),mir(B),mir(C),mir(na),mir(nb),mir(nc),col);tri(l,mir(A),mir(C),mir(D),mir(na),mir(nc),mir(nd),col);
+    }
+  };
+
+  // z, half width, sill, shoulder, crown
+  const LOWER=[[2.2,.76,.3,.68,.72],[2.14,.82,.25,.7,.74],[1.9,.85,.22,.74,.78],[1.715,.85,.22,.765,.805],[1.33,.85,.22,.81,.85],[.945,.85,.22,.855,.895],[.6,.85,.22,.89,.93],[0,.85,.22,.92,.96],[-.6,.85,.22,.94,.98],[-.835,.85,.22,.945,.985],[-1.22,.85,.22,.96,1],[-1.45,.85,.22,.965,1.005],[-1.605,.85,.22,.968,1.008],[-1.9,.84,.22,.975,1.015],[-2.1,.82,.26,.975,1.015],[-2.2,.74,.3,.93,.99]];
+  const ARCH=.385;
+  const sect=([z,w,b,s,t])=>[[0,b,z],[w*.86,b,z],[w*.98,b+.1,z],[w,b+(s-b)*.55,z],[w*.995,s-.03,z],[w*.96,s,z],[w*.86,t-.008,z],[w*.45,t-.001,z],[0,t,z]];
+  const lowerSt=LOWER.map(sect);
+  lowerSt.unshift(lowerSt[0].map(q=>[0,q[1],q[2]]));lowerSt.push(lowerSt[lowerSt.length-1].map(q=>[0,q[1],q[2]]));
+  loft(lowerSt,(i,j)=>{const z=(lowerSt[i][0][2]+lowerSt[i+1][0][2])/2;if(j>=1&&j<=3&&AXLES.some(a=>Math.abs(z-a)<ARCH))return null;return j<2?[trim,PLASTIC]:[paint,PAINT];});
+
+  const belt=z=>{for(let i=0;i<LOWER.length-1;i++){const a=LOWER[i],b=LOWER[i+1];if(z<=a[0]&&z>=b[0])return a[3]+(b[3]-a[3])*(a[0]-z)/(a[0]-b[0]);}return LOWER[0][3];};
+  // z, roof height; 0 closes the end at the shoulder
+  const UPPER=[[1.0,0],[.85,1.03],[.66,1.18],[.46,1.32],[.26,1.42],[.02,1.47],[-.5,1.48],[-1.0,1.46],[-1.35,1.42],[-1.6,1.33],[-1.78,1.18],[-1.88,1.05],[-1.93,0]];
+  const upSt=UPPER.map(([z,t])=>{
+    const y=belt(z)-.01,h=t||y+.012,xAt=q=>.77-.17*(q-y)/.44,top=Math.max(y+.001,h-.07),frame=top+Math.min(.015,(h-top)/3);
+    return[[.77,y,z],[xAt(top),top,z],[xAt(frame),frame,z],[xAt(h),h-.008,z],[xAt(h)*.55,h,z],[0,h+.008,z]];
+  });
+  loft(upSt,(i,j)=>{
+    const z=(UPPER[i][0]+UPPER[i+1][0])/2,side=z<.62&&z>-1.3,pillar=(z<-.12&&z>-.2);
+    if(j===0)return side?[trim,pillar?BLACK:GLASS]:[paint,PAINT];
+    if(j===1)return side?[trim,BLACK]:[paint,PAINT];
+    if(j===2)return[paint,PAINT];
+    return z>.32||z<-1.6?[trim,GLASS]:[paint,PAINT];
+  });
+  for(const[a,b]of[[[.08,.96,.975],[.6,.96,.915]],[[-.5,.96,.975],[.02,.96,.915]]]){
+    const t=[0,.7,.7];quad(trim,a,b,[b[0],b[1],b[2]+.016],[a[0],a[1],a[2]+.016],t,BLACK,false);}
+
+  // front: black grille, clear lamps, amber corners
+  quad(trim,[-.335,.555,2.206],[.335,.555,2.206],[.335,.69,2.206],[-.335,.69,2.206],[0,0,1],BLACK,false);
+  for(let i=0;i<4;i++)box(trim,-.325,.325,.57+i*.028,.578+i*.028,2.204,2.21,LENS);
+  quad(trim,[.34,.55,2.208],[.735,.55,2.208],[.735,.695,2.208],[.34,.695,2.208],[0,0,1],BLACK);
+  quad(head,[.35,.562,2.212],[.585,.562,2.212],[.585,.683,2.212],[.35,.683,2.212],[0,0,1],[.95,.96,.9]);
+  quad(head,[.595,.562,2.212],[.725,.562,2.212],[.725,.683,2.212],[.595,.683,2.212],[0,0,1],[.8,.85,.85]);
+  quad(head,[.735,.562,2.21],[.805,.562,2.15],[.805,.67,2.15],[.735,.683,2.21],[.65,0,.76],[.93,.6,.28]);
+  // four rings
+  const ring=(cx,cy,z,r,col)=>{const w=[0,0,Math.sign(z)];for(let i=0;i<14;i++){const a=i/14*TAU,b=(i+1)/14*TAU,n=r*.76;
+    quad(trim,[cx+Math.cos(a)*n,cy+Math.sin(a)*n,z],[cx+Math.cos(b)*n,cy+Math.sin(b)*n,z],[cx+Math.cos(b)*r,cy+Math.sin(b)*r,z],[cx+Math.cos(a)*r,cy+Math.sin(a)*r,z],w,col,false);}};
+  
+
+  // rear: boot lid with the rings, then lamps and plate in one band
+  quad(trim,[-.345,.68,-2.206],[.345,.68,-2.206],[.345,.88,-2.206],[-.345,.88,-2.206],[0,0,-1],BLACK,false);
+  quad(trim,[-.27,.72,-2.212],[.27,.72,-2.212],[.27,.84,-2.212],[-.27,.84,-2.212],[0,0,-1],WHITE,false);
+  quad(tail,[.345,.68,-2.206],[.43,.68,-2.206],[.43,.88,-2.206],[.345,.88,-2.206],[0,0,-1],CLEAR);
+  quad(tail,[.43,.68,-2.206],[.68,.68,-2.206],[.68,.885,-2.206],[.43,.88,-2.206],[0,0,-1],RED);
+  quad(tail,[.68,.68,-2.206],[.748,.68,-2.206],[.748,.885,-2.206],[.68,.885,-2.206],[0,0,-1],AMBER);
+  quad(tail,[.748,.68,-2.206],[.834,.68,-2.1],[.834,.885,-2.1],[.748,.885,-2.206],[.7,0,-.7],AMBER);
+  for(const x of[.43,.56,.68])box(trim,x-.005,x+.005,.68,.885,-2.212,-2.206,BLACK);
+  box(trim,.43,.68,.777,.783,-2.212,-2.206,[.22,.02,.03]);
+
+  // deep plastic bumpers running back to the arches, chrome line along the front one
+  const bumper=(pts,y0,y1,col)=>{for(let i=0;i<pts.length-1;i++){const[a,z0]=pts[i],[b,z1]=pts[i+1],nx=z0-z1,nz=b-a,m=Math.hypot(nx,nz),s=z0>0?1:-1,w=[nx/m*s,0,nz/m*s];
+    quad(trim,[a,y0,z0],[b,y0,z1],[b,y1,z1],[a,y1,z0],w,col);quad(trim,[a,y1,z0],[b,y1,z1],[b-.06,y1,z1-.06*s],[a,y1,z0-.06*s],[0,1,0],col);}};
+  const FR=[[0,2.25],[.72,2.24],[.81,2.19],[.858,2.1],[.868,1.9],[.868,1.715]],RR=[[0,-2.25],[.7,-2.24],[.79,-2.19],[.83,-2.1],[.858,-1.6]];
+  bumper(FR,.21,.54,PLASTIC);bumper(RR,.3,.58,PLASTIC);
+  bumper(FR.map(([x,z])=>[x*.995,z-.004*Math.sign(z)]),.54,.556,CHROME);
+  const rib=(x,z)=>[x*1.002,z-.003];
+  bumper(RR.map(([x,z])=>rib(x,z)),.44,.452,BLACK);bumper(RR.map(([x,z])=>rib(x,z)),.35,.36,BLACK);
+  quad(trim,[-.56,.26,2.254],[.56,.26,2.254],[.56,.32,2.254],[-.56,.32,2.254],[0,0,1],BLACK,false);
+  quad(trim,[-.26,.38,2.254],[.26,.38,2.254],[.26,.49,2.254],[-.26,.49,2.254],[0,0,1],WHITE,false);
+
+  // side: wide rub strip between the arches, shut lines, handles at the door ends, mirrors
+  const side=[1,0,0];
+  quad(trim,[.858,.46,.94],[.858,.46,-.83],[.858,.56,-.83],[.858,.56,.94],side,PLASTIC);
+  for(const[z,y0]of[[.72,.33],[-.17,.33],[-1.1,.68]]){
+    if(y0<.6)quad(trim,[.838,y0,z],[.838,y0,z+.012],[.855,.6,z+.012],[.855,.6,z],side,BLACK);
+    quad(trim,[.855,Math.max(y0,.6),z],[.855,Math.max(y0,.6),z+.012],[.83,.92,z+.012],[.83,.92,z],side,BLACK);
+  }
+  for(const z of[-.13,-1.05])quad(trim,[.832,.85,z],[.832,.85,z+.12],[.829,.89,z+.12],[.829,.89,z],side,BLACK);
+  box(trim,.77,.92,.97,1.06,.52,.63,BLACK);
+
+  // arches are cut through the side panel; the dark well behind hides the hollow body
+  const at=z=>{for(let i=0;i<LOWER.length-1;i++){const a=LOWER[i],b=LOWER[i+1];if(z<=a[0]&&z>=b[0]){const t=(a[0]-z)/(a[0]-b[0]);return[a[1]+(b[1]-a[1])*t,a[3]+(b[3]-a[3])*t];}}return[LOWER[0][1],LOWER[0][3]];};
+  for(const az of AXLES){
+    const n=6,col=i=>{const th=-Math.PI/2+i/n*Math.PI;return[az+Math.sin(th)*ARCH,WHEEL_R+Math.cos(th)*ARCH,Math.sin(th),Math.cos(th)];};
     for(let i=0;i<n;i++){
       const[z0,y0,s0,c0]=col(i),[z1,y1,s1,c1]=col(i+1),[w0,t0]=at(z0),[w1,t1]=at(z1);
       quad(paint,[w0,y0,z0],[w1,y1,z1],[w1*.995,t1-.03,z1],[w0*.995,t0-.03,z0],side);
@@ -2281,7 +2854,150 @@ const suvGeo=(()=>{
   }
   return out;
 })();
-const TRAFFIC_GEOS=[saloonGeo,estateGeo,estateGeo,mpvGeo,hatchGeo,hatchGeo,suvGeo];
+const suvLotGeo=(()=>{
+  const PAINT=[1,1,1],GLASS=[.13,.17,.2],BLACK=[.035,.035,.04],PLASTIC=[.14,.14,.15],CHROME=[.78,.8,.82],WHITE=[.93,.93,.9],LENS=[.2,.2,.21],AMBER=[.86,.36,.07],CLEAR=[.92,.92,.88],RED=[.77,.125,.165],LAMP=[1,.95,.77];
+  const L=()=>({p:[],n:[],c:[]});
+  const paint=L(),trim=L(),head=L(),tail=L(),wheel=L();
+  const tri=(l,a,b,c,na,nb,nc,col)=>{
+    const u=[b[0]-a[0],b[1]-a[1],b[2]-a[2]],v=[c[0]-a[0],c[1]-a[1],c[2]-a[2]];
+    const f=[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]];
+    const flip=f[0]*(na[0]+nb[0]+nc[0])+f[1]*(na[1]+nb[1]+nc[1])+f[2]*(na[2]+nb[2]+nc[2])<0;
+    for(const[q,w]of flip?[[a,na],[c,nc],[b,nb]]:[[a,na],[b,nb],[c,nc]]){l.p.push(...q);l.n.push(...w);l.c.push(...col);}
+  };
+  const mir=q=>[-q[0],q[1],q[2]];
+  // flat panel, mirrored unless it sits on the centre line
+  const quad=(l,A,B,C,D,want,col=PAINT,both=true)=>{
+    tri(l,A,B,C,want,want,want,col);tri(l,A,C,D,want,want,want,col);
+    if(both){const w=mir(want);tri(l,mir(A),mir(B),mir(C),w,w,w,col);tri(l,mir(A),mir(C),mir(D),w,w,w,col);}
+  };
+  const box=(l,x0,x1,y0,y1,z0,z1,col)=>{
+    quad(l,[x1,y0,z0],[x1,y1,z0],[x1,y1,z1],[x1,y0,z1],[1,0,0],col);quad(l,[x0,y0,z0],[x0,y1,z0],[x0,y1,z1],[x0,y0,z1],[-1,0,0],col);
+    quad(l,[x0,y1,z0],[x1,y1,z0],[x1,y1,z1],[x0,y1,z1],[0,1,0],col);quad(l,[x0,y0,z1],[x1,y0,z1],[x1,y1,z1],[x0,y1,z1],[0,0,1],col);quad(l,[x0,y0,z0],[x1,y0,z0],[x1,y1,z0],[x0,y1,z0],[0,0,-1],col);
+  };
+  // smooth skin over stations of right-half sections; pick(i,j) says which list and colour a panel gets
+  const loft=(st,pick)=>{
+    const nor=(i,j)=>{
+      const a=st[Math.min(i+1,st.length-1)][j],b=st[Math.max(i-1,0)][j],c=st[i][Math.min(j+1,st[i].length-1)],d=st[i][Math.max(j-1,0)];
+      const u=[a[0]-b[0],a[1]-b[1],a[2]-b[2]],v=[c[0]-d[0],c[1]-d[1],c[2]-d[2]];
+      const n=[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]];
+      const q=st[i][j],s=(n[0]*q[0]+n[1]*(q[1]-.75)+n[2]*q[2])<0?-1:1,m=Math.hypot(...n)||1;
+      return[n[0]*s/m,n[1]*s/m,n[2]*s/m];
+    };
+    for(let i=0;i<st.length-1;i++)for(let j=0;j<st[i].length-1;j++){
+      const pk=pick(i,j);if(!pk)continue;const[l,col]=pk,A=st[i][j],B=st[i+1][j],C=st[i+1][j+1],D=st[i][j+1],na=nor(i,j),nb=nor(i+1,j),nc=nor(i+1,j+1),nd=nor(i,j+1);
+      tri(l,A,B,C,na,nb,nc,col);tri(l,A,C,D,na,nc,nd,col);
+      tri(l,mir(A),mir(B),mir(C),mir(na),mir(nb),mir(nc),col);tri(l,mir(A),mir(C),mir(D),mir(na),mir(nc),mir(nd),col);
+    }
+  };
+
+  // z, half width, sill, shoulder, crown
+  const LOWER=[[2.2, 0.76, 0.3, 0.82, 0.86], [2.14, 0.82, 0.25, 0.84, 0.88], [1.9, 0.85, 0.22, 0.88, 0.92], [1.715, 0.85, 0.22, 0.905, 0.945], [1.33, 0.85, 0.22, 0.95, 0.99], [0.945, 0.85, 0.22, 0.995, 1.035], [0.6, 0.85, 0.22, 1.03, 1.07], [0, 0.85, 0.22, 1.06, 1.1], [-0.6, 0.85, 0.22, 1.08, 1.12], [-0.835, 0.85, 0.22, 1.085, 1.125], [-1.22, 0.85, 0.22, 1.1, 1.14], [-1.45, 0.85, 0.22, 1.105, 1.145], [-1.605, 0.85, 0.22, 1.108, 1.148], [-1.9, 0.84, 0.22, 1.115, 1.155], [-2.1, 0.82, 0.26, 1.115, 1.155], [-2.2, 0.74, 0.3, 1.07, 1.13]];
+  const ARCH=.385;
+  const sect=([z,w,b,s,t])=>[[0,b,z],[w*.86,b,z],[w*.98,b+.1,z],[w,b+(s-b)*.55,z],[w*.995,s-.03,z],[w*.96,s,z],[w*.86,t-.008,z],[w*.45,t-.001,z],[0,t,z]];
+  const lowerSt=LOWER.map(sect);
+  lowerSt.unshift(lowerSt[0].map(q=>[0,q[1],q[2]]));lowerSt.push(lowerSt[lowerSt.length-1].map(q=>[0,q[1],q[2]]));
+  loft(lowerSt,(i,j)=>{const z=(lowerSt[i][0][2]+lowerSt[i+1][0][2])/2;if(j>=1&&j<=3&&AXLES.some(a=>Math.abs(z-a)<ARCH))return null;return j<2?[trim,PLASTIC]:[paint,PAINT];});
+
+  const belt=z=>{for(let i=0;i<LOWER.length-1;i++){const a=LOWER[i],b=LOWER[i+1];if(z<=a[0]&&z>=b[0])return a[3]+(b[3]-a[3])*(a[0]-z)/(a[0]-b[0]);}return LOWER[0][3];};
+  // z, roof height; 0 closes the end at the shoulder
+  const UPPER=[[1.1,0],[.92,1.17],[.72,1.32],[.52,1.45],[.3,1.54],[.08,1.59],[-.3,1.61],[-.9,1.6],[-1.4,1.59],[-1.7,1.56],[-1.88,1.52],[-1.98,1.44],[-2.04,1.32],[-2.08,0]];
+  const upSt=UPPER.map(([z,t])=>{
+    const y=belt(z)-.01,h=t||y+.012,xAt=q=>.77-.17*(q-y)/.44,top=Math.max(y+.001,h-.07),frame=top+Math.min(.015,(h-top)/3);
+    return[[.77,y,z],[xAt(top),top,z],[xAt(frame),frame,z],[xAt(h),h-.008,z],[xAt(h)*.55,h,z],[0,h+.008,z]];
+  });
+  loft(upSt,(i,j)=>{
+    const z=(UPPER[i][0]+UPPER[i+1][0])/2,side=z<.7&&z>-1.88,pillar=(z<-.14&&z>-.22)||(z<-1.12&&z>-1.2);
+    if(j===0)return side?[trim,pillar?BLACK:GLASS]:[paint,PAINT];
+    if(j===1)return side?[trim,BLACK]:[paint,PAINT];
+    if(j===2)return[paint,PAINT];
+    return z>.4||z<-1.94?[trim,GLASS]:[paint,PAINT];
+  });
+  for(const[a,b]of[[[.08,.96,.975],[.6,.96,.915]],[[-.5,.96,.975],[.02,.96,.915]]]){
+    const t=[0,.7,.7];quad(trim,a,b,[b[0],b[1],b[2]+.016],[a[0],a[1],a[2]+.016],t,BLACK,false);}
+
+  // front: black grille, clear lamps, amber corners
+  quad(trim,[-.335,.555,2.206],[.335,.555,2.206],[.335,.69,2.206],[-.335,.69,2.206],[0,0,1],BLACK,false);
+  for(let i=0;i<4;i++)box(trim,-.325,.325,.57+i*.028,.578+i*.028,2.204,2.21,LENS);
+  quad(trim,[.34,.55,2.208],[.735,.55,2.208],[.735,.695,2.208],[.34,.695,2.208],[0,0,1],BLACK);
+  quad(head,[.35,.562,2.212],[.585,.562,2.212],[.585,.683,2.212],[.35,.683,2.212],[0,0,1],[.95,.96,.9]);
+  quad(head,[.595,.562,2.212],[.725,.562,2.212],[.725,.683,2.212],[.595,.683,2.212],[0,0,1],[.8,.85,.85]);
+  quad(head,[.735,.562,2.21],[.805,.562,2.15],[.805,.67,2.15],[.735,.683,2.21],[.65,0,.76],[.93,.6,.28]);
+  // four rings
+  const ring=(cx,cy,z,r,col)=>{const w=[0,0,Math.sign(z)];for(let i=0;i<14;i++){const a=i/14*TAU,b=(i+1)/14*TAU,n=r*.76;
+    quad(trim,[cx+Math.cos(a)*n,cy+Math.sin(a)*n,z],[cx+Math.cos(b)*n,cy+Math.sin(b)*n,z],[cx+Math.cos(b)*r,cy+Math.sin(b)*r,z],[cx+Math.cos(a)*r,cy+Math.sin(a)*r,z],w,col,false);}};
+  
+
+  // rear: boot lid with the rings, then lamps and plate in one band
+  quad(trim,[-.345,.68,-2.206],[.345,.68,-2.206],[.345,.88,-2.206],[-.345,.88,-2.206],[0,0,-1],BLACK,false);
+  quad(trim,[-.27,.72,-2.212],[.27,.72,-2.212],[.27,.84,-2.212],[-.27,.84,-2.212],[0,0,-1],WHITE,false);
+  quad(tail,[.345,.68,-2.206],[.43,.68,-2.206],[.43,.88,-2.206],[.345,.88,-2.206],[0,0,-1],CLEAR);
+  quad(tail,[.43,.68,-2.206],[.68,.68,-2.206],[.68,.885,-2.206],[.43,.88,-2.206],[0,0,-1],RED);
+  quad(tail,[.68,.68,-2.206],[.748,.68,-2.206],[.748,.885,-2.206],[.68,.885,-2.206],[0,0,-1],AMBER);
+  quad(tail,[.748,.68,-2.206],[.834,.68,-2.1],[.834,.885,-2.1],[.748,.885,-2.206],[.7,0,-.7],AMBER);
+  for(const x of[.43,.56,.68])box(trim,x-.005,x+.005,.68,.885,-2.212,-2.206,BLACK);
+  box(trim,.43,.68,.777,.783,-2.212,-2.206,[.22,.02,.03]);
+
+  // deep plastic bumpers running back to the arches, chrome line along the front one
+  const bumper=(pts,y0,y1,col)=>{for(let i=0;i<pts.length-1;i++){const[a,z0]=pts[i],[b,z1]=pts[i+1],nx=z0-z1,nz=b-a,m=Math.hypot(nx,nz),s=z0>0?1:-1,w=[nx/m*s,0,nz/m*s];
+    quad(trim,[a,y0,z0],[b,y0,z1],[b,y1,z1],[a,y1,z0],w,col);quad(trim,[a,y1,z0],[b,y1,z1],[b-.06,y1,z1-.06*s],[a,y1,z0-.06*s],[0,1,0],col);}};
+  const FR=[[0,2.25],[.72,2.24],[.81,2.19],[.858,2.1],[.868,1.9],[.868,1.715]],RR=[[0,-2.25],[.7,-2.24],[.79,-2.19],[.83,-2.1],[.858,-1.6]];
+  bumper(FR,.21,.54,PLASTIC);bumper(RR,.3,.58,PLASTIC);
+  bumper(FR.map(([x,z])=>[x*.995,z-.004*Math.sign(z)]),.54,.556,CHROME);
+  const rib=(x,z)=>[x*1.002,z-.003];
+  bumper(RR.map(([x,z])=>rib(x,z)),.44,.452,BLACK);bumper(RR.map(([x,z])=>rib(x,z)),.35,.36,BLACK);
+  quad(trim,[-.56,.26,2.254],[.56,.26,2.254],[.56,.32,2.254],[-.56,.32,2.254],[0,0,1],BLACK,false);
+  quad(trim,[-.26,.38,2.254],[.26,.38,2.254],[.26,.49,2.254],[-.26,.49,2.254],[0,0,1],WHITE,false);
+
+  // side: wide rub strip between the arches, shut lines, handles at the door ends, mirrors
+  const side=[1,0,0];
+  quad(trim,[.858,.46,.94],[.858,.46,-.83],[.858,.56,-.83],[.858,.56,.94],side,PLASTIC);
+  for(const[z,y0]of[[.72,.33],[-.17,.33],[-1.1,.68]]){
+    if(y0<.6)quad(trim,[.838,y0,z],[.838,y0,z+.012],[.855,.6,z+.012],[.855,.6,z],side,BLACK);
+    quad(trim,[.855,Math.max(y0,.6),z],[.855,Math.max(y0,.6),z+.012],[.83,.92,z+.012],[.83,.92,z],side,BLACK);
+  }
+  for(const z of[-.13,-1.05])quad(trim,[.832,.85,z],[.832,.85,z+.12],[.829,.89,z+.12],[.829,.89,z],side,BLACK);
+  box(trim,.77,.92,.97,1.06,.52,.63,BLACK);
+
+  // arches are cut through the side panel; the dark well behind hides the hollow body
+  const at=z=>{for(let i=0;i<LOWER.length-1;i++){const a=LOWER[i],b=LOWER[i+1];if(z<=a[0]&&z>=b[0]){const t=(a[0]-z)/(a[0]-b[0]);return[a[1]+(b[1]-a[1])*t,a[3]+(b[3]-a[3])*t];}}return[LOWER[0][1],LOWER[0][3]];};
+  for(const az of AXLES){
+    const n=6,col=i=>{const th=-Math.PI/2+i/n*Math.PI;return[az+Math.sin(th)*ARCH,WHEEL_R+Math.cos(th)*ARCH,Math.sin(th),Math.cos(th)];};
+    for(let i=0;i<n;i++){
+      const[z0,y0,s0,c0]=col(i),[z1,y1,s1,c1]=col(i+1),[w0,t0]=at(z0),[w1,t1]=at(z1);
+      quad(paint,[w0,y0,z0],[w1,y1,z1],[w1*.995,t1-.03,z1],[w0*.995,t0-.03,z0],side);
+      quad(trim,[.6,y0,z0],[.6,y1,z1],[w1,y1,z1],[w0,y0,z0],[0,-(c0+c1)/2,-(s0+s1)/2],BLACK);
+      quad(trim,[.6,y0,z0],[.6,y1,z1],[.6,WHEEL_R,z1],[.6,WHEEL_R,z0],side,BLACK);
+    }
+    for(const k of[1,-1])quad(trim,[.6,.22,az+k*ARCH],[.85,.22,az+k*ARCH],[.85,WHEEL_R,az+k*ARCH],[.6,WHEEL_R,az+k*ARCH],[0,0,-k],BLACK);
+    quad(trim,[.6,.22,az-ARCH],[.6,.22,az+ARCH],[.6,WHEEL_R,az+ARCH],[.6,WHEEL_R,az-ARCH],side,BLACK);
+  }
+
+  // one wheel centred on its hub, outer face at +x; ribs and slots make the spin visible
+  const N=32,R=WHEEL_R;
+  for(let i=0;i<N;i++){
+    const a=i/N*TAU,b=(i+1)/N*TAU,s=[Math.cos(a),Math.sin(a)],e=[Math.cos(b),Math.sin(b)],P=(x,r,q)=>[x,q[0]*r,q[1]*r];
+    const ann=(x,r0,r1,col)=>quad(wheel,P(x,r0,s),P(x,r0,e),P(x,r1,e),P(x,r1,s),side,col,false);
+    quad(wheel,P(-.1,R,s),P(-.1,R,e),P(.1,R,e),P(.1,R,s),[0,s[0],s[1]],i%2?[.06,.06,.065]:[.035,.035,.04],false);
+    ann(.1,R,.215,[.045,.045,.05]);
+    quad(wheel,P(-.1,R,s),P(-.1,R,e),P(-.1,.001,e),P(-.1,.001,s),[-1,0,0],BLACK,false);
+    ann(.102,.215,.2,[.52,.53,.54]);
+    ann(.104,.2,.17,[.8,.8,.77]);
+    ann(.106,.17,.04,i%8===0?[.62,.62,.6]:[.9,.9,.87]);
+    ann(.108,.04,.001,[.6,.61,.62]);
+  }
+
+  const out={};
+  // glass darkens towards the door and picks up the sky higher up
+  for(let i=0;i<trim.c.length;i+=3)if(trim.c[i]===GLASS[0]&&trim.c[i+1]===GLASS[1]&&trim.c[i+2]===GLASS[2]){
+    const k=clamp((trim.p[i+1]-.95)/.45,0,1);trim.c[i]=.09+k*.33;trim.c[i+1]=.12+k*.38;trim.c[i+2]=.15+k*.41;}
+  for(const[k,l]of Object.entries({paint,trim,head,tail,wheel})){
+    const g=new THREE.BufferGeometry();
+    g.setAttribute('position',new THREE.Float32BufferAttribute(l.p,3));g.setAttribute('normal',new THREE.Float32BufferAttribute(l.n,3));g.setAttribute('color',new THREE.Float32BufferAttribute(l.c,3));
+    g.userData.keep=true;out[k]=g;
+  }
+  return out;
+})();
+const TRAFFIC_GEOS=[saloonGeo,estateGeo,estateGeo,mpvGeo,hatchGeo,hatchGeo,suvGeo],LOT_GEOS=[saloonLotGeo,estateLotGeo,estateLotGeo,mpvLotGeo,hatchLotGeo,hatchLotGeo,suvLotGeo];
 function makeCarMesh(color,G=carGeo){
   let m=G===skodaGeo?policeM:carMats[color];if(!m){m=carMats[color]=new THREE.MeshPhongMaterial({color,specular:0x383838,shininess:60});m.userData.keep=true;}
   const g=new THREE.Group(),body=new THREE.Group();
@@ -3622,7 +4338,7 @@ function ride(c,dt){
 let props=new Map(),falling=[],walls=new Map();
 function addProp(p){const k=Math.floor(p.x/8)+','+Math.floor(p.z/8);let l=props.get(k);if(!l)props.set(k,l=[]);l.push(p);}
 // fences and railings: segments in the same 8 m grid
-const FAC={"lots":[[[55.3672831,23.137949],[55.3673663,23.1380681],[55.367265,23.1383387],[55.3671922,23.1382916],[55.3671922,23.1382125]],[[55.3847008,23.1194564],[55.384612,23.1196461],[55.3844844,23.1194609],[55.3843879,23.1196669],[55.3846501,23.1200474],[55.3847012,23.1199382],[55.3848322,23.1196271],[55.3848537,23.1192144],[55.3849305,23.119204],[55.3849524,23.119039],[55.3848223,23.1187149],[55.3847844,23.1187105],[55.3847851,23.1190561]],[[55.3841525,23.1191013],[55.3840365,23.1189107],[55.3839264,23.1191182],[55.3840424,23.1193088]],[[55.3849582,23.1272417],[55.3844573,23.1293107],[55.3842684,23.129169],[55.3847693,23.1271]],[[55.3729006,23.1272507],[55.3726907,23.1277346],[55.3726739,23.1277732],[55.3725681,23.1276311],[55.3727948,23.1271086]],[[55.3823257,23.1185119],[55.3820905,23.1189593],[55.3819906,23.1187967],[55.3822259,23.1183493]],[[55.3823815,23.1186547],[55.3824139,23.1187076],[55.382149,23.1192096],[55.3821166,23.1191567]],[[55.37943,23.1196399],[55.3793451,23.1195434],[55.3794343,23.1192563],[55.3793444,23.1191276],[55.3792914,23.1192471],[55.3792442,23.1189764],[55.3794414,23.1185305],[55.3796278,23.1187588],[55.3797317,23.1188988],[55.3795615,23.1193221]],[[55.3799839,23.1133072],[55.3795636,23.1128877],[55.3794835,23.1131221],[55.3799004,23.1135582]],[[55.3816741,23.1167347],[55.3816261,23.1167706],[55.3821878,23.1176645],[55.3822373,23.1176577]],[[55.3794177,23.1318816],[55.3790918,23.1320937],[55.3791852,23.1324491],[55.3792842,23.1323433],[55.3793299,23.1324028],[55.3794823,23.1322449]],[[55.3818542,23.1321015],[55.3817354,23.1322789],[55.381985,23.1328598],[55.3821185,23.1326459],[55.3820994,23.1326003],[55.3821098,23.1325387],[55.3821338,23.132507],[55.3821014,23.1324373],[55.3818832,23.1321414]],[[55.3708723,23.1425502],[55.3708499,23.1427667],[55.3708183,23.1427566],[55.3707967,23.1429652],[55.3707168,23.1429397],[55.3707064,23.1430401],[55.3705681,23.1429958],[55.3706224,23.1424702]],[[55.3778493,23.1337503],[55.3778113,23.1344681],[55.3776377,23.1344397],[55.3776757,23.1337219]],[[55.3721492,23.1264098],[55.3720817,23.1263189],[55.3719946,23.1265193],[55.371986,23.1265392],[55.3720535,23.1266301]],[[55.3723448,23.1258281],[55.3722608,23.1257218],[55.3722079,23.1257362],[55.3721006,23.1260103],[55.3722016,23.1261519]],[[55.3706608,23.1291385],[55.3706649,23.1292476],[55.3705087,23.1295734],[55.3704422,23.1296014],[55.3704165,23.1295694],[55.3706368,23.1291041]],[[55.3705318,23.1211108],[55.370627,23.1207825],[55.3710102,23.12115],[55.3709386,23.121374],[55.3708778,23.1214985],[55.3707175,23.1220177],[55.3705529,23.1218742],[55.3704857,23.1221095],[55.3697977,23.1214933],[55.3698747,23.1212358],[55.369822,23.1211807],[55.3700167,23.1206708],[55.3701145,23.1207632],[55.3701473,23.1206558],[55.3701876,23.120694],[55.3702508,23.1204869],[55.3700522,23.1202994],[55.3700771,23.1202177],[55.370108,23.1201164],[55.3703432,23.1203385],[55.3702028,23.1207988]],[[55.3790775,23.1173321],[55.3790031,23.1176754],[55.3788595,23.1174955],[55.3789762,23.1172109]],[[55.3794523,23.1138236],[55.3793663,23.11372],[55.3792073,23.1141285],[55.3788281,23.1136713],[55.3786965,23.1140093],[55.3790541,23.1144404],[55.3790792,23.1143759],[55.3792022,23.1145242],[55.3791775,23.1145877],[55.3793227,23.1147627],[55.379353,23.1146849],[55.3793909,23.1147305],[55.3794903,23.114475],[55.3794529,23.11443],[55.379483,23.1143526],[55.379322,23.1141585]],[[55.3796568,23.117757],[55.3796066,23.1178941],[55.3794968,23.1177623],[55.3793534,23.1181148],[55.3794046,23.1181781],[55.3794663,23.1180507],[55.3797794,23.1184995],[55.3797266,23.1186188],[55.3792082,23.1179544],[55.3794092,23.1174094]],[[55.3780328,23.1162708],[55.377998,23.1163553],[55.3778247,23.1161345],[55.3778595,23.1160499]],[[55.3819183,23.1178433],[55.3818087,23.1180631],[55.3815808,23.1177109],[55.3816533,23.1175654],[55.3817574,23.1177263],[55.3817703,23.1177462],[55.3819075,23.117471],[55.3820562,23.1177006],[55.3819789,23.1178555]],[[55.3797495,23.1106089],[55.3796211,23.1109806],[55.3795132,23.1108652],[55.3796415,23.1104934]],[[55.379456,23.1117843],[55.3793843,23.1119908],[55.3792149,23.1118085],[55.3792866,23.111602]],[[55.3802741,23.1124334],[55.3801791,23.1123481],[55.3800779,23.1126972],[55.3801729,23.1127825]],[[55.3786601,23.1237843],[55.3784495,23.1237],[55.3783003,23.1236496],[55.3784095,23.1240241],[55.3786671,23.1237999]],[[55.3801721,23.1176599],[55.3800465,23.1179514],[55.379837,23.1176746],[55.3799631,23.1173544]],[[55.3818337,23.1263116],[55.3814424,23.1265629],[55.3814539,23.1264069],[55.3818118,23.1261779]],[[55.3806177,23.1133883],[55.3808099,23.1137144],[55.380605,23.1140953],[55.3804056,23.113783]],[[55.3815781,23.1103995],[55.3815062,23.1106978],[55.3814103,23.1106262],[55.3814822,23.1103279]],[[55.3868874,23.1302603],[55.3869194,23.1305453],[55.3867726,23.130595],[55.3867627,23.1305594],[55.3867378,23.1303083]],[[55.3862759,23.126924],[55.3864266,23.1272071],[55.3865128,23.1270179],[55.3866303,23.1267628],[55.3864758,23.1265572]],[[55.388729,23.1296227],[55.3886902,23.1297834],[55.3887552,23.1298516],[55.3887927,23.1297657],[55.3889453,23.1299197],[55.3889155,23.1300368],[55.3887965,23.1299594],[55.388644,23.129922],[55.388454,23.1297701],[55.3885302,23.1294752],[55.3887089,23.1296078]],[[55.3885344,23.1291425],[55.3884578,23.1294591],[55.3882914,23.1293343],[55.388368,23.1290177]],[[55.3886269,23.1275149],[55.3885156,23.1280783],[55.3883794,23.1279631],[55.3884572,23.1276176],[55.3885385,23.1274247]],[[55.3860695,23.1150505],[55.3860332,23.1150877],[55.3862151,23.1156367],[55.3862514,23.1155995]],[[55.3856881,23.1150199],[55.3856575,23.1151278],[55.3856409,23.1151866],[55.3852325,23.1148276],[55.3852468,23.1147772],[55.3852798,23.1146609]],[[55.3858258,23.118109],[55.3859688,23.1183059],[55.38579,23.1187086],[55.3857711,23.1186826],[55.385647,23.1185117],[55.3856594,23.1184837]],[[55.3851168,23.1155832],[55.3855342,23.1158921],[55.3855503,23.1158247],[55.3855585,23.1157904],[55.3854806,23.1157328],[55.3854934,23.1156793],[55.3851539,23.1154281],[55.3851312,23.1155232]],[[55.3896997,23.1215928],[55.389789,23.1220454],[55.3896222,23.1221474],[55.3895329,23.1216948]],[[55.3827175,23.1103262],[55.3826286,23.1102598],[55.3827169,23.1099212],[55.382794,23.1099933]],[[55.382787,23.1152591],[55.3827108,23.1151478],[55.3825775,23.1154482],[55.3826621,23.1155675]],[[55.3829723,23.1147914],[55.3828564,23.1147118],[55.3827749,23.1150713],[55.3829003,23.115141]],[[55.3836523,23.1132716],[55.3834859,23.1139855],[55.3833137,23.1138611],[55.3834801,23.1131472]],[[55.3841896,23.1133767],[55.384085,23.1137914],[55.3839191,23.1136617],[55.3840237,23.113247]],[[55.3820849,23.1088359],[55.3819611,23.1092951],[55.3817875,23.1092149],[55.3818733,23.1087223]],[[55.3840828,23.1066864],[55.3840121,23.1066433],[55.3839327,23.1066509],[55.3839236,23.1071195],[55.3840745,23.1071276]],[[55.3850917,23.1325625],[55.3851898,23.1325115],[55.3852983,23.1332823],[55.3852078,23.133326],[55.3851158,23.132721]],[[55.388997,23.0733011],[55.3889918,23.0725161],[55.3890707,23.0725145],[55.3896721,23.0725021],[55.3896726,23.0725753],[55.3897195,23.0725743],[55.38972,23.0726529],[55.3897242,23.0732862]],[[55.3843797,23.1055312],[55.3846807,23.1055621],[55.3846487,23.1065268],[55.3843477,23.1064958]]],"pitches":[["basketball",0,"",[[55.384225,23.1086416],[55.3842356,23.1081769],[55.3841088,23.108168],[55.3840982,23.1086326]]],["basketball",0,"",[[55.371166,23.1306308],[55.3710725,23.1304647],[55.370887,23.1307881],[55.3709805,23.1309541]]],["volleyball",0,"",[[55.3844918,23.1082062],[55.3843994,23.1082],[55.3843889,23.1086832],[55.3844814,23.1086894]]],["soccer",0,"",[[55.3710539,23.1304375],[55.3708014,23.1299884],[55.3706215,23.1303018],[55.370874,23.1307509]]],["basketball",0,"",[[55.3843868,23.1081959],[55.3843717,23.1086701],[55.3842458,23.1086577],[55.3842608,23.1081835]]],["tennis",0,"",[[55.3716025,23.1268394],[55.3713412,23.1272013],[55.3714397,23.1274215],[55.371701,23.1270596]]],["basketball",0,"",[[55.3857472,23.1334826],[55.3857823,23.1336935],[55.3855689,23.1338038],[55.3855337,23.133593]]],["basketball",0,"",[[55.3857838,23.1337189],[55.3858156,23.1339177],[55.3856062,23.1340215],[55.3855744,23.1338227]]],["volleyball",0,"",[[55.3854462,23.1335314],[55.3853065,23.1335984],[55.3853767,23.1340517],[55.3855164,23.1339846]]],["basketball",0,"",[[55.3868558,23.1306099],[55.3868876,23.1308071],[55.3866571,23.1309222],[55.3866254,23.130725]]],["multi",0,"",[[55.3858594,23.133387],[55.3857798,23.1334282],[55.3858247,23.1336965],[55.3859042,23.1336553]]],["multi",0,"",[[55.3874288,23.1224263],[55.3873584,23.1226456],[55.3872882,23.1228645],[55.3871398,23.1227169],[55.3871044,23.1226817],[55.387245,23.1222435],[55.387374,23.1223718],[55.3874121,23.1224097]]],["tennis",0,"",[[55.3865911,23.0948069],[55.3865507,23.0950594],[55.3862491,23.0949097],[55.3862895,23.0946572]]],["basketball",4,"",[[55.3846197,23.122277],[55.3844643,23.1219274],[55.3842788,23.1221797],[55.3844342,23.1225293]]],["soccer",0,"",[[55.381821,23.1304784],[55.3820221,23.1299648],[55.3818695,23.1297797],[55.3816685,23.1302934],[55.3817071,23.1303403]]],["basketball",0,"",[[55.3817071,23.1303403],[55.381608,23.1305936],[55.3817219,23.1307317],[55.381821,23.1304784]]],["basketball",0,"",[[55.3905578,23.1118836],[55.3907117,23.1122614],[55.3905946,23.1124094],[55.3904406,23.1120316]]],["soccer",0,"",[[55.3822016,23.1300132],[55.3824649,23.1303489],[55.3821242,23.131177],[55.3818609,23.1308412]]],["",0,"",[[55.3818609,23.1308412],[55.3818522,23.1308653],[55.381832,23.1309585],[55.381836,23.1310702],[55.3818504,23.131148],[55.3818876,23.1312243],[55.381941,23.1312805],[55.3820001,23.1312982],[55.3820517,23.1312828],[55.3821068,23.1312204],[55.3821242,23.131177]]],["",0,"",[[55.3822016,23.1300132],[55.3822215,23.1299626],[55.3822556,23.1299148],[55.3823073,23.1298879],[55.3823659,23.1298848],[55.3824066,23.1299094],[55.3824438,23.129958],[55.3824797,23.1300388],[55.3824958,23.1301382],[55.3824915,23.1302484],[55.382474,23.1303177],[55.3824649,23.1303489]]],["basketball",0,"",[[55.403785,23.1534663],[55.4037005,23.153531],[55.4036273,23.1532346],[55.4037117,23.1531698]]],["roller_skating",0,"",[[55.3813049,23.1256226],[55.3813562,23.1256928],[55.3813642,23.125978],[55.3811471,23.1261094],[55.3810814,23.1258661],[55.3811089,23.1258348],[55.3811059,23.1256977],[55.3811772,23.125579]]]],"parks":[["Raseini\u0173 parkas",[[55.3829655,23.1188777],[55.3823994,23.1199617],[55.3830055,23.1213507],[55.3835537,23.1225038],[55.3840322,23.1233999],[55.3845589,23.1240015],[55.3851826,23.124606],[55.3852685,23.1245906],[55.3853897,23.1240159],[55.3853889,23.123934],[55.3842936,23.1215001],[55.3835486,23.1198212]]],["\u017demai\u010dio aik\u0161t\u0117",[[55.3817347,23.1169857],[55.3816043,23.1167826],[55.3816583,23.1166752],[55.3811657,23.1159078],[55.3807359,23.1167625],[55.3813589,23.117733]]]],"bleachers":[[[55.3709648,23.1290492],[55.3709171,23.128984],[55.3713453,23.1280143],[55.371393,23.1280795]]],"benches":[[55.3709972,23.1197941],[55.3709668,23.1197982],[55.3709058,23.1196882],[55.3708806,23.1197365],[55.3708806,23.1198183]],"masts":[[55.3722344,23.1286903],[55.3714119,23.1305074],[55.3706738,23.1294676],[55.3714963,23.1276434]],"play":[[55.3709919,23.1198505]],"stops":[[55.4026932,23.1560734,2,""],[55.4031389,23.1581409,2,""],[55.3789799,23.1155921,2,"Raseini\u0173 autobus\u0173 stotis"],[55.3781206,23.1151321,2,"Raseiniai AS"],[55.3770252,23.0867481,2,"Ston\u0173 sodai"],[55.3634087,23.1497061,2,"Norg\u0117lai"],[55.3611837,23.1534748,2,"Norg\u0117lai"],[55.3601346,23.1556233,2,"Norg\u0117lai"],[55.3886501,23.0714147,2,""],[55.3889883,23.0706181,2,""],[55.3733071,23.1264889,2,""],[55.3728834,23.1276691,2,""],[55.3729626,23.127653,2,""],[55.3853807,23.0857059,2,""],[55.3858393,23.0844668,2,""],[55.3747999,23.0992618,0,""],[55.3747081,23.0986201,0,""]],"water":[[[[55.3737432,23.0813032],[55.3737625,23.0813733],[55.3737522,23.0814435],[55.3737239,23.0815204],[55.3737134,23.0815568],[55.373698,23.0816116],[55.3736647,23.0816893],[55.3736281,23.0817013],[55.3735311,23.0816584],[55.3733897,23.0815272],[55.373373,23.081448],[55.3733717,23.0813394],[55.3733663,23.0812264],[55.3733331,23.081181],[55.3733151,23.0811493],[55.3733254,23.0811018],[55.3733537,23.0811131],[55.3733842,23.081136],[55.3734169,23.0810998],[55.3734679,23.0810663],[55.3735362,23.0811064],[55.3735603,23.0811307],[55.3736072,23.0811786],[55.3736865,23.0812352]],[[[55.3736586,23.0814937],[55.3736568,23.081562],[55.3736326,23.0816114],[55.3735907,23.0816171],[55.3735431,23.0815877],[55.3734789,23.0815311],[55.3734711,23.0814745],[55.3734621,23.0813931],[55.3734904,23.081375],[55.3735363,23.0813839],[55.3735946,23.0814021],[55.3736494,23.0814368]]]],[[[55.3802152,23.1250338],[55.3801939,23.1250097],[55.3801733,23.1250124],[55.3800171,23.1252792],[55.3799973,23.125357],[55.379973,23.1254281],[55.3799349,23.1254911],[55.3798686,23.1255394],[55.3798069,23.1255971],[55.3794122,23.1263414],[55.3792887,23.1265493],[55.379275,23.1265774],[55.3792773,23.1266016],[55.3792948,23.1266163],[55.3794731,23.1266056],[55.3794952,23.1265976],[55.3795196,23.1265815],[55.3795836,23.1264983],[55.3796469,23.1263897],[55.3797109,23.1263079],[55.379829,23.1262274],[55.3800042,23.1261402],[55.3800271,23.1261161],[55.3800796,23.1260088],[55.3801436,23.1258211],[55.3802381,23.1254818],[55.380261,23.1253436],[55.3802622,23.125267],[55.3802305,23.1251018]],[[[55.3799806,23.1257674],[55.3799585,23.1257634],[55.3799303,23.1257848],[55.3799097,23.1258385],[55.3799074,23.1258747],[55.379915,23.1259122],[55.3799379,23.1259297],[55.3799722,23.1259029],[55.3799859,23.1258787],[55.3799958,23.1258385],[55.3799958,23.1257942]]]],[[[55.3705277,23.0771215],[55.3705042,23.0771871],[55.370297,23.0773375],[55.3702672,23.0774019],[55.3701615,23.077429],[55.3695741,23.0779098],[55.3694961,23.0779262],[55.3694329,23.0778084],[55.3693604,23.0773832],[55.3694013,23.0772981],[55.3698418,23.076922],[55.3699366,23.0768075],[55.3702954,23.0768402]],[[[55.3700593,23.0772033],[55.3700686,23.0772523],[55.3700407,23.077272],[55.3699905,23.0772523],[55.3700054,23.0772]]]],[[[55.3580571,23.1467603],[55.3579899,23.146727],[55.357884,23.1466845],[55.3577502,23.1467074],[55.3577373,23.1462831],[55.3577445,23.1462043],[55.3577585,23.1461649],[55.3577775,23.1461482],[55.3578343,23.1461409],[55.3578732,23.1461241],[55.3579036,23.1460766],[55.3579371,23.1459615],[55.357941,23.1459018],[55.3579154,23.1457784],[55.3578836,23.1457009],[55.3577216,23.1454353],[55.3575704,23.145208],[55.3575251,23.1451682],[55.3573922,23.1451024],[55.357325,23.145062],[55.3572072,23.144944],[55.3571817,23.1448944],[55.3571662,23.1448318],[55.3571504,23.1447793],[55.3570857,23.1446702],[55.3570182,23.1445847],[55.3568631,23.1444946],[55.3567868,23.144428],[55.3567227,23.1443466],[55.3566701,23.1442987],[55.3566064,23.1442844],[55.3563601,23.1443304],[55.3562138,23.1443327],[55.3560965,23.144332],[55.356004,23.1443158],[55.3557451,23.144214],[55.3556644,23.1441682],[55.3555791,23.1440868],[55.3555113,23.1440495],[55.3554139,23.1440235],[55.3553572,23.1440131],[55.3553234,23.1439783],[55.3552444,23.143831],[55.3551848,23.1437802],[55.355115,23.143758],[55.3549834,23.1437647],[55.3549371,23.1437726],[55.354908,23.1437504],[55.3548128,23.1435738],[55.3547506,23.1435302],[55.3547128,23.1435252],[55.3546438,23.143565],[55.3546026,23.1435916],[55.3545751,23.1435826],[55.3545266,23.1435222],[55.3544405,23.1434418],[55.3540857,23.1432071],[55.3539596,23.1430928],[55.3538653,23.1430195],[55.3537726,23.1429582],[55.3537441,23.14291],[55.3537064,23.1428172],[55.3536475,23.1426629],[55.3535552,23.1424989],[55.3534877,23.1424161],[55.3534123,23.1423671],[55.3533119,23.1423398],[55.3531953,23.1423501],[55.3530991,23.1423916],[55.3529619,23.1425072],[55.3529073,23.1425773],[55.3528447,23.1426176],[55.3527215,23.1426219],[55.3526856,23.1425964],[55.3526237,23.1424826],[55.3525553,23.142362],[55.3524452,23.1422638],[55.3522853,23.1421609],[55.3522424,23.1421099],[55.3521807,23.1420388],[55.351684,23.1417228],[55.3515384,23.1415678],[55.3514869,23.1412817],[55.3515511,23.1410268],[55.3518865,23.1400183],[55.3519179,23.1399238],[55.3519923,23.1399043],[55.3520432,23.139914],[55.3521372,23.140049],[55.3522311,23.1402638],[55.3523029,23.1404467],[55.3524475,23.1405762],[55.3528655,23.1406964],[55.3529241,23.1408609],[55.3531495,23.1410988],[55.353394,23.1412144],[55.3536437,23.1412514],[55.3537354,23.1413762],[55.3539506,23.1413518],[55.3543352,23.1418849],[55.3543772,23.1420422],[55.3544877,23.1420884],[55.3546083,23.1422265],[55.3547847,23.1425139],[55.355027,23.1426346],[55.3551532,23.1426445],[55.3553947,23.1428561],[55.3558568,23.1432358],[55.3559969,23.1431957],[55.3566687,23.1433043],[55.3569048,23.1434967],[55.3570359,23.1435729],[55.3571806,23.1434609],[55.3572725,23.1433168],[55.3571895,23.1436014],[55.3572852,23.1438303],[55.3573869,23.1440732],[55.357503,23.1446273],[55.3576371,23.1447706],[55.3577526,23.1448096],[55.3578771,23.1450053],[55.3580664,23.1452898],[55.358094,23.1453418],[55.3581186,23.1454393],[55.3581271,23.1455455],[55.3581249,23.1456166],[55.3580735,23.145838],[55.3580301,23.1460149],[55.3580247,23.146081],[55.3580415,23.1462248],[55.3579809,23.1462926],[55.3579836,23.1464984]],[]],[[[55.3613426,23.1444936],[55.3613329,23.144793],[55.3613286,23.1449959],[55.3613021,23.1450423],[55.3613086,23.1451162],[55.3613561,23.1451561],[55.3613835,23.1452642],[55.3613976,23.1453277],[55.3615512,23.145542],[55.3616194,23.1455881],[55.3616687,23.1456065],[55.3617665,23.1458237],[55.3618112,23.1459469],[55.3618649,23.1460446],[55.3618918,23.1461243],[55.3619587,23.1461527],[55.3620988,23.1461812],[55.362164,23.1462379],[55.362212,23.1462779],[55.3622605,23.1463291],[55.3623425,23.1463633],[55.3623909,23.1464315],[55.3625074,23.1466383],[55.3625537,23.1466819],[55.3626033,23.1467274],[55.3626378,23.1467919],[55.3626454,23.1468393],[55.3626949,23.146881],[55.362765,23.1470066],[55.3628426,23.1470802],[55.3628954,23.1471788],[55.3629817,23.1472452],[55.3630948,23.1473387],[55.3632088,23.1473598],[55.3633237,23.1473567],[55.3634428,23.1473816],[55.3635131,23.1473609],[55.3635492,23.1473611],[55.3636425,23.1473931],[55.3636633,23.1474043],[55.3637018,23.1473988],[55.363746,23.1473647],[55.3637797,23.1473569],[55.3638154,23.1473214],[55.3638507,23.1472724],[55.3638864,23.1471756],[55.3639698,23.1470759],[55.3640482,23.1470759],[55.3641332,23.1468471],[55.3642449,23.1468236],[55.364365,23.1464862],[55.3645067,23.1461459],[55.3646501,23.1458702],[55.3647387,23.1457544],[55.3648052,23.1456302],[55.3651393,23.1447373],[55.3651696,23.1443767],[55.3651461,23.1443387],[55.3650558,23.1443461],[55.3650032,23.1444269],[55.3649478,23.1444932],[55.3648689,23.1444895],[55.3647091,23.1443377],[55.3646475,23.1442699],[55.3646128,23.1444081],[55.364533,23.1444973],[55.3644423,23.1445124],[55.3642877,23.145088],[55.3642443,23.1451928],[55.3642259,23.1454407],[55.3642328,23.145545],[55.3642061,23.1456608],[55.364115,23.1458173],[55.363839,23.1464149],[55.3637838,23.1464968],[55.3636935,23.1465386],[55.3636355,23.1465383],[55.3635594,23.1465299],[55.363484,23.1465048],[55.3633566,23.1464212],[55.3632515,23.1463339],[55.3631894,23.1462529],[55.3631303,23.1461156],[55.3629894,23.1458438],[55.362846,23.1456677],[55.3626892,23.1455533],[55.3625877,23.1453725],[55.3625075,23.1452908],[55.362408,23.1452429],[55.3623465,23.1451628],[55.3622873,23.1450067],[55.3621955,23.1448203],[55.3621459,23.1445964],[55.362015,23.1443777],[55.3619779,23.1443606],[55.3619655,23.1443217],[55.361932,23.1443056],[55.3617405,23.144223],[55.3617141,23.1441491],[55.3616262,23.1441113],[55.3615403,23.1442156],[55.3614332,23.1443063],[55.3613653,23.1444356]],[]],[[[55.3755657,23.1275564],[55.3757364,23.1274679],[55.3758934,23.1274277],[55.376087,23.1274116],[55.3763491,23.1273714],[55.3768062,23.1273234],[55.3770135,23.1272855],[55.3772238,23.127307],[55.3772909,23.1273472],[55.3773275,23.127417],[55.3773412,23.1274921],[55.3773818,23.1282408],[55.3773747,23.1283638],[55.3773392,23.1284317],[55.3769461,23.1285812],[55.3767682,23.1286401],[55.3766645,23.1287152],[55.3765716,23.1288519],[55.3765106,23.128978],[55.3764832,23.1291336],[55.3764695,23.129375],[55.3764817,23.1295466],[55.3767133,23.1306142],[55.3767758,23.1309709],[55.3767956,23.1312472],[55.3767682,23.1314859],[55.3767042,23.1316575],[55.3766295,23.1317541],[55.3765792,23.1317487],[55.3765133,23.1316552],[55.3764649,23.1314966],[55.376442,23.1313276],[55.3764207,23.131054],[55.376343,23.1306142],[55.3762378,23.1302628],[55.3759757,23.1297129],[55.3755977,23.1289968],[55.3755185,23.1287634],[55.3754484,23.1283262],[55.3753951,23.1281868],[55.3753905,23.1279615],[55.375427,23.127784],[55.3754895,23.127653]],[]],[[[55.3800766,23.1225863],[55.3802168,23.1229565],[55.3803372,23.1233239],[55.3803912,23.1234634],[55.3804415,23.1235452],[55.3805002,23.1235921],[55.3805505,23.1236324],[55.3805718,23.123678],[55.3805848,23.123737],[55.3805779,23.1238228],[55.3805535,23.1239274],[55.3804987,23.1240401],[55.3804743,23.1241393],[55.3804773,23.124252],[55.3804911,23.1243941],[55.380584,23.1246382],[55.3805901,23.1246892],[55.3805627,23.1247187],[55.380517,23.1247213],[55.3804469,23.1247079],[55.3803941,23.12465],[55.3803524,23.1245819],[55.3803265,23.1244692],[55.3802564,23.1242064],[55.3801726,23.1239542],[55.3801132,23.1238228],[55.3800705,23.1237343],[55.3800248,23.1236538],[55.3799699,23.1235975],[55.379912,23.1235063],[55.3796392,23.1229833],[55.3794975,23.1226587],[55.379432,23.1224442],[55.3794061,23.1223074],[55.3794091,23.1221437],[55.3794396,23.1220257],[55.3795036,23.1219082],[55.3796171,23.1218004],[55.3796781,23.121779],[55.3797139,23.1217897],[55.3797573,23.1218393],[55.3798145,23.1219453],[55.379944,23.122251]],[[[55.3803128,23.1235237],[55.3802952,23.1235573],[55.3803011,23.1236306],[55.3803394,23.123796],[55.380376,23.1238805],[55.380405,23.1238979],[55.3804278,23.1238966],[55.38044,23.123863],[55.3804415,23.1237799],[55.3804118,23.1236377],[55.3803935,23.1235921],[55.3803608,23.1235385],[55.3803379,23.1235184]]]],[[[55.3925592,23.0744925],[55.3920486,23.0741368],[55.3912005,23.0736939],[55.3911354,23.0737242],[55.3911065,23.073775],[55.3911065,23.0741186],[55.3911738,23.074906],[55.391199,23.0749681],[55.3913692,23.0750487],[55.391853,23.0749225],[55.3919879,23.0749311],[55.3923299,23.0751273],[55.3926651,23.075559],[55.3927514,23.0756745],[55.3929528,23.0757175],[55.3933458,23.0757734],[55.3934062,23.0757331],[55.3934465,23.0756307],[55.3934639,23.0755409],[55.3934835,23.0751949],[55.3934656,23.0750304],[55.3934176,23.0749825],[55.393099,23.0749277],[55.3930018,23.0748832],[55.3928038,23.0746629]],[]]]};
+const FAC={"lots":[[[55.3672831,23.137949],[55.3673663,23.1380681],[55.367265,23.1383387],[55.3671922,23.1382916],[55.3671922,23.1382125]],[[55.3847008,23.1194564],[55.384612,23.1196461],[55.3844844,23.1194609],[55.3843879,23.1196669],[55.3846501,23.1200474],[55.3847012,23.1199382],[55.3848322,23.1196271],[55.3848537,23.1192144],[55.3849305,23.119204],[55.3849524,23.119039],[55.3848223,23.1187149],[55.3847844,23.1187105],[55.3847851,23.1190561]],[[55.3841525,23.1191013],[55.3840365,23.1189107],[55.3839264,23.1191182],[55.3840424,23.1193088]],[[55.3849582,23.1272417],[55.3844573,23.1293107],[55.3842684,23.129169],[55.3847693,23.1271]],[[55.3729006,23.1272507],[55.3726907,23.1277346],[55.3726739,23.1277732],[55.3725681,23.1276311],[55.3727948,23.1271086]],[[55.3823257,23.1185119],[55.3820905,23.1189593],[55.3819906,23.1187967],[55.3822259,23.1183493]],[[55.3823815,23.1186547],[55.3824139,23.1187076],[55.382149,23.1192096],[55.3821166,23.1191567]],[[55.37943,23.1196399],[55.3793451,23.1195434],[55.3794343,23.1192563],[55.3793444,23.1191276],[55.3792914,23.1192471],[55.3792442,23.1189764],[55.3794414,23.1185305],[55.3796278,23.1187588],[55.3797317,23.1188988],[55.3795615,23.1193221]],[[55.3799839,23.1133072],[55.3795636,23.1128877],[55.3794835,23.1131221],[55.3799004,23.1135582]],[[55.3816741,23.1167347],[55.3816261,23.1167706],[55.3821878,23.1176645],[55.3822373,23.1176577]],[[55.3794177,23.1318816],[55.3790918,23.1320937],[55.3791852,23.1324491],[55.3792842,23.1323433],[55.3793299,23.1324028],[55.3794823,23.1322449]],[[55.3818542,23.1321015],[55.3817354,23.1322789],[55.381985,23.1328598],[55.3821185,23.1326459],[55.3820994,23.1326003],[55.3821098,23.1325387],[55.3821338,23.132507],[55.3821014,23.1324373],[55.3818832,23.1321414]],[[55.3708723,23.1425502],[55.3708499,23.1427667],[55.3708183,23.1427566],[55.3707967,23.1429652],[55.3707168,23.1429397],[55.3707064,23.1430401],[55.3705681,23.1429958],[55.3706224,23.1424702]],[[55.3778493,23.1337503],[55.3778113,23.1344681],[55.3776377,23.1344397],[55.3776757,23.1337219]],[[55.3721492,23.1264098],[55.3720817,23.1263189],[55.3719946,23.1265193],[55.371986,23.1265392],[55.3720535,23.1266301]],[[55.3723448,23.1258281],[55.3722608,23.1257218],[55.3722079,23.1257362],[55.3721006,23.1260103],[55.3722016,23.1261519]],[[55.3706608,23.1291385],[55.3706649,23.1292476],[55.3705087,23.1295734],[55.3704422,23.1296014],[55.3704165,23.1295694],[55.3706368,23.1291041]],[[55.3705318,23.1211108],[55.370627,23.1207825],[55.3710102,23.12115],[55.3709386,23.121374],[55.3708778,23.1214985],[55.3707175,23.1220177],[55.3705529,23.1218742],[55.3704857,23.1221095],[55.3697977,23.1214933],[55.3698747,23.1212358],[55.369822,23.1211807],[55.3700167,23.1206708],[55.3701145,23.1207632],[55.3701473,23.1206558],[55.3701876,23.120694],[55.3702508,23.1204869],[55.3700522,23.1202994],[55.3700771,23.1202177],[55.370108,23.1201164],[55.3703432,23.1203385],[55.3702028,23.1207988]],[[55.3790775,23.1173321],[55.3790031,23.1176754],[55.3788595,23.1174955],[55.3789762,23.1172109]],[[55.3794523,23.1138236],[55.3793663,23.11372],[55.3792073,23.1141285],[55.3788281,23.1136713],[55.3786965,23.1140093],[55.3790541,23.1144404],[55.3790792,23.1143759],[55.3792022,23.1145242],[55.3791775,23.1145877],[55.3793227,23.1147627],[55.379353,23.1146849],[55.3793909,23.1147305],[55.3794903,23.114475],[55.3794529,23.11443],[55.379483,23.1143526],[55.379322,23.1141585]],[[55.3796568,23.117757],[55.3796066,23.1178941],[55.3794968,23.1177623],[55.3793534,23.1181148],[55.3794046,23.1181781],[55.3794663,23.1180507],[55.3797794,23.1184995],[55.3797266,23.1186188],[55.3792082,23.1179544],[55.3794092,23.1174094]],[[55.3780328,23.1162708],[55.377998,23.1163553],[55.3778247,23.1161345],[55.3778595,23.1160499]],[[55.3819183,23.1178433],[55.3818087,23.1180631],[55.3815808,23.1177109],[55.3816533,23.1175654],[55.3817574,23.1177263],[55.3817703,23.1177462],[55.3819075,23.117471],[55.3820562,23.1177006],[55.3819789,23.1178555]],[[55.3797495,23.1106089],[55.3796211,23.1109806],[55.3795132,23.1108652],[55.3796415,23.1104934]],[[55.379456,23.1117843],[55.3793843,23.1119908],[55.3792149,23.1118085],[55.3792866,23.111602]],[[55.3802741,23.1124334],[55.3801791,23.1123481],[55.3800779,23.1126972],[55.3801729,23.1127825]],[[55.3786601,23.1237843],[55.3784495,23.1237],[55.3783003,23.1236496],[55.3784095,23.1240241],[55.3786671,23.1237999]],[[55.3801721,23.1176599],[55.3800465,23.1179514],[55.379837,23.1176746],[55.3799631,23.1173544]],[[55.3818337,23.1263116],[55.3814424,23.1265629],[55.3814539,23.1264069],[55.3818118,23.1261779]],[[55.3806177,23.1133883],[55.3808099,23.1137144],[55.380605,23.1140953],[55.3804056,23.113783]],[[55.3815781,23.1103995],[55.3815062,23.1106978],[55.3814103,23.1106262],[55.3814822,23.1103279]],[[55.3868874,23.1302603],[55.3869194,23.1305453],[55.3867726,23.130595],[55.3867627,23.1305594],[55.3867378,23.1303083]],[[55.3862759,23.126924],[55.3864266,23.1272071],[55.3865128,23.1270179],[55.3866303,23.1267628],[55.3864758,23.1265572]],[[55.388729,23.1296227],[55.3886902,23.1297834],[55.3887552,23.1298516],[55.3887927,23.1297657],[55.3889453,23.1299197],[55.3889155,23.1300368],[55.3887965,23.1299594],[55.388644,23.129922],[55.388454,23.1297701],[55.3885302,23.1294752],[55.3887089,23.1296078]],[[55.3885344,23.1291425],[55.3884578,23.1294591],[55.3882914,23.1293343],[55.388368,23.1290177]],[[55.3886269,23.1275149],[55.3885156,23.1280783],[55.3883794,23.1279631],[55.3884572,23.1276176],[55.3885385,23.1274247]],[[55.3860695,23.1150505],[55.3860332,23.1150877],[55.3862151,23.1156367],[55.3862514,23.1155995]],[[55.3856881,23.1150199],[55.3856575,23.1151278],[55.3856409,23.1151866],[55.3852325,23.1148276],[55.3852468,23.1147772],[55.3852798,23.1146609]],[[55.3858258,23.118109],[55.3859688,23.1183059],[55.38579,23.1187086],[55.3857711,23.1186826],[55.385647,23.1185117],[55.3856594,23.1184837]],[[55.3851168,23.1155832],[55.3855342,23.1158921],[55.3855503,23.1158247],[55.3855585,23.1157904],[55.3854806,23.1157328],[55.3854934,23.1156793],[55.3851539,23.1154281],[55.3851312,23.1155232]],[[55.3896997,23.1215928],[55.389789,23.1220454],[55.3896222,23.1221474],[55.3895329,23.1216948]],[[55.3827175,23.1103262],[55.3826286,23.1102598],[55.3827169,23.1099212],[55.382794,23.1099933]],[[55.382787,23.1152591],[55.3827108,23.1151478],[55.3825775,23.1154482],[55.3826621,23.1155675]],[[55.3829723,23.1147914],[55.3828564,23.1147118],[55.3827749,23.1150713],[55.3829003,23.115141]],[[55.3836523,23.1132716],[55.3834859,23.1139855],[55.3833137,23.1138611],[55.3834801,23.1131472]],[[55.3841896,23.1133767],[55.384085,23.1137914],[55.3839191,23.1136617],[55.3840237,23.113247]],[[55.3820849,23.1088359],[55.3819611,23.1092951],[55.3817875,23.1092149],[55.3818733,23.1087223]],[[55.3840828,23.1066864],[55.3840121,23.1066433],[55.3839327,23.1066509],[55.3839236,23.1071195],[55.3840745,23.1071276]],[[55.3850917,23.1325625],[55.3851898,23.1325115],[55.3852983,23.1332823],[55.3852078,23.133326],[55.3851158,23.132721]],[[55.388997,23.0733011],[55.3889918,23.0725161],[55.3890707,23.0725145],[55.3896721,23.0725021],[55.3896726,23.0725753],[55.3897195,23.0725743],[55.38972,23.0726529],[55.3897242,23.0732862]],[[55.3843797,23.1055312],[55.3846807,23.1055621],[55.3846487,23.1065268],[55.3843477,23.1064958]]],"pitches":[["basketball",0,"",[[55.384225,23.1086416],[55.3842356,23.1081769],[55.3841088,23.108168],[55.3840982,23.1086326]]],["basketball",0,"",[[55.371166,23.1306308],[55.3710725,23.1304647],[55.370887,23.1307881],[55.3709805,23.1309541]]],["volleyball",0,"",[[55.3844918,23.1082062],[55.3843994,23.1082],[55.3843889,23.1086832],[55.3844814,23.1086894]]],["soccer",0,"",[[55.3710539,23.1304375],[55.3708014,23.1299884],[55.3706215,23.1303018],[55.370874,23.1307509]]],["basketball",0,"",[[55.3843868,23.1081959],[55.3843717,23.1086701],[55.3842458,23.1086577],[55.3842608,23.1081835]]],["tennis",0,"",[[55.3716025,23.1268394],[55.3713412,23.1272013],[55.3714397,23.1274215],[55.371701,23.1270596]]],["basketball",0,"",[[55.3857472,23.1334826],[55.3857823,23.1336935],[55.3855689,23.1338038],[55.3855337,23.133593]]],["basketball",0,"",[[55.3857838,23.1337189],[55.3858156,23.1339177],[55.3856062,23.1340215],[55.3855744,23.1338227]]],["volleyball",0,"",[[55.3854462,23.1335314],[55.3853065,23.1335984],[55.3853767,23.1340517],[55.3855164,23.1339846]]],["basketball",0,"",[[55.3868558,23.1306099],[55.3868876,23.1308071],[55.3866571,23.1309222],[55.3866254,23.130725]]],["multi",0,"",[[55.3858594,23.133387],[55.3857798,23.1334282],[55.3858247,23.1336965],[55.3859042,23.1336553]]],["multi",0,"",[[55.3874288,23.1224263],[55.3873584,23.1226456],[55.3872882,23.1228645],[55.3871398,23.1227169],[55.3871044,23.1226817],[55.387245,23.1222435],[55.387374,23.1223718],[55.3874121,23.1224097]]],["tennis",0,"",[[55.3865911,23.0948069],[55.3865507,23.0950594],[55.3862491,23.0949097],[55.3862895,23.0946572]]],["soccer",0,"",[[55.381821,23.1304784],[55.3820221,23.1299648],[55.3818695,23.1297797],[55.3816685,23.1302934],[55.3817071,23.1303403]]],["basketball",0,"",[[55.3817071,23.1303403],[55.381608,23.1305936],[55.3817219,23.1307317],[55.381821,23.1304784]]],["basketball",0,"",[[55.3905578,23.1118836],[55.3907117,23.1122614],[55.3905946,23.1124094],[55.3904406,23.1120316]]],["soccer",0,"",[[55.3822016,23.1300132],[55.3824649,23.1303489],[55.3821242,23.131177],[55.3818609,23.1308412]]],["",0,"",[[55.3818609,23.1308412],[55.3818522,23.1308653],[55.381832,23.1309585],[55.381836,23.1310702],[55.3818504,23.131148],[55.3818876,23.1312243],[55.381941,23.1312805],[55.3820001,23.1312982],[55.3820517,23.1312828],[55.3821068,23.1312204],[55.3821242,23.131177]]],["",0,"",[[55.3822016,23.1300132],[55.3822215,23.1299626],[55.3822556,23.1299148],[55.3823073,23.1298879],[55.3823659,23.1298848],[55.3824066,23.1299094],[55.3824438,23.129958],[55.3824797,23.1300388],[55.3824958,23.1301382],[55.3824915,23.1302484],[55.382474,23.1303177],[55.3824649,23.1303489]]],["basketball",0,"",[[55.403785,23.1534663],[55.4037005,23.153531],[55.4036273,23.1532346],[55.4037117,23.1531698]]],["roller_skating",0,"",[[55.3813049,23.1256226],[55.3813562,23.1256928],[55.3813642,23.125978],[55.3811471,23.1261094],[55.3810814,23.1258661],[55.3811089,23.1258348],[55.3811059,23.1256977],[55.3811772,23.125579]]],["basketball",2,"",[[55.384628,23.1222957],[55.3844283,23.1225674],[55.384345,23.1223802],[55.3845448,23.1221084]]],["basketball",2,"",[[55.3845392,23.1220959],[55.3843395,23.1223677],[55.3842562,23.1221804],[55.3844559,23.1219087]]]],"parks":[["Raseini\u0173 parkas",[[55.3829655,23.1188777],[55.3823994,23.1199617],[55.3830055,23.1213507],[55.3835537,23.1225038],[55.3840322,23.1233999],[55.3845589,23.1240015],[55.3851826,23.124606],[55.3852685,23.1245906],[55.3853897,23.1240159],[55.3853889,23.123934],[55.3842936,23.1215001],[55.3835486,23.1198212]]],["\u017demai\u010dio aik\u0161t\u0117",[[55.3817347,23.1169857],[55.3816043,23.1167826],[55.3816583,23.1166752],[55.3811657,23.1159078],[55.3807359,23.1167625],[55.3813589,23.117733]]]],"bleachers":[[[55.3709648,23.1290492],[55.3709171,23.128984],[55.3713453,23.1280143],[55.371393,23.1280795]]],"benches":[[55.3709972,23.1197941],[55.3709668,23.1197982],[55.3709058,23.1196882],[55.3708806,23.1197365],[55.3708806,23.1198183]],"masts":[[55.3722344,23.1286903],[55.3714119,23.1305074],[55.3706738,23.1294676],[55.3714963,23.1276434]],"play":[[55.3709919,23.1198505]],"stops":[[55.4026932,23.1560734,2,""],[55.4031389,23.1581409,2,""],[55.3789799,23.1155921,2,"Raseini\u0173 autobus\u0173 stotis"],[55.3781206,23.1151321,2,"Raseiniai AS"],[55.3770252,23.0867481,2,"Ston\u0173 sodai"],[55.3634087,23.1497061,2,"Norg\u0117lai"],[55.3611837,23.1534748,2,"Norg\u0117lai"],[55.3601346,23.1556233,2,"Norg\u0117lai"],[55.3886501,23.0714147,2,""],[55.3889883,23.0706181,2,""],[55.3733071,23.1264889,2,""],[55.3728834,23.1276691,2,""],[55.3729626,23.127653,2,""],[55.3853807,23.0857059,2,""],[55.3858393,23.0844668,2,""],[55.3747999,23.0992618,0,""],[55.3747081,23.0986201,0,""]],"water":[[[[55.3737432,23.0813032],[55.3737625,23.0813733],[55.3737522,23.0814435],[55.3737239,23.0815204],[55.3737134,23.0815568],[55.373698,23.0816116],[55.3736647,23.0816893],[55.3736281,23.0817013],[55.3735311,23.0816584],[55.3733897,23.0815272],[55.373373,23.081448],[55.3733717,23.0813394],[55.3733663,23.0812264],[55.3733331,23.081181],[55.3733151,23.0811493],[55.3733254,23.0811018],[55.3733537,23.0811131],[55.3733842,23.081136],[55.3734169,23.0810998],[55.3734679,23.0810663],[55.3735362,23.0811064],[55.3735603,23.0811307],[55.3736072,23.0811786],[55.3736865,23.0812352]],[[[55.3736586,23.0814937],[55.3736568,23.081562],[55.3736326,23.0816114],[55.3735907,23.0816171],[55.3735431,23.0815877],[55.3734789,23.0815311],[55.3734711,23.0814745],[55.3734621,23.0813931],[55.3734904,23.081375],[55.3735363,23.0813839],[55.3735946,23.0814021],[55.3736494,23.0814368]]]],[[[55.3802152,23.1250338],[55.3801939,23.1250097],[55.3801733,23.1250124],[55.3800171,23.1252792],[55.3799973,23.125357],[55.379973,23.1254281],[55.3799349,23.1254911],[55.3798686,23.1255394],[55.3798069,23.1255971],[55.3794122,23.1263414],[55.3792887,23.1265493],[55.379275,23.1265774],[55.3792773,23.1266016],[55.3792948,23.1266163],[55.3794731,23.1266056],[55.3794952,23.1265976],[55.3795196,23.1265815],[55.3795836,23.1264983],[55.3796469,23.1263897],[55.3797109,23.1263079],[55.379829,23.1262274],[55.3800042,23.1261402],[55.3800271,23.1261161],[55.3800796,23.1260088],[55.3801436,23.1258211],[55.3802381,23.1254818],[55.380261,23.1253436],[55.3802622,23.125267],[55.3802305,23.1251018]],[[[55.3799806,23.1257674],[55.3799585,23.1257634],[55.3799303,23.1257848],[55.3799097,23.1258385],[55.3799074,23.1258747],[55.379915,23.1259122],[55.3799379,23.1259297],[55.3799722,23.1259029],[55.3799859,23.1258787],[55.3799958,23.1258385],[55.3799958,23.1257942]]]],[[[55.3705277,23.0771215],[55.3705042,23.0771871],[55.370297,23.0773375],[55.3702672,23.0774019],[55.3701615,23.077429],[55.3695741,23.0779098],[55.3694961,23.0779262],[55.3694329,23.0778084],[55.3693604,23.0773832],[55.3694013,23.0772981],[55.3698418,23.076922],[55.3699366,23.0768075],[55.3702954,23.0768402]],[[[55.3700593,23.0772033],[55.3700686,23.0772523],[55.3700407,23.077272],[55.3699905,23.0772523],[55.3700054,23.0772]]]],[[[55.3580571,23.1467603],[55.3579899,23.146727],[55.357884,23.1466845],[55.3577502,23.1467074],[55.3577373,23.1462831],[55.3577445,23.1462043],[55.3577585,23.1461649],[55.3577775,23.1461482],[55.3578343,23.1461409],[55.3578732,23.1461241],[55.3579036,23.1460766],[55.3579371,23.1459615],[55.357941,23.1459018],[55.3579154,23.1457784],[55.3578836,23.1457009],[55.3577216,23.1454353],[55.3575704,23.145208],[55.3575251,23.1451682],[55.3573922,23.1451024],[55.357325,23.145062],[55.3572072,23.144944],[55.3571817,23.1448944],[55.3571662,23.1448318],[55.3571504,23.1447793],[55.3570857,23.1446702],[55.3570182,23.1445847],[55.3568631,23.1444946],[55.3567868,23.144428],[55.3567227,23.1443466],[55.3566701,23.1442987],[55.3566064,23.1442844],[55.3563601,23.1443304],[55.3562138,23.1443327],[55.3560965,23.144332],[55.356004,23.1443158],[55.3557451,23.144214],[55.3556644,23.1441682],[55.3555791,23.1440868],[55.3555113,23.1440495],[55.3554139,23.1440235],[55.3553572,23.1440131],[55.3553234,23.1439783],[55.3552444,23.143831],[55.3551848,23.1437802],[55.355115,23.143758],[55.3549834,23.1437647],[55.3549371,23.1437726],[55.354908,23.1437504],[55.3548128,23.1435738],[55.3547506,23.1435302],[55.3547128,23.1435252],[55.3546438,23.143565],[55.3546026,23.1435916],[55.3545751,23.1435826],[55.3545266,23.1435222],[55.3544405,23.1434418],[55.3540857,23.1432071],[55.3539596,23.1430928],[55.3538653,23.1430195],[55.3537726,23.1429582],[55.3537441,23.14291],[55.3537064,23.1428172],[55.3536475,23.1426629],[55.3535552,23.1424989],[55.3534877,23.1424161],[55.3534123,23.1423671],[55.3533119,23.1423398],[55.3531953,23.1423501],[55.3530991,23.1423916],[55.3529619,23.1425072],[55.3529073,23.1425773],[55.3528447,23.1426176],[55.3527215,23.1426219],[55.3526856,23.1425964],[55.3526237,23.1424826],[55.3525553,23.142362],[55.3524452,23.1422638],[55.3522853,23.1421609],[55.3522424,23.1421099],[55.3521807,23.1420388],[55.351684,23.1417228],[55.3515384,23.1415678],[55.3514869,23.1412817],[55.3515511,23.1410268],[55.3518865,23.1400183],[55.3519179,23.1399238],[55.3519923,23.1399043],[55.3520432,23.139914],[55.3521372,23.140049],[55.3522311,23.1402638],[55.3523029,23.1404467],[55.3524475,23.1405762],[55.3528655,23.1406964],[55.3529241,23.1408609],[55.3531495,23.1410988],[55.353394,23.1412144],[55.3536437,23.1412514],[55.3537354,23.1413762],[55.3539506,23.1413518],[55.3543352,23.1418849],[55.3543772,23.1420422],[55.3544877,23.1420884],[55.3546083,23.1422265],[55.3547847,23.1425139],[55.355027,23.1426346],[55.3551532,23.1426445],[55.3553947,23.1428561],[55.3558568,23.1432358],[55.3559969,23.1431957],[55.3566687,23.1433043],[55.3569048,23.1434967],[55.3570359,23.1435729],[55.3571806,23.1434609],[55.3572725,23.1433168],[55.3571895,23.1436014],[55.3572852,23.1438303],[55.3573869,23.1440732],[55.357503,23.1446273],[55.3576371,23.1447706],[55.3577526,23.1448096],[55.3578771,23.1450053],[55.3580664,23.1452898],[55.358094,23.1453418],[55.3581186,23.1454393],[55.3581271,23.1455455],[55.3581249,23.1456166],[55.3580735,23.145838],[55.3580301,23.1460149],[55.3580247,23.146081],[55.3580415,23.1462248],[55.3579809,23.1462926],[55.3579836,23.1464984]],[]],[[[55.3613426,23.1444936],[55.3613329,23.144793],[55.3613286,23.1449959],[55.3613021,23.1450423],[55.3613086,23.1451162],[55.3613561,23.1451561],[55.3613835,23.1452642],[55.3613976,23.1453277],[55.3615512,23.145542],[55.3616194,23.1455881],[55.3616687,23.1456065],[55.3617665,23.1458237],[55.3618112,23.1459469],[55.3618649,23.1460446],[55.3618918,23.1461243],[55.3619587,23.1461527],[55.3620988,23.1461812],[55.362164,23.1462379],[55.362212,23.1462779],[55.3622605,23.1463291],[55.3623425,23.1463633],[55.3623909,23.1464315],[55.3625074,23.1466383],[55.3625537,23.1466819],[55.3626033,23.1467274],[55.3626378,23.1467919],[55.3626454,23.1468393],[55.3626949,23.146881],[55.362765,23.1470066],[55.3628426,23.1470802],[55.3628954,23.1471788],[55.3629817,23.1472452],[55.3630948,23.1473387],[55.3632088,23.1473598],[55.3633237,23.1473567],[55.3634428,23.1473816],[55.3635131,23.1473609],[55.3635492,23.1473611],[55.3636425,23.1473931],[55.3636633,23.1474043],[55.3637018,23.1473988],[55.363746,23.1473647],[55.3637797,23.1473569],[55.3638154,23.1473214],[55.3638507,23.1472724],[55.3638864,23.1471756],[55.3639698,23.1470759],[55.3640482,23.1470759],[55.3641332,23.1468471],[55.3642449,23.1468236],[55.364365,23.1464862],[55.3645067,23.1461459],[55.3646501,23.1458702],[55.3647387,23.1457544],[55.3648052,23.1456302],[55.3651393,23.1447373],[55.3651696,23.1443767],[55.3651461,23.1443387],[55.3650558,23.1443461],[55.3650032,23.1444269],[55.3649478,23.1444932],[55.3648689,23.1444895],[55.3647091,23.1443377],[55.3646475,23.1442699],[55.3646128,23.1444081],[55.364533,23.1444973],[55.3644423,23.1445124],[55.3642877,23.145088],[55.3642443,23.1451928],[55.3642259,23.1454407],[55.3642328,23.145545],[55.3642061,23.1456608],[55.364115,23.1458173],[55.363839,23.1464149],[55.3637838,23.1464968],[55.3636935,23.1465386],[55.3636355,23.1465383],[55.3635594,23.1465299],[55.363484,23.1465048],[55.3633566,23.1464212],[55.3632515,23.1463339],[55.3631894,23.1462529],[55.3631303,23.1461156],[55.3629894,23.1458438],[55.362846,23.1456677],[55.3626892,23.1455533],[55.3625877,23.1453725],[55.3625075,23.1452908],[55.362408,23.1452429],[55.3623465,23.1451628],[55.3622873,23.1450067],[55.3621955,23.1448203],[55.3621459,23.1445964],[55.362015,23.1443777],[55.3619779,23.1443606],[55.3619655,23.1443217],[55.361932,23.1443056],[55.3617405,23.144223],[55.3617141,23.1441491],[55.3616262,23.1441113],[55.3615403,23.1442156],[55.3614332,23.1443063],[55.3613653,23.1444356]],[]],[[[55.3755657,23.1275564],[55.3757364,23.1274679],[55.3758934,23.1274277],[55.376087,23.1274116],[55.3763491,23.1273714],[55.3768062,23.1273234],[55.3770135,23.1272855],[55.3772238,23.127307],[55.3772909,23.1273472],[55.3773275,23.127417],[55.3773412,23.1274921],[55.3773818,23.1282408],[55.3773747,23.1283638],[55.3773392,23.1284317],[55.3769461,23.1285812],[55.3767682,23.1286401],[55.3766645,23.1287152],[55.3765716,23.1288519],[55.3765106,23.128978],[55.3764832,23.1291336],[55.3764695,23.129375],[55.3764817,23.1295466],[55.3767133,23.1306142],[55.3767758,23.1309709],[55.3767956,23.1312472],[55.3767682,23.1314859],[55.3767042,23.1316575],[55.3766295,23.1317541],[55.3765792,23.1317487],[55.3765133,23.1316552],[55.3764649,23.1314966],[55.376442,23.1313276],[55.3764207,23.131054],[55.376343,23.1306142],[55.3762378,23.1302628],[55.3759757,23.1297129],[55.3755977,23.1289968],[55.3755185,23.1287634],[55.3754484,23.1283262],[55.3753951,23.1281868],[55.3753905,23.1279615],[55.375427,23.127784],[55.3754895,23.127653]],[]],[[[55.3800766,23.1225863],[55.3802168,23.1229565],[55.3803372,23.1233239],[55.3803912,23.1234634],[55.3804415,23.1235452],[55.3805002,23.1235921],[55.3805505,23.1236324],[55.3805718,23.123678],[55.3805848,23.123737],[55.3805779,23.1238228],[55.3805535,23.1239274],[55.3804987,23.1240401],[55.3804743,23.1241393],[55.3804773,23.124252],[55.3804911,23.1243941],[55.380584,23.1246382],[55.3805901,23.1246892],[55.3805627,23.1247187],[55.380517,23.1247213],[55.3804469,23.1247079],[55.3803941,23.12465],[55.3803524,23.1245819],[55.3803265,23.1244692],[55.3802564,23.1242064],[55.3801726,23.1239542],[55.3801132,23.1238228],[55.3800705,23.1237343],[55.3800248,23.1236538],[55.3799699,23.1235975],[55.379912,23.1235063],[55.3796392,23.1229833],[55.3794975,23.1226587],[55.379432,23.1224442],[55.3794061,23.1223074],[55.3794091,23.1221437],[55.3794396,23.1220257],[55.3795036,23.1219082],[55.3796171,23.1218004],[55.3796781,23.121779],[55.3797139,23.1217897],[55.3797573,23.1218393],[55.3798145,23.1219453],[55.379944,23.122251]],[[[55.3803128,23.1235237],[55.3802952,23.1235573],[55.3803011,23.1236306],[55.3803394,23.123796],[55.380376,23.1238805],[55.380405,23.1238979],[55.3804278,23.1238966],[55.38044,23.123863],[55.3804415,23.1237799],[55.3804118,23.1236377],[55.3803935,23.1235921],[55.3803608,23.1235385],[55.3803379,23.1235184]]]],[[[55.3925592,23.0744925],[55.3920486,23.0741368],[55.3912005,23.0736939],[55.3911354,23.0737242],[55.3911065,23.073775],[55.3911065,23.0741186],[55.3911738,23.074906],[55.391199,23.0749681],[55.3913692,23.0750487],[55.391853,23.0749225],[55.3919879,23.0749311],[55.3923299,23.0751273],[55.3926651,23.075559],[55.3927514,23.0756745],[55.3929528,23.0757175],[55.3933458,23.0757734],[55.3934062,23.0757331],[55.3934465,23.0756307],[55.3934639,23.0755409],[55.3934835,23.0751949],[55.3934656,23.0750304],[55.3934176,23.0749825],[55.393099,23.0749277],[55.3930018,23.0748832],[55.3928038,23.0746629]],[]]]};
 function facRect(p){let c0=0,c1=0;for(const q of p){c0+=q[0]/p.length;c1+=q[1]/p.length;}
   let bi=0,bl=0;for(let i=0;i<p.length;i++){const q=p[(i+1)%p.length],l=Math.hypot(q[0]-p[i][0],q[1]-p[i][1]);if(l>bl){bl=l;bi=i;}}
   const a=p[bi],b=p[(bi+1)%p.length],ux=(b[0]-a[0])/bl,uz=(b[1]-a[1])/bl,vx=-uz,vz=ux;let L0=1e9,L1=-1e9,W0=1e9,W1=-1e9;
@@ -4017,17 +4733,19 @@ function buildStadium(){
     for(const g of FAC.bleachers){const R=facRect(g.map(q=>LL(...q))),f=Math.sign((mc[0]-R.cx)*R.vx+(mc[1]-R.cz)*R.vz)||1,hd=hdOf(R.ux,R.uz);
       for(let k=0;k<4;k++){const [x,z]=R.at(0,f*(R.W/2-(k+.5)*R.W/4)),y=.45*(k+1);put('stand',x,z,y/2,hd,R.L,y,R.W/4);}
       const c=[R.at(-R.L/2,-R.W/2),R.at(R.L/2,-R.W/2),R.at(R.L/2,R.W/2),R.at(-R.L/2,R.W/2)];for(let i=0;i<4;i++)addWall(...c[i],...c[(i+1)%4]);}
-    const lotCars=TRAFFIC_GEOS.map(()=>[]);let n=0;
+    const lotCars=LOT_GEOS.map(()=>[]);let n=0;
     for(const R of world.lots){for(const e of R.rows)for(let s=-R.L/2+1.85;s<=R.L/2-1.2;s+=2.5){
-      const hs=hash(R.cx*.13+s*1.7+e*5.1);if(hs>.55)continue;const [x,z]=R.at(s,e*(R.W/2-2.5)),fl=hs<.27?1:-1,k=Math.floor(hash(n*3.3+.9)*TRAFFIC_GEOS.length);
+      const hs=hash(R.cx*.13+s*1.7+e*5.1);if(hs>.32)continue;const [x,z]=R.at(s,e*(R.W/2-2.5)),fl=hs<.16?1:-1,k=Math.floor(hash(n*3.3+.9)*LOT_GEOS.length);
       lotCars[k].push([x,GY(x,z),z,Math.atan2(R.vx*fl*e,R.vz*fl*e),CAR_COLORS[Math.floor(hash(n*7.7+.5)*CAR_COLORS.length)]]);n++;
       const q=[[-2.2,-.9],[2.2,-.9],[2.2,.9],[-2.2,.9]].map(([a,b])=>[x+R.vx*a+R.ux*b,z+R.vz*a+R.uz*b]);for(let i=0;i<4;i++)addWall(...q[i],...q[(i+1)%4]);}}
+    // parked cars: bodies with coarse wheel arches and an 8-sided wheel; only the paint casts a shadow, and not on phones
+    const lotWheel=new THREE.CylinderGeometry(WHEEL_R,WHEEL_R,.2,8).rotateZ(Math.PI/2);{const n=lotWheel.attributes.position.count;lotWheel.setAttribute('color',new THREE.Float32BufferAttribute(new Array(n*3).fill(.05),3));}
     {const M=new THREE.Matrix4(),Mw=new THREE.Matrix4(),Q=new THREE.Quaternion(),V=new THREE.Vector3(),S1=new THREE.Vector3(1,1,1),col=new THREE.Color();
-      TRAFFIC_GEOS.forEach((G,k)=>{const Lc=lotCars[k];if(!Lc.length)return;
-        const pm=new THREE.InstancedMesh(G.paint,new THREE.MeshPhongMaterial({color:0xffffff,specular:0x383838,shininess:60}),Lc.length),tm=new THREE.InstancedMesh(G.trim,trimM,Lc.length),wm=new THREE.InstancedMesh(G.wheel,trimM,Lc.length*4);
+      LOT_GEOS.forEach((G,k)=>{const Lc=lotCars[k];if(!Lc.length)return;
+        const pm=new THREE.InstancedMesh(G.paint,new THREE.MeshPhongMaterial({color:0xffffff,specular:0x383838,shininess:60}),Lc.length),tm=new THREE.InstancedMesh(G.trim,trimM,Lc.length),wm=new THREE.InstancedMesh(lotWheel,trimM,Lc.length*4);
         Lc.forEach(([x,y,z,h,c],i)=>{Q.setFromAxisAngle(Y_AXIS,h);M.compose(V.set(x,y,z),Q,S1);pm.setMatrixAt(i,M);tm.setMatrixAt(i,M);pm.setColorAt(i,col.setHex(c));
           let j=0;for(const az of AXLES)for(const ax of[-.74,.74]){Mw.makeRotationY(ax<0?Math.PI:0);Mw.setPosition(ax,WHEEL_R,az);wm.setMatrixAt(i*4+j++,M.clone().multiply(Mw));}});
-        pm.castShadow=tm.castShadow=true;worldGroup.add(pm,tm,wm);});}
+        pm.castShadow=!PHONE;worldGroup.add(pm,tm,wm);});}
     const C={seat:0x7a5a3c,iron:0x2f3236,bin:0x2e4636,lamp:0x3a3f42,lampH:0x2a2d30,steel:0x8a8f93,board:0xe9ebea,rim:0xd2551e,net:0x2c2f31,fence:0x3d5a48,goal:0xf2f2f0,mast:0xb8bcbf,stand:0xa7a7a2,carL:0x1d1f21,brick:0x8a3e2e,cap:0xd9d7d0,sign:0x1f5fae,roofS:0x4a4f53,glass:0x9db4bb,frame:0x5d6266};
     for(const q of world.hedgeSegs||[])addWall(...q);
     for(const [x,z] of world.pillars||[]){put('brick',x,z,.95,0,.62,1.9,.62);put('cap',x,z,1.95,0,.72,.12,.72);}
@@ -4059,6 +4777,15 @@ function buildTown(){
     let nx=uz,nz=-ux;if(((a[0]+b[0])/2-c[0])*nx+((a[1]+b[1])/2-c[1])*nz<0){nx=-nx;nz=-nz;}
     return{a,ux,uz,nx,nz,l,hd:Math.atan2(ux,uz),at:(s,o)=>[a[0]+ux*s+nx*o,a[1]+uz*s+nz*o]};};
 
+  // a bench facing out from wall w at distance t along it, o out from it
+  const bench=(w,t,o)=>{const [bx,bz]=w.at(t,o),[kx,kz]=w.at(t,o-.2),g=GY(bx,bz);put('seat',[bx,g+.45,bz,w.hd,.42,.07,1.7]);put('seat',[kx,g+.7,kz,w.hd,.06,.4,1.7]);
+    for(const q of[-.7,.7]){const [lx,lz]=w.at(t+q,o);put('iron',[lx,g+.22,lz,w.hd,.42,.45,.08]);}addWall(...w.at(t-.85,o-.2),...w.at(t+.85,o-.2));};
+
+  // Žemaičio aikštė: benches on the paving round each lawn, the ones on the cut corners facing the monument
+  const SQ=typeof sqLayout==='function'&&sqLayout(q=>LL(q[0],q[1]));
+  if(SQ)for(const l of SQ.lawns){const c=centre(l);
+    for(const i of[4,0,3]){const w=side(l,i,c);if(i===4){bench(w,w.l*.3,.8);bench(w,w.l*.7,.8);}else for(let t=3;t<=w.l-3;t+=9)bench(w,t,.8);}}
+
   // five-storey blocks: loggia columns on one long side, stairwells with doors on the side facing the road
   const CONC=[.72,.72,.69],PARA=[[.74,.74,.71],[.80,.79,.75],[.62,.58,.52],[.86,.86,.84]],GLASS=[.62,.69,.72],FRAME=[.93,.93,.91];
   // a wall of one part may face another part or a neighbour: features go only where the outside is open
@@ -4084,8 +4811,7 @@ function buildTown(){
       for(let k=1;k<v1;k++){const [wx,wz]=F.at(t,.12);put('glass',[wx,s.yb+k*fh+.1,wz,F.hd,.05,1.05,.95]);}
       const [dx,dz]=F.at(t,.12);put(hash(seed+i)<.5?'door':'doorS',[dx,g+.35+1.08,dz,F.hd,.14,2.15,1.3]);
       const [cx,cz]=F.at(t,.8),[sx,sz]=F.at(t,.85);put('slab',[cx,g+.35+2.5,cz,F.hd,1.5,.14,2.4]);put('step',[sx,g+.02,sz,F.hd,1.6,.66,2.4]);
-      if(hash(seed+i*2.3)<.6){const [bx,bz]=F.at(t+2.6,2),[kx,kz]=F.at(t+2.6,1.8);put('seat',[bx,g+.45,bz,F.hd,.42,.07,1.7]);put('seat',[kx,g+.7,kz,F.hd,.06,.4,1.7]);
-        for(const q of[-.7,.7]){const [lx,lz]=F.at(t+2.6+q,2);put('iron',[lx,g+.22,lz,F.hd,.42,.45,.08]);}}}
+      if(hash(seed+i*2.3)<.6)bench(F,t+2.6,2);}
     // glass, plastic and paper bells by the end of the block on the road side
     const [rx,rz]=F.at(-4,6);if(!W.inBuilding(rx,rz)&&!onRoad(rx,rz,1)){const g=GY(rx,rz);
       ['bellG','bellY','bellB'].forEach((k,q)=>{const [x,z]=[rx+F.ux*q*1.9,rz+F.uz*q*1.9];put(k,[x,g+.75,z,0,1,1,1]);addWall(x-.8,z,x+.8,z);});}}
