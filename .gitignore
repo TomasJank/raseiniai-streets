@@ -4,6 +4,7 @@ work/*
 work/build/*
 !work/build/v37.html
 !work/build/v38.html
+!work/build/v39.html
 !work/*.mjs
 _m.html
 _*.html
