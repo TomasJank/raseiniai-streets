@@ -28,7 +28,7 @@ function prep(g){
   for(let i=0;i<si.count;i++){let b=0,w=-1;for(let k=0;k<4;k++)if(sw.getComponent(i,k)>w){w=sw.getComponent(i,k);b=si.getComponent(i,k);}
     const n=bones[b].name,key=Object.keys(REG).find(k=>n.startsWith(k))??(/index|middle|pinky|ring|thumb/.test(n)?'hand':'root');reg[i]=REG[key];
     if(n==='Head'){s0.getVertexPosition(i,v).applyMatrix4(s0.matrixWorld);top.push(i);ht=Math.max(ht,v.y);}}
-  const H=ht-hp.y;for(const i of top){s0.getVertexPosition(i,v).applyMatrix4(s0.matrixWorld);if(v.y>hp.y+.62*H||v.z<hp.z-.1*H&&v.y>hp.y+.3*H)reg[i]=6;}
+  const H=ht-hp.y;for(const i of top){s0.getVertexPosition(i,v).applyMatrix4(s0.matrixWorld);if(v.y>hp.y+.72*H||v.z<hp.z-.1*H&&v.y>hp.y+.3*H)reg[i]=6;}
   geo.setAttribute('region',new THREE.BufferAttribute(reg,1));
   for(const m of sk.slice(1))m.removeFromParent();
   const box=new THREE.Box3().setFromObject(g.scene,true);g.k=1.76/(box.max.y-box.min.y);g.mesh=s0;return g;}

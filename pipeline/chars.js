@@ -2,7 +2,7 @@
 // behaviour is untouched: poseAt still gets called for everyone, and for the nearest people it moves a SkinnedMesh instead of
 // the instanced rig. Far people, the taxi fare (it waves, no clip does) and everyone before the assets decode stay instanced.
 // Hats, bags, coats, long hair and sticks stay instanced too, carried by the mannequin's bones.
-const CHAR={park:new THREE.Matrix4().makeTranslation(0,-1e4,0),ready:false,near:60,keep:70,max:24,list:[],use:new Uint8Array(PED_ALL),body:{},clips:null,G:[],off:{},phoneOff:null,ms:0,
+const CHAR={park:new THREE.Matrix4().makeTranslation(0,-1e4,0),ready:false,near:60,keep:70,max:24,list:[],use:new Uint8Array(PED_ALL),body:{},clips:null,G:[],off:{},ms:0,n:0,
   // region per vertex from its heaviest bone: skin, shirt, forearm, legs, shin, shoe, hair
   REG:[['Head',0],['neck',0],['hand',0],['index',0],['middle',0],['ring',0],['pinky',0],['thumb',0],['spine',1],['clavicle',1],['upperarm',1],['lowerarm',2],['pelvis',3],['thigh',3],['calf',4],['foot',5],['ball',5]],
   // which bone carries each instanced gear part, keyed by its look option
@@ -24,7 +24,7 @@ async function charInit(){
       if(n==='Head'){s0.getVertexPosition(i,v).applyMatrix4(s0.matrixWorld);top[i]=1;ht=Math.max(ht,v.y);}}
     // hair: the crown and the back of the head
     const H=ht-hp.y;for(let i=0;i<si.count;i++)if(top[i]){s0.getVertexPosition(i,v).applyMatrix4(s0.matrixWorld);
-      if(v.y>hp.y+.62*H||v.z<hp.z-.1*H&&v.y>hp.y+.3*H)reg[i]=6;}
+      if(v.y>hp.y+.72*H||v.z<hp.z-.1*H&&v.y>hp.y+.3*H)reg[i]=6;}
     geo.setAttribute('region',new THREE.BufferAttribute(reg,1));s0.castShadow=true;
     // the bind-pose sphere misses a body lying down or mid-punch
     s0.computeBoundingSphere();s0.boundingSphere.radius*=1.8;
@@ -43,7 +43,7 @@ async function charInit(){
     for(const k of[...CHAR.G,8]){const src=k===8?'hand_r':CHAR.SRC[PARTS[k].opt],bone=st.bone[src];
       off[k]=bone.matrixWorld.clone().invert().multiply(new THREE.Matrix4().multiplyMatrices(inv,PM[k]));
       if(src==='hand_r')off[k].setPosition(0,0,0);}
-    scene.remove(o);}
+    o.removeFromParent();}
   hidePed(FARE_I);CHAR.ready=true;
 }
 function charMake(b){
@@ -55,7 +55,8 @@ function charMake(b){
     s.fragmentShader=s.fragmentShader.replace('#include <common>','#include <common>\nvarying vec3 vRc;').replace('vec4 diffuseColor = vec4( diffuse, opacity );','vec4 diffuseColor = vec4( diffuse*vRc, opacity );');};
   mat.customProgramCacheKey=()=>'char';mesh.material=mat;
   const mx=new THREE.AnimationMixer(o),act={};for(const n in CHAR.clips)act[n]=mx.clipAction(CHAR.clips[n]);
-  scene.add(o);return{b,o,mesh,rc,mx,act,bone,w:{},t:0,one:null,oneT:0,mode:null,swing:null,stag:0,cols:null,clip:'idle',phone:false,look:null};
+  // a child of the instanced torso, so whatever hides the crowd (views.mjs, cutscenes) hides the mannequins too
+  pedMesh[1].add(o);return{b,o,mesh,rc,mx,act,bone,t:0,one:null,oneT:0,mode:null,swing:null,cols:null,clip:'idle',phone:false,look:null};
 }
 function charHide(i){const st=CHAR.list[i];if(st)st.o.visible=false;CHAR.use[i]=0;}
 // called at the top of poseAt: true means the mannequin has this person and the instanced rig stays hidden
@@ -63,7 +64,7 @@ function charPose(i,look,x,z,h,fall,lift,ph,gait,wave,yaw,act){
   let st=CHAR.list[i];
   if(!CHAR.use[i]){if(st)st.o.visible=false;return false;}
   const b=look.male===false?'f':'m';
-  if(!st||st.b!==b){if(st){scene.remove(st.o);st.mx.stopAllAction();}st=CHAR.list[i]=charMake(b);st.cols=null;}
+  if(!st||st.b!==b){if(st){st.o.removeFromParent();st.mx.stopAllAction();}st=CHAR.list[i]=charMake(b);st.cols=null;}
   if(st.cols!==charCols.a[i]){const c=st.cols=charCols.a[i]||{};[c.skin,c.shirt,c.fore??c.shirt,c.legs,c.shin??c.legs,c.shoe,c.hair??c.skin].forEach((v,k)=>st.rc[k].setHex(v??0x808080));}
   const p=i<PED_N?peds[i]:null,o=st.o;
   if(!o.visible){o.visible=true;st.snap=true;}
@@ -76,7 +77,7 @@ function charPose(i,look,x,z,h,fall,lift,ph,gait,wave,yaw,act){
   for(const m of pedMesh)m.setMatrixAt(i,CHAR.park);
   return true;
 }
-const _cm=new THREE.Matrix4(),_cv=new THREE.Vector3();
+const _cm=new THREE.Matrix4();
 // the nearest people within CHAR.near of the camera (the player always) get a mannequin; then every mannequin animates
 function charTick(){
   if(!CHAR.ready){if(!CHAR.busy&&world&&ASSETS.has('char_clips')){CHAR.busy=1;charInit().catch(e=>console.warn('characters stay instanced:',e.message));}return;}
@@ -95,7 +96,6 @@ function charTick(){
   pedPhone.instanceMatrix.needsUpdate=true;
   CHAR.ms=performance.now()-t0;
 }
-const CHAR_ONE={jab:1,cross:1,hit_chest:1,hit_head:1,knockback:1,getup:1,sit_in:1};
 function charAnim(st,dt){
   const C=CHAR.clips,w={},m=st.mode,g=st.gait;
   // one-shots: a new swing, a hit, getting up, sitting down
@@ -108,7 +108,7 @@ function charAnim(st,dt){
   if(m==='down'){base='death';hold=true;}
   else if(m==='cower')base='crouch';
   else if(m==='sit')base=st.talk?'sit_talk':'sit';
-  else if(g<.1&&(m==='fight'))base='guard',hold=true;
+  else if(g<.1&&m==='fight'){base='guard';hold=true;}
   else if(g<.1&&m==='watch')base=st.phone?'phone':'fold';
   else if(g<.1&&m==='talk')base=st.talk?'talk':st.pr<.3?'fold':'idle';
   else if(g<.1&&st.phone)base='phone';

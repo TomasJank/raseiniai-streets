@@ -1,5 +1,5 @@
 // ---------- graphics: AO, soft shadows, sky, colour (all flags; override for tests with window.__GFX) ----------
-const GFX=Object.assign({softShadows:!PHONE,shadowSize:PHONE?1024:2048,ao:!PHONE,aoRadius:3,aoStrength:2.2,sky:false,skyExposure:.7,exposure:1,sunPath:false,tone:false},window.__GFX||{});
+const GFX=Object.assign({softShadows:!PHONE,shadowSize:PHONE?1024:2048,ao:!PHONE,aoRadius:3,aoStrength:2.2,sky:!PHONE,skyExposure:.7,exposure:1,sunPath:true,tone:false},window.__GFX||{});
 if(GFX.tone){renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=GFX.tone==='agx'?THREE.AgXToneMapping:THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=GFX.exposure;}
 if(GFX.softShadows)renderer.shadowMap.type=THREE.PCFSoftShadowMap;
 //@@late
