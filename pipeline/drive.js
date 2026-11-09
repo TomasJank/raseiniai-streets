@@ -23,14 +23,14 @@ function carLamps(c){
   if(c.lamps)return c.lamps;
   const b=c.g.userData.body,s=susOf(c),tm=tailM.clone();tm.userData.keep=true;b.children[3].material=tm;
   const spr=[-1,1].map(k=>{const p=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex,color:0xff2a1a,transparent:true,opacity:0,depthWrite:false,blending:THREE.AdditiveBlending}));
-    p.scale.setScalar(.75);p.position.set(k*s.hw*.74,s.H*.62,s.zb-.05);b.add(p);return p;});
-  const sl=[-1,1].map(k=>{const L=new THREE.SpotLight(0xfff0d2,0,70,.46,.8,1.5);L.position.set(k*s.hw*.62,.72,s.zf-.1);
+    p.scale.setScalar(.75);p.position.set(k*s.hw*.74,s.H*.5,s.zb-.05);b.add(p);return p;});
+  const sl=(PHONE?[]:[-1,1]).map(k=>{const L=new THREE.SpotLight(0xfff0d2,0,60,.5,1,1.5);L.position.set(k*s.hw*.62,.72,s.zf-.1);
     L.target.position.set(k*s.hw*.5,-.3,s.zf+32);b.add(L,L.target);return L;});
   return c.lamps={tm,spr,sl};
 }
 function lampsSet(c,lit,brake){
   const L=carLamps(c),on=c.lampsOut||c.dead||ENV.night.value<.2?0:lit;
-  for(const l of L.sl)l.intensity=on*620;
+  for(const l of L.sl)l.intensity=on*260;
   L.tm.color.setScalar(brake?1.8:.55+.25*lit);
   for(const p of L.spr)p.material.opacity=brake?.9:lit*.25;
 }

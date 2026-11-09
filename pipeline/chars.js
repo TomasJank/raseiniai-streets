@@ -2,7 +2,7 @@
 // behaviour is untouched: poseAt still gets called for everyone, and for the nearest people it moves a SkinnedMesh instead of
 // the instanced rig. Far people, the taxi fare (it waves, no clip does) and everyone before the assets decode stay instanced.
 // Hats, bags, coats, long hair and sticks stay instanced too, carried by the mannequin's bones.
-const CHAR={ready:false,near:60,keep:70,max:24,list:[],use:new Uint8Array(PED_ALL),body:{},clips:null,G:[],off:{},phoneOff:null,ms:0,
+const CHAR={park:new THREE.Matrix4().makeTranslation(0,-1e4,0),ready:false,near:60,keep:70,max:24,list:[],use:new Uint8Array(PED_ALL),body:{},clips:null,G:[],off:{},phoneOff:null,ms:0,
   // region per vertex from its heaviest bone: skin, shirt, forearm, legs, shin, shoe, hair
   REG:[['Head',0],['neck',0],['hand',0],['index',0],['middle',0],['ring',0],['pinky',0],['thumb',0],['spine',1],['clavicle',1],['upperarm',1],['lowerarm',2],['pelvis',3],['thigh',3],['calf',4],['foot',5],['ball',5]],
   // which bone carries each instanced gear part, keyed by its look option
@@ -15,16 +15,17 @@ async function charInit(){
     const sk=[];g.scene.traverse(o=>{if(o.isSkinnedMesh)sk.push(o);});
     const s0=sk[0],bones=s0.skeleton.bones,geo=U.mergeGeometries(sk.map(m=>m.geometry));
     for(const m of sk.slice(1))m.removeFromParent();
-    g.scene.updateMatrixWorld(true);const hp=bones.find(b=>b.name==='Head').getWorldPosition(new THREE.Vector3()),v=new THREE.Vector3();
-    const si=geo.attributes.skinIndex,sw=geo.attributes.skinWeight,pos=geo.attributes.position,reg=new Float32Array(si.count),top=new Float32Array(si.count);
+    s0.geometry=geo;g.scene.updateMatrixWorld(true);const hp=bones.find(b=>b.name==='Head').getWorldPosition(new THREE.Vector3()),v=new THREE.Vector3();
+    const si=geo.attributes.skinIndex,sw=geo.attributes.skinWeight,reg=new Float32Array(si.count),top=new Float32Array(si.count);
     let ht=-1e9;
     for(let i=0;i<si.count;i++){let b=0,w=-1;for(let j=0;j<4;j++)if(sw.getComponent(i,j)>w){w=sw.getComponent(i,j);b=si.getComponent(i,j);}
       const n=bones[b].name;reg[i]=(CHAR.REG.find(e=>n.startsWith(e[0]))||[0,3])[1];
-      if(n==='Head'){v.fromBufferAttribute(pos,i).applyMatrix4(s0.matrixWorld);top[i]=1;ht=Math.max(ht,v.y);}}
+      // positions are quantized: only the skinning transform puts them in metres
+      if(n==='Head'){s0.getVertexPosition(i,v).applyMatrix4(s0.matrixWorld);top[i]=1;ht=Math.max(ht,v.y);}}
     // hair: the crown and the back of the head
-    const H=ht-hp.y;for(let i=0;i<si.count;i++)if(top[i]){v.fromBufferAttribute(pos,i).applyMatrix4(s0.matrixWorld);
+    const H=ht-hp.y;for(let i=0;i<si.count;i++)if(top[i]){s0.getVertexPosition(i,v).applyMatrix4(s0.matrixWorld);
       if(v.y>hp.y+.62*H||v.z<hp.z-.1*H&&v.y>hp.y+.3*H)reg[i]=6;}
-    geo.setAttribute('region',new THREE.BufferAttribute(reg,1));s0.geometry=geo;s0.castShadow=true;
+    geo.setAttribute('region',new THREE.BufferAttribute(reg,1));s0.castShadow=true;
     // the bind-pose sphere misses a body lying down or mid-punch
     s0.computeBoundingSphere();s0.boundingSphere.radius*=1.8;
     const box=new THREE.Box3().setFromObject(g.scene,true);
@@ -38,9 +39,9 @@ async function charInit(){
   CHAR.G=PARTS.map((p,k)=>p.opt&&CHAR.SRC[p.opt]?k:-1).filter(k=>k>=0);
   for(const b of['m','f']){const st=charMake(b),o=st.o;o.position.set(0,0,0);o.rotation.set(0,0,0);o.scale.setScalar(CHAR.body[b].k);
     st.act.idle.play().setEffectiveWeight(1);st.act.idle.time=0;st.mx.update(0);o.updateMatrixWorld(true);
-    const off=CHAR.off[b]={},ib=new THREE.Matrix4();
+    const off=CHAR.off[b]={};
     for(const k of[...CHAR.G,8]){const src=k===8?'hand_r':CHAR.SRC[PARTS[k].opt],bone=st.bone[src];
-      off[k]=ib.copy(bone.matrixWorld).invert().multiply(new THREE.Matrix4().multiplyMatrices(inv,PM[k]));
+      off[k]=bone.matrixWorld.clone().invert().multiply(new THREE.Matrix4().multiplyMatrices(inv,PM[k]));
       if(src==='hand_r')off[k].setPosition(0,0,0);}
     scene.remove(o);}
   hidePed(FARE_I);CHAR.ready=true;
@@ -71,7 +72,8 @@ function charPose(i,look,x,z,h,fall,lift,ph,gait,wave,yaw,act){
   st.look=look;st.gait=gait;st.ph=ph;st.phone=!!(act&&act.phone);
   if(p){st.mode=p.mode;st.talk=p.mode==='talk'&&gait<.1&&p.grp&&p.grp.mem[p.grp.spk]===p&&p.grp.say>0;st.pr=p.pr||0;st.swingAt=p.mode==='fight'?p.swing:null;}
   else{const dn=fight.pDown>0;st.mode=dn?'down':fight.pStag>0?'stagger':pedClock-fight.last<4&&gait<.1?'fight':'walk';st.talk=false;st.pr=1;st.swingAt=fight.anim;}
-  for(const m of pedMesh)m.setMatrixAt(i,ZERO_M);
+  // parked 10 km down rather than scaled to zero: hidden either way, and per-part checks of the old rig (test_people2) still see a person
+  for(const m of pedMesh)m.setMatrixAt(i,CHAR.park);
   return true;
 }
 const _cm=new THREE.Matrix4(),_cv=new THREE.Vector3();

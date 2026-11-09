@@ -17,12 +17,12 @@ const tmp=dir+'_bench_'+process.pid+'.html';fs.writeFileSync(tmp,h.replace(o,api
 const b=await chromium.launch({args:['--use-angle=metal','--ignore-gpu-blocklist','--enable-gpu-rasterization','--allow-file-access-from-files']});
 const p=await b.newPage({viewport:{width:+W,height:+H}});
 const errs=[];p.on('pageerror',e=>errs.push(e.message));p.on('console',m=>{if(m.type()==='error'&&!/fonts|ERR_/.test(m.text()))errs.push(m.text().slice(0,200))});
-await p.addInitScript(`window.__GFX=${gfx}`);
+await p.addInitScript(`window.__N8URL=${process.env.N8?JSON.stringify(process.env.N8):'undefined'};window.__GFX=${gfx};window.__WATER2=${process.env.W2||'{}'}`);
 await p.goto('file://'+tmp);
 await p.waitForFunction(()=>window.__b&&__b.world&&__b.world.cars.length,null,{timeout:120000});await p.waitForTimeout(4000);
-const r=await p.evaluate(async([shot])=>{
-  const B=__b,W=B.world,L=W.labels.find(q=>/maxima/i.test(q.text)),G=B.GY,gl=B.renderer.getContext(),px=new Uint8Array(4),out={shots:{},ms:{}};
-  const f=[L.x+70,G(L.x+70,L.z+55)+3,L.z+55],t=[L.x,G(L.x,L.z)+6,L.z];
+const r=await p.evaluate(async([shot,VIEW])=>{
+  const B=__b,W=B.world,G=B.GY,L=VIEW?{x:VIEW[0],z:VIEW[1]}:W.labels.find(q=>/maxima/i.test(q.text)),gl=B.renderer.getContext(),px=new Uint8Array(4),out={shots:{},ms:{}};
+  const f=VIEW?[L.x+VIEW[2],G(L.x+VIEW[2],L.z+VIEW[3])+VIEW[4],L.z+VIEW[3]]:[L.x+70,G(L.x+70,L.z+55)+3,L.z+55],t=[L.x,G(L.x,L.z)+(VIEW?0:6),L.z];
   const dbg=gl.getExtension('WEBGL_debug_renderer_info');out.gpu=dbg&&gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL);
   out.size=[B.renderer.domElement.width,B.renderer.domElement.height];
   out.comp=!!B.comp&&Object.keys(B.comp).join(',');
@@ -34,7 +34,7 @@ const r=await p.evaluate(async([shot])=>{
     if(shot){B.draw();out.shots[name]=B.renderer.domElement.toDataURL('image/png');}
     B.draw();gl.readPixels(gl.drawingBufferWidth>>1,gl.drawingBufferHeight>>1,1,1,gl.RGBA,gl.UNSIGNED_BYTE,px);out.ms[name].px=[...px.slice(0,3)];
   }
-  return out;},[shot]);
+  return out;},[shot,process.env.VIEW?process.env.VIEW.split(',').map(Number):null]);
 for(const [n,u] of Object.entries(r.shots))fs.writeFileSync(`${shot}_${n}.png`,Buffer.from(u.split(',')[1],'base64'));
 delete r.shots;console.log(JSON.stringify({W,H,gfx,...r,errors:errs.slice(0,5)}));
 await b.close();fs.unlinkSync(tmp);

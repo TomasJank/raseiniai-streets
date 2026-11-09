@@ -1,7 +1,7 @@
 <!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Character prototype</title>
 <style>body{margin:0;background:#9fb7c9;font:13px system-ui;overflow:hidden}#ui{position:fixed;left:8px;top:8px;background:#fffd;padding:8px;border-radius:6px;display:grid;gap:6px}#ui button{margin-right:4px}</style>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.187.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.187.0/examples/jsm/"}}</script></head>
-<body><div id="ui"><label>gait <input id="gait" type="range" min="0" max="1" step=".01" value=".5"></label>
+<body><div id="loader" hidden></div><div id="ui"><label>gait <input id="gait" type="range" min="0" max="1" step=".01" value=".5"></label>
 <div><button data-a="jab">punch</button><button data-a="hook">kick→hook</button><button data-a="hit_chest">hit</button><button data-a="death">fall</button><button data-a="getup">get up</button><button data-a="sit">sit</button><button data-a="talk">talk</button><button data-a="crouch">cower</button><button data-a="phone">phone</button></div>
 <div id="stat">loading</div></div>
 <script type="module">
@@ -23,14 +23,14 @@ const REG={Head:0,neck_01:0,hand:0,spine:1,clavicle:1,upperarm:1,lowerarm:2,pelv
 function prep(g){
   const sk=[];g.scene.traverse(o=>{if(o.isSkinnedMesh)sk.push(o);});
   const geo=mergeGeometries(sk.map(m=>m.geometry.clone()));const s0=sk[0],bones=s0.skeleton.bones;
-  const si=geo.attributes.skinIndex,sw=geo.attributes.skinWeight,pos=geo.attributes.position,reg=new Float32Array(si.count),v=new THREE.Vector3();
-  s0.updateMatrixWorld(true);const head=bones.find(b=>b.name==='Head'),hp=head.getWorldPosition(new THREE.Vector3());
+  const si=geo.attributes.skinIndex,sw=geo.attributes.skinWeight,reg=new Float32Array(si.count),v=new THREE.Vector3(),top=[];
+  s0.geometry=geo;g.scene.updateMatrixWorld(true);const head=bones.find(b=>b.name==='Head'),hp=head.getWorldPosition(new THREE.Vector3());let ht=-1e9;
   for(let i=0;i<si.count;i++){let b=0,w=-1;for(let k=0;k<4;k++)if(sw.getComponent(i,k)>w){w=sw.getComponent(i,k);b=si.getComponent(i,k);}
-    const n=bones[b].name,key=Object.keys(REG).find(k=>n.startsWith(k))??(/index|middle|pinky|ring|thumb/.test(n)?'hand':'root');let r=REG[key];
-    if(n==='Head'){v.fromBufferAttribute(pos,i).applyMatrix4(s0.matrixWorld);if(v.y>hp.y+.13||v.z<hp.z-.04&&v.y>hp.y+.04)r=6;}
-    reg[i]=r;}
+    const n=bones[b].name,key=Object.keys(REG).find(k=>n.startsWith(k))??(/index|middle|pinky|ring|thumb/.test(n)?'hand':'root');reg[i]=REG[key];
+    if(n==='Head'){s0.getVertexPosition(i,v).applyMatrix4(s0.matrixWorld);top.push(i);ht=Math.max(ht,v.y);}}
+  const H=ht-hp.y;for(const i of top){s0.getVertexPosition(i,v).applyMatrix4(s0.matrixWorld);if(v.y>hp.y+.62*H||v.z<hp.z-.1*H&&v.y>hp.y+.3*H)reg[i]=6;}
   geo.setAttribute('region',new THREE.BufferAttribute(reg,1));
-  for(const m of sk.slice(1))m.removeFromParent();s0.geometry=geo;s0.material=null;
+  for(const m of sk.slice(1))m.removeFromParent();
   const box=new THREE.Box3().setFromObject(g.scene,true);g.k=1.76/(box.max.y-box.min.y);g.mesh=s0;return g;}
 prep(gm);prep(gf);
 function mat(cols){const m=new THREE.MeshLambertMaterial({flatShading:true}),rc=cols.map(c=>new THREE.Color(c));
