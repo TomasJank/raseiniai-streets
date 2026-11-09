@@ -1,6 +1,6 @@
 # Characters: rigged GLB people behind the poseAt seam (2026-11-09)
 
-Owner: chars agent (Opus). Status: steps `assets` and `chars` ready to integrate; all tests listed below pass on the scratch build.
+Owner: chars agent (Opus). Status: steps `assets` and `chars` ready to integrate. test_chars, test_fight, test_people2, test_solid and test_animals pass; test_talk is flaky on base and on this build alike (see Test results).
 
 ## What was downloaded
 
@@ -93,4 +93,71 @@ A wave-2 combat step can trigger a one-shot with `charOne(CHAR.list[i],'hook')`.
 - `research/prototypes/characters/index.html`, `research/prototypes/characters/shots/*.png`
 - this report
 
-RESULTS_PLACEHOLDER
+## Test results (scratch build = `build.sh` incl. facades + `add_assets.py` + `add_chars.py`; two builds byte-identical)
+
+`node work/test_chars.mjs` (SwiftShader):
+```
+setup {"ok":true}
+assetsDecode {"ok":true,"afterMs":9}
+skinnedVisible {"ok":true,"visible":9,"player":true}
+nearUseGlbFarDoNot {"ok":true,"near":[true,true,true,true,true,true,true,true,true,true],"far":[false,false,false,false],"farDist":[120,125,130,135]}
+clipSwitches {"ok":true,"seq":["idle","walk","death","getup","jog","walk"],"downMode":"down","final":"walk"}
+playerPunchClip {"ok":true,"before":"idle","after":"jab"}
+frameTime {"ok":true,"updatePeopleMs":0.3,"charsMs":0.15,"glb":24}
+noNaN {"ok":true,"chars":24,"badBones":0,"badInstanced":0}
+drawCalls {"ok":true,"calls":1403,"glb":24}
+errors []
+PASS
+```
+`frameTime` is updatePeople including 24 mixers and gear posing (0.15 ms of it is `charTick`), on the SwiftShader page.
+
+Existing tests on the same build: `test_fight` PASS · `test_people2` all passed · `test_solid` all passed · `test_animals` PASS ·
+`test_talk` 1-4 failed per run. `test_talk` is flaky on the base build too (5 base runs: all passed / 1 / 1 / 1 / 1 failed;
+the failures are "4 nearby groups all get a bubble" and "talk 95-130 m ... i:-1, mem:1", a group made by `talkAt` that loses
+a member on its first step). Math.random is unseeded, and every `Object3D`/material the mannequins create draws a UUID from
+it, so the random sequence differs between builds; chars.js does not touch any behaviour state. Worth seeding or hardening
+`talkAt` (it can pick a kid without its guard, which people2 hides at once).
+
+## Performance (Metal, M5 Pro, 1280×720)
+
+| | base (build.sh) | + assets + chars |
+|---|---|---|
+| `work/fps.mjs` fps | 60.3 | 60.3 |
+| `fps.mjs` load (warm, alternating runs) | 1106 / 1071 ms | 1050 / 1104 ms |
+| JS heap | 272 MB | 289 MB (+17) |
+| on foot, street (scratch `fps2.mjs`) | 60.3 fps, 753 calls | 60.3 fps, 759 calls, 12 mannequins |
+| on foot, 40 people forced within 30 m | 60.3 fps, 754 calls, worst frame 18.5 ms | 60.3 fps, 784 calls, 24 mannequins, worst 18.7 ms |
+| HTML size | 5,007,223 B | 5,471,985 B (+454 KB) |
+
+Cold load is unchanged by construction: nothing awaits the assets; they decode after the first `updatePeople` with a world.
+Prototype (`research/prototypes/characters/index.html`, 42 skinned mannequins, no LOD): 60.3 fps Metal, 85 draw calls, 417k tris.
+
+`views.mjs` before/after: identical to the base-vs-base noise floor (people are hidden in those views, and the mannequins
+are children of `pedMesh[1]`, so they hide with them). Shots: `research/prototypes/characters/shots/` (prototype clips,
+`game_*` in-town close-ups, `views_before_*`/`views_after_*`).
+
+## Limitations
+
+- Two bodies (male, female mannequin), not 6-10 authored characters: variety comes from the game's own looks (colours by
+  region, hair, all gear parts, `look.s`). Faces are blank, as before. Kids are the adult bodies scaled by `look.s`.
+- No kick clip in the free UAL packs (UAL Pro has more, paid): `hook` (Melee_Hook) is the stand-in. No wave clip: the taxi
+  fare stays on the instanced rig. No elderly stoop: old people use the same clips (their stick is carried by `hand_r`).
+- Head yaw (`yaw`, people looking at things) and `fall` tilt are ignored on mannequins; clips carry lying down and staggering.
+- Feet slide a little: stride timing follows the game's phase, stride length is the clip's.
+- Getting up plays while behaviour already moves the person (flee starts the same frame `down` ends).
+- The old rig's per-part instance matrices are parked 10 km down for mannequin people (see Seam design).
+- Phone: shown in `hand_r` whenever `act.phone`; the `phone` clip holds it to the ear, the old rig held it in front.
+
+## Integration notes
+
+1. `build.sh` steps, after `voice`: `... voice assets chars ...` (`assets` must precede `chars`; `add_chars.py` asserts it).
+   No anchor overlaps with `facades` (it inserts into `buildStadium();buildTown();`, chars into `function buildExtra(){`), so
+   `voice assets chars facades` and `voice facades assets chars` both build; tested with facades in `build.sh`.
+2. **Blocker for a clean clone:** `pipeline/assets/manifest.json` points at `research/assets/characters/*.glb`, which
+   `.gitignore` excludes (`research/assets/**/*.glb`, the QAL ruling). A fresh checkout cannot build until the GLBs are
+   regenerated with `research/assets/characters/build.mjs` (needs the two zips + npm packages, see SOURCE.md). Options:
+   keep it that way and document it, or keep the three processed GLBs (331 KB) in a private, non-public location the build
+   reads. The integrator's call; nothing in my files assumes either.
+3. Add `work/test_chars.mjs` to the suite. It needs network for the three addon modules from jsdelivr, like three itself.
+4. For wave 2 (combat): clip names above are stable; trigger a one-shot with `charOne(CHAR.list[i],'hook')`; each
+   mannequin's bones are in `CHAR.list[i].bone`; `CHAR.use[i]` says whether person `i` is a mannequin this frame.

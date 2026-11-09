@@ -27,3 +27,6 @@ research/assets/**/*.ogg
 research/assets/**/*.mp3
 research/assets/**/*.wav
 research/prototypes/**/shots/
+# the three processed character GLBs (331 KB) are build inputs for the assets step; keep the repo private while they are tracked (Quaternius QAL)
+!research/assets/characters/*.glb
+!work/build/v40.html
