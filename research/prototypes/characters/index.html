@@ -1,0 +1,65 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Character prototype</title>
+<style>body{margin:0;background:#9fb7c9;font:13px system-ui;overflow:hidden}#ui{position:fixed;left:8px;top:8px;background:#fffd;padding:8px;border-radius:6px;display:grid;gap:6px}#ui button{margin-right:4px}</style>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.187.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.187.0/examples/jsm/"}}</script></head>
+<body><div id="ui"><label>gait <input id="gait" type="range" min="0" max="1" step=".01" value=".5"></label>
+<div><button data-a="jab">punch</button><button data-a="hook">kick→hook</button><button data-a="hit_chest">hit</button><button data-a="death">fall</button><button data-a="getup">get up</button><button data-a="sit">sit</button><button data-a="talk">talk</button><button data-a="crouch">cower</button><button data-a="phone">phone</button></div>
+<div id="stat">loading</div></div>
+<script type="module">
+import * as THREE from 'three';
+import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
+import {MeshoptDecoder} from 'three/addons/libs/meshopt_decoder.module.js';
+import * as SU from 'three/addons/utils/SkeletonUtils.js';
+import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
+const R=new THREE.WebGLRenderer({antialias:true});R.setSize(innerWidth,innerHeight);R.shadowMap.enabled=true;document.body.appendChild(R.domElement);
+const scene=new THREE.Scene();scene.background=new THREE.Color(0x9fb7c9);scene.fog=new THREE.Fog(0x9fb7c9,30,90);
+const cam=new THREE.PerspectiveCamera(50,innerWidth/innerHeight,.1,200);cam.position.set(0,4,12);cam.lookAt(0,1,0);
+scene.add(new THREE.HemisphereLight(0xdfe9f2,0x5b5245,1.1));const sun=new THREE.DirectionalLight(0xffffff,1.6);sun.position.set(8,14,6);sun.castShadow=true;Object.assign(sun.shadow.camera,{left:-20,right:20,top:20,bottom:-20});scene.add(sun);
+const ground=new THREE.Mesh(new THREE.PlaneGeometry(200,200).rotateX(-Math.PI/2),new THREE.MeshLambertMaterial({color:0x8a8f84}));ground.receiveShadow=true;scene.add(ground);
+const L=new GLTFLoader().setMeshoptDecoder(MeshoptDecoder),A='../../assets/characters/';
+const [gm,gf,gc]=await Promise.all(['body_m','body_f','clips'].map(n=>L.loadAsync(A+n+'.glb')));
+const clips=Object.fromEntries(gc.animations.map(c=>[c.name,c]));
+// same body prep as pipeline/chars.js: one SkinnedMesh, a region per vertex from its heaviest bone
+const REG={Head:0,neck_01:0,hand:0,spine:1,clavicle:1,upperarm:1,lowerarm:2,pelvis:3,thigh:3,root:3,calf:4,foot:5,ball:5};
+function prep(g){
+  const sk=[];g.scene.traverse(o=>{if(o.isSkinnedMesh)sk.push(o);});
+  const geo=mergeGeometries(sk.map(m=>m.geometry.clone()));const s0=sk[0],bones=s0.skeleton.bones;
+  const si=geo.attributes.skinIndex,sw=geo.attributes.skinWeight,pos=geo.attributes.position,reg=new Float32Array(si.count),v=new THREE.Vector3();
+  s0.updateMatrixWorld(true);const head=bones.find(b=>b.name==='Head'),hp=head.getWorldPosition(new THREE.Vector3());
+  for(let i=0;i<si.count;i++){let b=0,w=-1;for(let k=0;k<4;k++)if(sw.getComponent(i,k)>w){w=sw.getComponent(i,k);b=si.getComponent(i,k);}
+    const n=bones[b].name,key=Object.keys(REG).find(k=>n.startsWith(k))??(/index|middle|pinky|ring|thumb/.test(n)?'hand':'root');let r=REG[key];
+    if(n==='Head'){v.fromBufferAttribute(pos,i).applyMatrix4(s0.matrixWorld);if(v.y>hp.y+.13||v.z<hp.z-.04&&v.y>hp.y+.04)r=6;}
+    reg[i]=r;}
+  geo.setAttribute('region',new THREE.BufferAttribute(reg,1));
+  for(const m of sk.slice(1))m.removeFromParent();s0.geometry=geo;s0.material=null;
+  const box=new THREE.Box3().setFromObject(g.scene,true);g.k=1.76/(box.max.y-box.min.y);g.mesh=s0;return g;}
+prep(gm);prep(gf);
+function mat(cols){const m=new THREE.MeshLambertMaterial({flatShading:true}),rc=cols.map(c=>new THREE.Color(c));
+  m.onBeforeCompile=s=>{s.uniforms.rc={value:rc};s.vertexShader=s.vertexShader.replace('#include <common>','#include <common>\nattribute float region;uniform vec3 rc[7];varying vec3 vRc;')
+    .replace('#include <begin_vertex>','#include <begin_vertex>\nvRc=rc[int(region+.5)];');
+    s.fragmentShader=s.fragmentShader.replace('#include <common>','#include <common>\nvarying vec3 vRc;').replace('vec4 diffuseColor = vec4( diffuse, opacity );','vec4 diffuseColor = vec4( diffuse*vRc, opacity );');};
+  m.customProgramCacheKey=()=>'char';return m;}
+const P=[0xe2b493,0x8d3b3b,0x8d3b3b,0x2c3a55,0x2c3a55,0x1d1c1b,0x3a2c20],SH=[0x8d3b3b,0x3d5f8a,0x4e7a52,0xc9a23d,0x6b4d7c,0xd8d4c8,0x9b6a3c,0x5a7f8f],TR=[0x2c3a55,0x34302b,0x54565a,0x5a4a38],HA=[0x3a2c20,0x6b5136,0xb59a6a,0x9c9c98,0x23201c];
+const chars=[];
+for(let i=0;i<42;i++){const g=i%2?gf:gm,o=SU.clone(g.scene),m=o.getObjectByProperty('isSkinnedMesh',true);
+  const sh=SH[i%8],tr=TR[i%4];m.material=mat([[0xf2d0b8,0xe2b493,0xc8916c][i%3],sh,i%3?sh:0xe2b493,tr,tr,0x1d1c1b,HA[i%5]]);m.castShadow=true;m.frustumCulled=false;
+  const s=(i%7===3?.62:1)*g.k;o.scale.setScalar(s);o.position.set((i%7-3)*1.6,0,-Math.floor(i/7)*2.2+4);scene.add(o);
+  const mx=new THREE.AnimationMixer(o),act={};for(const n in clips){act[n]=mx.clipAction(clips[n]);act[n].play();act[n].setEffectiveWeight(0);}
+  chars.push({o,mx,act,ph:Math.random()*6,one:null,t:0});}
+let one=null,oneT=0;
+document.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{one=b.dataset.a;oneT=0;});
+const LOOP={sit:1,talk:1,crouch:1,phone:1};
+const clock=new THREE.Clock();let fr=0,acc=0,fps=0;
+function tick(){const dt=Math.min(clock.getDelta(),.1),gait=+document.getElementById('gait').value;oneT+=dt;
+  for(const c of chars){const w={};
+    if(one&&(LOOP[one]||oneT<clips[one].duration+(one==='death'?2:0))){w[one]=1;c.act[one].time=LOOP[one]?oneT%clips[one].duration:Math.min(oneT,clips[one].duration);}
+    else{c.ph+=dt*(gait<.6?6:9)*Math.max(gait,.1);const u=(c.ph/(2*Math.PI))%1;
+      if(gait<.05)w.idle=1;else if(gait<.6){w.walk=1;}else{w.jog=1;}
+      w.idle&&(c.act.idle.time=(c.ph*.2)%clips.idle.duration);c.act.walk.time=u*clips.walk.duration;c.act.jog.time=u*clips.jog.duration;}
+    for(const n in c.act){const a=c.act[n],cur=a.getEffectiveWeight(),t=w[n]||0;a.setEffectiveWeight(cur+(t-cur)*Math.min(1,dt*10));}
+    c.mx.update(0);}
+  R.render(scene,cam);fr++;acc+=dt;if(acc>1){fps=fr/acc;fr=acc=0;}
+  document.getElementById('stat').textContent=`fps ${fps.toFixed(0)} · draw calls ${R.info.render.calls} · tris ${R.info.render.triangles} · clips ${Object.keys(clips).join(' ')}`;
+  requestAnimationFrame(tick);}
+window.__proto={chars,clips,R,cam,stat:()=>({fps,calls:R.info.render.calls,tris:R.info.render.triangles}),set(a){one=a;oneT=0;}};
+tick();
+</script></body></html>

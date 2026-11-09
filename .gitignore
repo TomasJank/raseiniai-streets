@@ -15,3 +15,14 @@ research/repositories/
 research/assets/**/*.zip
 research/assets/**/*.blend
 research/assets/**/*.fbx
+# raw downloaded assets are not redistributed through git (QAL, CC-BY mixes); SOURCE.md files are tracked, the built HTML embeds what it uses
+research/assets/**/*.glb
+research/assets/**/*.gltf
+research/assets/**/*.bin
+research/assets/**/*.png
+research/assets/**/*.jpg
+research/assets/**/*.webp
+research/assets/**/*.ogg
+research/assets/**/*.mp3
+research/assets/**/*.wav
+research/prototypes/**/shots/
