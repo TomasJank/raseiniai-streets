@@ -641,6 +641,7 @@ function addBuilding(B,p,s){
   return T?(s.y0||0)+Math.max(...T):h;
 }
 
+// Vyšnių g. 5A front, from Tomas's photo: framed windows, balcony, attic triangle, picket fence
 function addFacade(B,a,b,c,d,h,rh,s){
   const y0=s.y0||0,W=[.96,.96,.94],RED=[.6,.15,.13],DARK=[.22,.26,.28],LACE=[.93,.93,.91];
   const at=(p,q,t,y,off)=>{const dx=q[0]-p[0],dz=q[1]-p[1],L=Math.hypot(dx,dz);return[p[0]+dx*t/L-dz/L*off,y,p[1]+dz*t/L+dx/L*off];};
@@ -3318,10 +3319,12 @@ function driveCar(c,dt){if(sinkStep(c,dt))return;
   }
   // car vs car
   for(const o of world.cars){
-    if(o===c)continue;const dx=c.x-o.x,dz=c.z-o.z,d=Math.hypot(dx,dz);
-    if(d<2.7&&d>.01){const ov=2.7-d,nx=dx/d,nz=dz/d;c.x+=nx*ov*.6;c.z+=nz*ov*.6;o.x-=nx*ov*.4;o.z-=nz*ov*.4;
+    if(o===c||(c.x-o.x)**2+(c.z-o.z)**2>49)continue;const K=carOverlap(c,o,1.8);
+    if(K){const ov=K.ov,nx=K.nx,nz=K.nz;c.x+=nx*ov*.6;c.z+=nz*ov*.6;o.x-=nx*ov*.4;o.z-=nz*ov*.4;
       if(Math.abs(c.speed)>6){shake=Math.min(1,Math.abs(c.speed)/30);hit(Math.min(.8,Math.abs(c.speed)/34));hurtCargo(.06);hurtCar(c,.03+Math.abs(c.speed)*.0025);if(o.ai)addHeat(.34);if(o.cop)addHeat(1);}carHitCar(c,o,nx,nz,Math.abs(c.speed));c.speed*=.55;if(o.ai)o.stun=2.5;syncCar(o);}
   }
+  for(const o of parkedNear(c.x,c.z)){const K=carOverlap(c,o,1.8);if(!K)continue;c.x+=K.nx*K.ov;c.z+=K.nz*K.ov;const sp=Math.abs(c.speed);
+    if(sp>6){shake=Math.min(1,sp/30);hit(Math.min(.8,sp/34));hurtCargo(.06);hurtCar(c,.03+sp*.0025);crashFX(c,{nx:K.nx,nz:K.nz},sp);}c.speed*=sp>2?.55:.9;}
   const B=world.box;c.x=clamp(c.x,B.minX,B.maxX);c.z=clamp(c.z,B.minZ,B.maxZ);
   syncCar(c);
   tyreFX(c,dt);
@@ -3337,7 +3340,7 @@ function walk(dt){waterTick(dt);
   player.speed=mv*sp;
   player.x+=Math.sin(player.h)*player.speed*dt;player.z+=Math.cos(player.h)*player.speed*dt;
   const r=collideCar(player.x,player.z,.42,null);player.x=r.x;player.z=r.z;
-  for(const o of world.cars){const dx=player.x-o.x,dz=player.z-o.z,d=Math.hypot(dx,dz);if(d<1.9&&d>.01){player.x=o.x+dx/d*1.9;player.z=o.z+dz/d*1.9;}}
+  for(const o of[...world.cars,...parkedNear(player.x,player.z)]){const fx=Math.sin(o.h),fz=Math.cos(o.h),dx=player.x-o.x,dz=player.z-o.z,t=clamp(dx*fx+dz*fz,-1.35,1.35),qx=dx-fx*t,qz=dz-fz*t,d=Math.hypot(qx,qz);if(d<1.3&&d>.01){player.x+=qx/d*(1.3-d);player.z+=qz/d*(1.3-d);}}
   const B=world.box;player.x=clamp(player.x,B.minX,B.maxX);player.z=clamp(player.z,B.minZ,B.maxZ);
   player.walk+=Math.abs(player.speed)*dt*2.2;
   personMesh.position.set(player.x,GY(player.x,player.z)+Math.abs(Math.sin(player.walk))*.05*(mv?1:0),player.z);personMesh.rotation.y=player.h;
@@ -3593,6 +3596,8 @@ PARTS.forEach((p,k)=>{if(p.at===-1)p.at=k-1;p.g.userData.keep=true;});
 const SHIRTS=[0x8d3b3b,0x3d5f8a,0x4e7a52,0xc9a23d,0x6b4d7c,0xd8d4c8,0x2f3236,0x9b6a3c,0xb0553a,0x5a7f8f,0x23272b,0x4a4f55],TROUSERS=[0x2c3a55,0x34302b,0x54565a,0x5a4a38,0x1f2328,0x6a6f78],SKINS=[0xe8bfa0,0xe2b493,0xd9a884,0xf0cdb0],HAIRS=[0x3a2c20,0x6b5136,0xb59a6a,0x9c9c98,0x23201c,0xd0cfc9],SHOES=[0x1d1c1b,0x3a2a1f,0x2c2f33,0xcfccc4];
 const pedMesh=PARTS.map(p=>{const m=new THREE.InstancedMesh(p.g,pedMats,PED_ALL);m.frustumCulled=false;m.castShadow=true;scene.add(m);return m;});
 const ZERO_M=new THREE.Matrix4().makeScale(0,0,0),_pb=new THREE.Matrix4(),_pt=new THREE.Matrix4(),_pr=new THREE.Matrix4(),_pq=new THREE.Quaternion(),_pe=new THREE.Euler(0,0,0,'YXZ'),_pj=new THREE.Euler(),_pv=new THREE.Vector3(),_ps=new THREE.Vector3(1,1,1),_pc=new THREE.Color(),PM=PARTS.map(()=>new THREE.Matrix4());
+const pedPhone=new THREE.InstancedMesh(new THREE.BoxGeometry(.07,.14,.014).translate(0,-.07,.03),new THREE.MeshLambertMaterial({color:0x17191c}),PED_ALL);
+pedPhone.frustumCulled=false;pedPhone.count=PED_N;for(let i=0;i<PED_ALL;i++)pedPhone.setMatrixAt(i,ZERO_M);scene.add(pedPhone);
 const pick=a=>a[Math.floor(Math.random()*a.length)];
 function dress(i,cols){PARTS.forEach((p,k)=>pedMesh[k].setColorAt(i,_pc.setHex(cols[p.col])));pedMesh.forEach(m=>{if(m.instanceColor)m.instanceColor.needsUpdate=true;});}
 function randomLook(i){const f=Math.random()<.5,look={s:f?.92+Math.random()*.08:.97+Math.random()*.1,long:f&&Math.random()<.7,skirt:f&&Math.random()<.35};dress(i,{shirt:pick(SHIRTS),skin:pick(SKINS),hair:pick(HAIRS),legs:pick(TROUSERS),shoe:pick(SHOES)});return look;}
@@ -3600,10 +3605,11 @@ const peds=Array.from({length:PED_N},(_,i)=>({look:randomLook(i),mode:'hide',x:0
 const PLAYER_LOOK={s:1};dress(PLAYER_I,{shirt:0x2f6f4b,skin:0xe2b493,hair:0x3a2c20,legs:0x2c3a55,shoe:0x1d1c1b});
 let fare=null;
 function hidePed(i){for(const m of pedMesh)m.setMatrixAt(i,ZERO_M);}
-function poseAt(i,look,x,z,h,fall,lift,ph,gait,wave,yaw=0){
+function poseAt(i,look,x,z,h,fall,lift,ph,gait,wave,yaw=0,act=null){
   const s=Math.sin(ph),c=Math.cos(ph),A=gait*.85,K=gait*1.25,el=-(.18+gait*.35);
   const ang=[0,gait*.08,0,0,0,0,A*.7*s,el,0,-A*.7*s,el,0,-A*s,.06+K*Math.max(0,c),0,A*s,.06+K*Math.max(0,-c),0,0];
   if(wave){ang[9]=-2.3;ang[10]=-.55-.4*Math.sin(ph*1.6);}
+  if(act)for(let k=0;k<19;k++)if(act[k]===act[k])ang[k]=act[k];
   _pe.set(fall,h,0);_pq.setFromEuler(_pe);_pv.set(x,GY(x,z)+world.surf(x,z)+lift+gait*.035*Math.abs(c),z);_ps.setScalar(look.s);_pb.compose(_pv,_pq,_ps);
   PARTS.forEach((p,k)=>{
     if(p.opt&&!look[p.opt]){pedMesh[k].setMatrixAt(i,ZERO_M);return;}
@@ -3624,7 +3630,7 @@ function buildPeople(){
 function edgesNear(x,z){const o=[],cx=Math.floor(x/PCELL),cz=Math.floor(z/PCELL);for(let i=-1;i<=1;i++)for(let j=-1;j<=1;j++){const l=pedGrid.get((cx+i)+':'+(cz+j));if(l)o.push(...l);}return o;}
 function pedTarget(p){
   const G=world.graph,A=G.get(p.e.a),B=G.get(p.e.b),dx=B.x-A.x,dz=B.z-A.z,L=Math.hypot(dx,dz)||1;
-  let off=p.e.w/2+.9+(p.lane||0)*.4,x=A.x+dx*p.t+(-dz/L)*off*p.side,z=A.z+dz*p.t+(dx/L)*off*p.side;
+  let off=p.e.w/2+.9+(p.lane||0)*.4+(p.avo||0),x=A.x+dx*p.t+(-dz/L)*off*p.side,z=A.z+dz*p.t+(dx/L)*off*p.side;
   if(world.inBuilding(x,z)){off=p.e.w/2+.5;x=A.x+dx*p.t+(-dz/L)*off*p.side;z=A.z+dz*p.t+(dx/L)*off*p.side;}
   return[x,z,L];
 }
@@ -3644,12 +3650,12 @@ function driverRunsOff(c){
 // pedestrian crossings mapped in OpenStreetMap (highway=crossing, queried 2026-11-03)
 const CROSSINGS=[[55.381600,23.116516],[55.385532,23.127322],[55.382807,23.102862],[55.379628,23.121226],[55.385783,23.125365],[55.385582,23.123687],[55.382766,23.106901],[55.380058,23.113979],[55.380429,23.114620],[55.380548,23.114592],[55.382505,23.108746],[55.382605,23.108409],[55.382041,23.110133],[55.382117,23.109871],[55.381150,23.113338],[55.381167,23.113557],[55.380569,23.114856],[55.380432,23.114834],[55.380039,23.115667],[55.383576,23.119505],[55.383692,23.120046],[55.379598,23.121467],[55.384156,23.123637],[55.385186,23.124685],[55.384824,23.122555],[55.385241,23.125011],[55.385649,23.127340],[55.385895,23.125160],[55.379207,23.121800],[55.373047,23.127265],[55.381190,23.126330],[55.387565,23.115144],[55.370769,23.120364],[55.381725,23.116556],[55.381074,23.117434],[55.379179,23.121992],[55.379326,23.121814],[55.379786,23.121246],[55.379772,23.121484],[55.381999,23.109967],[55.382134,23.110056],[55.381127,23.109560],[55.381235,23.109457],[55.381193,23.109266],[55.381064,23.109350],[55.382112,23.105178],[55.382638,23.108759],[55.382781,23.102055],[55.382749,23.102652],[55.384268,23.121314],[55.383797,23.123076],[55.383955,23.123528],[55.382948,23.124995],[55.383589,23.124067],[55.383082,23.124816],[55.384827,23.127080],[55.385675,23.127108],[55.382520,23.118008],[55.382674,23.118020],[55.382532,23.118281],[55.382700,23.118304],[55.385397,23.123817],[55.377389,23.120039],[55.377208,23.120411]];
 let pedEvents=[],pedEvN=0,pedClock=0,crossPts=null,densT=0,pedDens=1,sirenT=0,busWas=-1;
-const CALM={walk:1,idle:1,wait:1,stop:1,cross:1,goto:1};
+const CALM={walk:1,idle:1,wait:1,stop:1,cross:1,goto:1,talk:1,sit:1};
 // something happened at x,z: seen within r inside a 120 degree cone, heard within hear from any side
 function pedEvent(x,z,r,hear){pedEvents.push({x,z,r,hear,t:pedClock,id:++pedEvN});}
 function nearCross(x,z){for(const c of crossPts)if((c[0]-x)**2+(c[1]-z)**2<144)return true;return false;}
 function signalAt(x,z){for(const s of signals)if(Math.hypot(s.n.x-x,s.n.z-z)<16)return s;return null;}
-function resetPed(p){Object.assign(p,{fall:0,hop:0,lead:null,dest:null,react:0,nerv:0,yaw:0,gait:0,panicT:0,idleT:15+Math.random()*40,seen:pedEvN,lane:(Math.random()-.5)*.8,stop:null,then:null});}
+function resetPed(p){Object.assign(p,{fall:0,hop:0,lead:null,dest:null,react:0,nerv:0,yaw:0,gait:0,panicT:0,idleT:15+Math.random()*40,seen:pedEvN,lane:(Math.random()-.5)*.8,stop:null,then:null,grp:null,pair:null,seat:null,avo:0,avoT:0,dly:null,chatT:5+Math.random()*30,pr:Math.random()});}
 function pickDest(x,z){
   const r=Math.random();
   if(r<.4){const shops=world.labels.filter(L=>L.kind!=='park'&&Math.hypot(L.x-x,L.z-z)<400);if(shops.length){const L=pick(shops);return{x:L.x,z:L.z,kind:'shop'};}}
@@ -3661,6 +3667,7 @@ function pedPlace(p){
   const fx=Math.sin(player.h),fz=Math.cos(player.h),G=world.graph;
   const far=(x,z)=>{const d=Math.hypot(x-player.x,z-player.z),ahead=(x-player.x)*fx+(z-player.z)*fz;return d<150&&d>35&&!(ahead>0&&d<75);};
   resetPed(p);
+  if(Math.random()<.16&&placeSit(p,far))return true;
   if(bus&&Math.random()<.15){const st=pick(bus.at).st;if(st&&st.x!=null&&far(st.x,st.z)){const a=Math.random()*TAU,r=.8+Math.random()*1.6;
     p.x=st.x+Math.cos(a)*r;p.z=st.z+Math.sin(a)*r;p.mode='stop';p.stop=st;p.h=Math.atan2(st.rx-p.x,st.rz-p.z);return true;}}
   const list=edgesNear(player.x,player.z);if(!list.length)return false;
@@ -3669,7 +3676,7 @@ function pedPlace(p){
     if(!far(mx,mz)||e.cls&&Math.random()<.6)continue;
     p.e=e;p.t=t;p.dir=Math.random()<.5?1:-1;p.side=Math.random()<.5?1:-1;p.mode='walk';p.dest=pickDest(mx,mz);
     const q=pedTarget(p);p.x=q[0];p.z=q[1];
-    if(Math.random()<.25)addFollower(p);
+    {const r=Math.random();if(r<.1)spawnTalk(p);else if(r<.35)addFollower(p);}
     return true;
   }
   return false;
@@ -3711,21 +3718,22 @@ function dodge(p,M){
   if(!CALM[p.mode])return;
   for(const m of M){
     const dx=p.x-m.x,dz=p.z-m.z,s=Math.sign(m.v),fx=Math.sin(m.h)*s,fz=Math.cos(m.h)*s,al=dx*fx+dz*fz,lt=dx*fz-dz*fx,av=Math.abs(m.v);
-    if(m.me&&Math.hypot(dx,dz)<2&&av>5){const c=m.me;
-      p.mode='down';p.lead=null;p.timer=3.2;p.vx=Math.sin(c.h)*c.speed*.55;p.vz=Math.cos(c.h)*c.speed*.55;c.speed*=.82;
-      shake=Math.max(shake,.35);hit(.3);addHeat(1);hurtCargo(.15);pedEvent(p.x,p.z,25,8);return;}
+    if(m.me&&Math.abs(al)<2.45&&Math.abs(lt)<1.2&&av>2.5){runOver(p);return;}
     if(al>-1-m.len&&al<7+av*.45+m.len&&Math.abs(lt)<m.w){
+      if(m.me){if(p.dly==null)p.dly=(p.nerv>0?.12:.3)+Math.random()*.45;if((p.dly-=pedDt)>0)return;p.dly=null;
+        if(al<6&&Math.random()<.35){p.mode='cower';p.timer=1.4;p.lead=null;p.nerv=Math.max(p.nerv,8);return;}}
       if(av>14&&al<3.5&&Math.random()<.5){p.mode='cower';p.timer=1.6;p.lead=null;}
       else{const sd=Math.abs(lt)<.3?(Math.random()<.5?1:-1):Math.sign(lt);pedFlee(p,fz*sd,-fx*sd,.95,6.5);p.lead=null;}
       p.nerv=Math.max(p.nerv,8);return;}
   }
+  p.dly=null;
 }
 function gotoStep(p,dt){
   const dx=p.tx-p.x,dz=p.tz-p.z,d=Math.hypot(dx,dz),st=Math.min(d,p.sp*dt);
   if(d>.01){p.x+=dx/d*st;p.z+=dz/d*st;p.h=lerpAngle(p.h,Math.atan2(dx,dz),Math.min(1,dt*6));}
   return d;
 }
-function pedPush(p){if(p.mode==='down'||p.mode==='stop')return;let x=p.x,z=p.z;const r=.32,ci=Math.floor(x/8),cj=Math.floor(z/8);
+function pedPush(p){if(p.mode==='down'||p.mode==='stop'||p.mode==='sit')return;let x=p.x,z=p.z;const r=.32,ci=Math.floor(x/8),cj=Math.floor(z/8);
   for(let i=ci-1;i<=ci+1;i++)for(let j=cj-1;j<=cj+1;j++){const l=walls.get(i+','+j);
     if(l)for(const s of l){const dx=s[2]-s[0],dz=s[3]-s[1],t=clamp(((x-s[0])*dx+(z-s[1])*dz)/(dx*dx+dz*dz||1),0,1),ex=x-s[0]-dx*t,ez=z-s[1]-dz*t,d=Math.hypot(ex,ez);if(d<r&&d>1e-5){x+=ex/d*(r-d);z+=ez/d*(r-d);}}
     const q=props.get(i+','+j);if(q)for(const o of q){if(o.down)continue;const dx=x-o.x,dz=z-o.z,d=Math.hypot(dx,dz),m=r+(o.r||.2);if(d<m&&d>1e-5){x=o.x+dx/d*m;z=o.z+dz/d*m;}}}
@@ -3752,7 +3760,7 @@ function stepPed(p,dt,M){
       rate=5.4*p.sp*fast;gait=.5;
       if(p.dest&&Math.hypot(p.x-p.dest.x,p.z-p.dest.z)<(p.dest.kind==='shop'?45:8)){
         p.mode='goto';p.tx=p.dest.x;p.tz=p.dest.z;p.then=p.dest.kind==='shop'?'hide':'stop';if(p.dest.st)p.stop=p.dest.st;p.dest=null;}
-      else if((p.idleT-=dt)<=0){p.mode='idle';p.timer=3+Math.random()*6;}
+      else if((p.idleT-=dt)<=0)pedIdle(p);
     }
   }else if(p.mode==='idle'){
     p.timer-=dt;if(p.timer<=0){p.mode='walk';p.idleT=20+Math.random()*50;}
@@ -3764,9 +3772,14 @@ function stepPed(p,dt,M){
     p.tx=p.cx;p.tz=p.cz;p.sp*=1.15;const d=gotoStep(p,dt);p.sp/=1.15;rate=6.2*p.sp;gait=.6;
     if(d<.3){p.side=-p.side;p.mode='walk';pedAtNode(p,p.node,true);}
   }else if(p.mode==='goto'){
+    if(p.then==='sit'&&(p.timer-=dt)<=0){if(p.seat)p.seat.who=null;p.seat=null;pedRejoin(p);return;}
     const d=gotoStep(p,dt);rate=5.4*p.sp;gait=.5;
     if(p.then==='hide'&&(d<1||world.inBuilding(p.x,p.z))){p.mode='hide';return;}
-    if(d<.6){if(p.then==='stop'&&p.stop){p.mode='stop';p.h=Math.atan2(p.stop.rx-p.x,p.stop.rz-p.z);}else if(p.then==='hide'){p.mode='hide';return;}else pedRejoin(p);}
+    if(d<.6){if(p.then==='stop'&&p.stop){p.mode='stop';p.h=Math.atan2(p.stop.rx-p.x,p.stop.rz-p.z);}else if(p.then==='hide'){p.mode='hide';return;}else if(p.then==='sit'&&p.seat){p.mode='sit';p.timer=20+Math.random()*50;}else pedRejoin(p);}
+  }else if(p.mode==='talk'){
+    const g=p.grp;if(!g)pedRejoin(p);else{const d=gotoStep(p,dt);if(d>.12){rate=5.4*p.sp;gait=.5;}else p.h=lerpAngle(p.h,Math.atan2(g.x-p.x,g.z-p.z),Math.min(1,dt*4));}
+  }else if(p.mode==='sit'){
+    const s=p.seat;if(!s)pedRejoin(p);else{p.x=s.x;p.z=s.z;p.h=s.h;if((p.timer-=dt)<=0){s.who=null;p.seat=null;p.x+=Math.sin(s.h)*.5;p.z+=Math.cos(s.h)*.5;pedRejoin(p);}}
   }else if(p.mode==='stop'){
   }else if(p.mode==='flee'){
     p.timer-=dt;const nx=p.x+p.vx*dt,nz=p.z+p.vz*dt;if(!world.inBuilding(nx,nz)){p.x=nx;p.z=nz;}
@@ -3785,7 +3798,8 @@ function stepPed(p,dt,M){
   pedPush(p);
   dodge(p,M);
   // idle people look around; anyone calm turns their head to the player walking or crawling past
-  let ty=p.mode==='idle'||p.mode==='stop'?Math.sin(pedClock*.7+p.phase)*.8:0;
+  let ty=p.mode==='idle'||p.mode==='stop'||p.mode==='sit'?Math.sin(pedClock*.7+p.phase)*.8:0;
+  if(p.mode==='talk'&&p.grp){const m=p.grp.mem,s=m[p.grp.spk],L=s===p?m[(m.indexOf(p)+1)%m.length]:s;if(L&&L!==p)ty=clamp(wrapA(Math.atan2(L.x-p.x,L.z-p.z)-p.h),-1.1,1.1);}
   const dx=player.x-p.x,dz=player.z-p.z;
   if(CALM[p.mode]&&dx*dx+dz*dz<36&&(player.mode==='foot'||Math.abs(player.car.speed)<3))ty=clamp(wrapA(Math.atan2(dx,dz)-p.h),-1.1,1.1);
   p.yaw+=(ty-p.yaw)*Math.min(1,dt*4);
@@ -3804,9 +3818,89 @@ function busStops(){
   let n=Math.floor(Math.random()*3);
   for(const p of peds){if(!n)break;if(p.mode!=='hide')continue;resetPed(p);p.x=dx;p.z=dz;pedRejoin(p);if(p.mode==='walk'){p.dest=pickDest(p.x,p.z);n--;}}
 }
+// a car is five circles along its length, so bumpers and corners touch rather than centres
+const CAR_O=[-1.35,-.68,0,.68,1.35];
+function carOverlap(a,b,R){let best=null;const fa=Math.sin(a.h),ga=Math.cos(a.h),fb=Math.sin(b.h),gb=Math.cos(b.h);
+  for(const i of CAR_O)for(const j of CAR_O){const dx=a.x+fa*i-b.x-fb*j,dz=a.z+ga*i-b.z-gb*j,d2=dx*dx+dz*dz;if(d2>=R*R||d2<1e-6)continue;const d=Math.sqrt(d2);if(!best||R-d>best.ov)best={ov:R-d,nx:dx/d,nz:dz/d};}
+  return best;}
+function parkedNear(x,z){const P=PARKED;
+  if(P.ga!==P.cars||P.gn!==P.cars.length){P.ga=P.cars;P.gn=P.cars.length;P.g=new Map();for(const o of P.cars){const k=Math.floor(o.x/16)+','+Math.floor(o.z/16);let l=P.g.get(k);if(!l)P.g.set(k,l=[]);l.push(o);}}
+  const out=[],ci=Math.floor(x/16),cj=Math.floor(z/16);for(let i=ci-1;i<=ci+1;i++)for(let j=cj-1;j<=cj+1;j++){const l=P.g.get(i+','+j);if(l)out.push(...l);}return out;}
+let pedDt=.016,pedGroups=[],SEATS=[],seatsOf=null;
+// the player's car knocks down whoever is inside its outline, whatever they were doing
+function runOver(p){if(player.mode!=='car'||p.mode==='down')return;const c=player.car,sp=Math.abs(c.speed);if(sp<2.5)return;
+  const fx=Math.sin(c.h),fz=Math.cos(c.h),dx=p.x-c.x,dz=p.z-c.z,al=dx*fx+dz*fz,lt=dx*fz-dz*fx;if(Math.abs(al)>2.45||Math.abs(lt)>1.2)return;
+  const sd=Math.sign(lt)||1;p.mode='down';p.lead=null;p.timer=3.2;p.vx=fx*c.speed*.55+fz*sd*sp*.15;p.vz=fz*c.speed*.55-fx*sd*sp*.15;c.speed*=.82;
+  shake=Math.max(shake,.35);hit(.3);addHeat(1);hurtCargo(.15);pedEvent(p.x,p.z,25,8);}
+// benches: two seats each, from world.benches [x,z,heading the sitter faces]
+function pedSeats(){const B=world.benches||[];if(seatsOf!==B||SEATS.n!==B.length){seatsOf=B;SEATS=[];SEATS.n=B.length;
+    for(const [x,z,h] of B)for(const k of[-.42,.42])SEATS.push({x:x+Math.cos(h)*k+Math.sin(h)*.06,z:z-Math.sin(h)*k+Math.cos(h)*.06,h,who:null});}return SEATS;}
+const seatFree=s=>!s.who||s.who.seat!==s||(s.who.mode!=='sit'&&!(s.who.mode==='goto'&&s.who.then==='sit'));
+function placeSit(p,far){const l=pedSeats().filter(s=>seatFree(s)&&far(s.x,s.z));if(!l.length)return false;const s=pick(l);
+  p.seat=s;s.who=p;p.mode='sit';p.x=s.x;p.z=s.z;p.h=s.h;p.timer=25+Math.random()*60;return true;}
+function pedIdle(p){const F=peds.filter(q=>q.lead===p&&q.mode==='walk');
+  if(F.length&&Math.random()<.6){startTalk([p,...F],(p.x+F[0].x)/2,(p.z+F[0].z)/2);return;}
+  if(!F.length&&Math.random()<.5){let s=null,bd=400;for(const q of pedSeats()){const d=(q.x-p.x)**2+(q.z-p.z)**2;if(d<bd&&seatFree(q)){bd=d;s=q;}}
+    if(s){p.mode='goto';p.seat=s;s.who=p;p.tx=s.x+Math.sin(s.h)*.45;p.tz=s.z+Math.cos(s.h)*.45;p.then='sit';p.timer=14;return;}}
+  p.mode='idle';p.timer=3+Math.random()*6;}
+function startTalk(mem,cx,cz){const n=mem.length,r=[0,0,.55,.7,.8][n]||.85,a0=Math.random()*TAU,g={x:cx,z:cz,mem,spk:0,sw:1+Math.random()*2,say:0,line:0,end:15+Math.random()*35};
+  mem.forEach((p,i)=>{const a=a0+i*TAU/n;let tx=cx+Math.cos(a)*r,tz=cz+Math.sin(a)*r;if(world.inBuilding(tx,tz)){tx=p.x;tz=p.z;}
+    p.pair=p.lead;p.lead=null;p.mode='talk';p.grp=g;p.tx=tx;p.tz=tz;p.dest=null;p.chatT=60;});
+  pedGroups.push(g);}
+function spawnTalk(p){const mem=[p],n=Math.random()<.35?3:2;
+  for(const q of peds){if(mem.length>=n)break;if(q.mode!=='hide'||q===p)continue;resetPed(q);Object.assign(q,{mode:'walk',e:p.e,t:p.t,dir:-p.dir,side:p.side,x:p.x,z:p.z});mem.push(q);}
+  if(mem.length<2)return;startTalk(mem,p.x,p.z);for(const q of mem){q.x=q.tx;q.z=q.tz;q.h=Math.atan2(p.x-q.x,p.z-q.z);}}
+function tickGroups(dt){
+  for(let i=pedGroups.length;i--;){const g=pedGroups[i];g.mem=g.mem.filter(p=>p.mode==='talk'&&p.grp===g);g.end-=dt;g.say-=dt;
+    if(g.mem.length<2||g.end<=0){for(const p of g.mem){p.grp=null;pedRejoin(p);p.idleT=25+Math.random()*40;}
+      for(const p of g.mem){if(p.pair&&p.pair.mode==='walk'&&p.mode==='walk')p.lead=p.pair;p.pair=null;}pedGroups.splice(i,1);continue;}
+    if(g.spk>=g.mem.length)g.spk=0;
+    if((g.sw-=dt)<=0){g.spk=(g.spk+1+Math.floor(Math.random()*(g.mem.length-1)))%g.mem.length;g.sw=2.5+Math.random()*3.5;g.say=1.8+Math.random()*.8;g.line=Math.floor(Math.random()*TALK_LINES.length);}}}
+// walkers predict who they will pass within 0.9 m in the next 3.5 s and drift to the free side of the pavement;
+// two strangers walking towards each other sometimes stop to chat
+function pedAvoid(dt){
+  const dk=Math.exp(-dt*.8),ek=Math.min(1,dt*2.5);
+  for(const p of peds){if(p.mode==='hide')continue;p.avoT=(p.avoT||0)*dk;p.avo=(p.avo||0)+(p.avoT-p.avo)*ek;p.chatT=(p.chatT||0)-dt;
+    const mv=(p.mode==='walk'||p.mode==='goto'||p.mode==='cross')&&p.gait>0;p.wx=mv?Math.sin(p.h)*p.sp:0;p.wz=mv?Math.cos(p.h)*p.sp:0;}
+  for(let i=0;i<PED_N;i++){const a=peds[i];if(a.mode==='hide'||!CALM[a.mode])continue;
+    for(let j=i+1;j<PED_N;j++){const b=peds[j];if(b.mode==='hide'||!CALM[b.mode]||a.lead===b||b.lead===a)continue;
+      const rx=b.x-a.x,rz=b.z-a.z,d2=rx*rx+rz*rz;if(d2>64)continue;
+      if(d2<9&&a.mode==='walk'&&b.mode==='walk'&&!a.lead&&!b.lead&&a.chatT<=0&&b.chatT<=0&&Math.cos(a.h-b.h)<-.3){a.chatT=b.chatT=30;
+        if(Math.random()<.4){startTalk([a,b,...peds.filter(q=>(q.lead===a||q.lead===b)&&q.mode==='walk')],(a.x+b.x)/2,(a.z+b.z)/2);continue;}}
+      const vx=b.wx-a.wx,vz=b.wz-a.wz,v2=vx*vx+vz*vz;if(v2<.04)continue;
+      const t=-(rx*vx+rz*vz)/v2;if(t<=0||t>3.5)continue;
+      const mx=rx+vx*t,mz=rz+vz*t;if(mx*mx+mz*mz>.81)continue;
+      sideStep(a,mx,mz);sideStep(b,-mx,-mz);}}}
+function sideStep(p,mx,mz){if(p.mode!=='walk'||p.lead||!p.e)return;const G=world.graph,A=G.get(p.e.a),B=G.get(p.e.b);if(!A||!B)return;
+  const L=Math.hypot(B.x-A.x,B.z-A.z)||1,nx=-(B.z-A.z)/L*p.side,nz=(B.x-A.x)/L*p.side,o=mx*nx+mz*nz;
+  const s=Math.abs(o)>.08?-Math.sign(o):(Math.sign(-Math.cos(p.h)*nx+Math.sin(p.h)*nz)||1);
+  p.avoT=clamp(s*.75,-.45-(p.lane||0)*.4,.9);}
+// joint angles that replace the walk cycle: sitting, talking, phone. NaN keeps the walk cycle's angle.
+const ACT=new Array(19);
+function pedAct(p){
+  const m=p.mode,t=pedClock+p.phase;let any=false;ACT.fill(NaN);ACT.phone=false;const set=(k,v)=>{ACT[k]=v;any=true;};
+  if(m==='sit'){set(12,-1.5);set(15,-1.5);set(13,1.45);set(16,1.45);set(14,.05);set(17,.05);set(1,-.06);set(18,-1.35);set(6,-.3);set(7,-.9);set(9,-.3);set(10,-.9);}
+  if(m==='talk'&&p.gait<.1&&p.grp){
+    if(p.grp.mem[p.grp.spk]===p){set(9,-.35-.45*(.5+.5*Math.sin(t*2.3)));set(10,-1.1-.6*Math.sin(t*3.1+1));set(1,.05*Math.sin(t*1.3));
+      if(Math.sin(t*.9)>.2){set(6,-.3-.35*(.5+.5*Math.sin(t*2.9+2)));set(7,-1-.55*Math.sin(t*3.7));}}
+    else{const nod=Math.sin(t*.37)>.3?Math.max(0,Math.sin(t*2.2))*.16:0;set(3,nod);set(4,nod);set(5,nod);if(p.pr<.3){set(6,-.35);set(7,-1.35);set(9,-.35);set(10,-1.35);}}}
+  if(!p.lead&&(m==='walk'&&p.pr<.14||(m==='stop'||m==='idle'||m==='wait'||m==='sit')&&p.pr<.45)){set(6,-.45);set(7,-1.5);set(8,.2);set(3,.4);set(4,.4);set(5,.4);ACT.phone=true;}
+  return any?ACT:null;}
+const TALK_LINES=['Labas!','Kaip sekasi?','Nu jo...','Ar matei?','Šalta šiandien','Ką veiki?','Gerai, gerai','Aha','Rimtai?','Važiuoji į Kauną?','Maximoj akcija','Nu tai va','Matysim','Ar girdėjai?'];
+let talkTex=null;const talkSpr=[];
+function pedBubbles(){
+  if(!talkTex){talkTex=TALK_LINES.map(s=>{const cv=document.createElement('canvas'),x=cv.getContext('2d'),f='600 30px system-ui,sans-serif';x.font=f;const w=Math.ceil(x.measureText(s).width)+36;cv.width=w;cv.height=78;
+      x.font=f;x.fillStyle='rgba(255,255,255,.92)';x.beginPath();x.roundRect(2,2,w-4,54,16);x.moveTo(w*.3,54);x.lineTo(w*.3+6,76);x.lineTo(w*.3+20,54);x.fill();
+      x.fillStyle='#1d1f22';x.textBaseline='middle';x.fillText(s,18,30);const t=new THREE.CanvasTexture(cv);t.colorSpace=THREE.SRGBColorSpace;return{t,w};});
+    for(let i=0;i<3;i++){const s=new THREE.Sprite(new THREE.SpriteMaterial({transparent:true,depthWrite:false,fog:false}));s.visible=false;s.renderOrder=5;scene.add(s);talkSpr.push(s);}}
+  const cx=camera.position.x,cz=camera.position.z,on=[];
+  for(const g of pedGroups){if(g.say<=0)continue;const p=g.mem[g.spk];if(!p||p.mode!=='talk'||p.gait>.1)continue;const d=(p.x-cx)**2+(p.z-cz)**2;if(d<900)on.push([d,p,g]);}
+  on.sort((a,b)=>a[0]-b[0]);
+  talkSpr.forEach((s,i)=>{const o=on[i];s.visible=!!o;if(!o)return;const p=o[1],T=talkTex[o[2].line];if(s.material.map!==T.t){s.material.map=T.t;s.material.needsUpdate=true;}
+    s.scale.set(T.w/78*.36,.36,1);s.position.set(p.x,GY(p.x,p.z)+world.surf(p.x,p.z)+2.1*p.look.s,p.z);});}
 function updatePeople(dt){
   if(!pedGrid)return;
-  pedClock+=dt;if(pedEvents.length)pedEvents=pedEvents.filter(e=>pedClock-e.t<1.5);
+  pedClock+=dt;pedDt=dt;if(pedEvents.length)pedEvents=pedEvents.filter(e=>pedClock-e.t<1.5);
   if(!crossPts){crossPts=CROSSINGS.map(([la,lo])=>LL(la,lo));for(const s of signals)crossPts.push([s.n.x,s.n.z]);}
   const horn=down('KeyQ'),M=movers();
   const hornNow=horn&&!hornWas;hornWas=horn;
@@ -3819,14 +3913,17 @@ function updatePeople(dt){
   for(const p of peds){
     if(p.mode==='hide'){if(active<want&&placed<3&&pedPlace(p)){placed++;active++;}}
     else{const d=Math.hypot(p.x-player.x,p.z-player.z);if(d>190||(active>want+2&&d>90&&!p.lead&&CALM[p.mode])){p.mode='hide';p.lead=null;active--;}}
-    if(p.mode!=='hide')stepPed(p,dt,M);
+    if(p.mode!=='hide'){stepPed(p,dt,M);if(p.mode!=='hide')runOver(p);}
     if(hornNow&&CALM[p.mode]){const dx=p.x-player.x,dz=p.z-player.z,d=Math.hypot(dx,dz);if(d<24&&d>.1){pedFlee(p,dx,dz,1.2,5.5);p.nerv=10;p.lead=null;}}
   }
+  tickGroups(dt);pedAvoid(dt);
   // nobody walks through anybody: calm people push apart, partners excepted
   for(let i=0;i<PED_N;i++){const a=peds[i];if(!CALM[a.mode])continue;
-    for(let j=i+1;j<PED_N;j++){const b=peds[j];if(!CALM[b.mode]||a.lead===b||b.lead===a)continue;
+    for(let j=i+1;j<PED_N;j++){const b=peds[j];if(!CALM[b.mode]||a.lead===b||b.lead===a||a.mode==='sit'||b.mode==='sit')continue;
       const dx=b.x-a.x,dz=b.z-a.z,d2=dx*dx+dz*dz;if(d2>.64||d2<1e-6)continue;const d=Math.sqrt(d2),k=(.8-d)/2/d;a.x-=dx*k;a.z-=dz*k;b.x+=dx*k;b.z+=dz*k;}}
-  peds.forEach((p,i)=>{if(p.mode==='hide')hidePed(i);else poseAt(i,p.look,p.x,p.z,p.h,p.fall,p.hop,p.phase,p.gait,p.mode==='cower',p.yaw);});
+  peds.forEach((p,i)=>{if(p.mode==='hide'){hidePed(i);pedPhone.setMatrixAt(i,ZERO_M);return;}const A=pedAct(p);
+    poseAt(i,p.look,p.x,p.z,p.h,p.fall,p.mode==='sit'?.5-.92*p.look.s:p.hop,p.phase,p.gait,p.mode==='cower',p.yaw,A);pedPhone.setMatrixAt(i,A&&A.phone?PM[8]:ZERO_M);});
+  pedPhone.instanceMatrix.needsUpdate=true;pedBubbles();
   if(personMesh.visible&&player.mode==='foot')poseAt(PLAYER_I,PLAYER_LOOK,player.x,player.z,player.h,0,0,player.walk,player.gait||0);else hidePed(PLAYER_I);
   if(fare)poseAt(FARE_I,fare.look,fare.x,fare.z,fare.h,0,0,fare.ph+=dt*4,0,true);else hidePed(FARE_I);
   for(const m of pedMesh)m.instanceMatrix.needsUpdate=true;
@@ -4947,7 +5044,7 @@ function buildStadium(){
       poles.push([x,g+5,z,0,.08,10,.08]);cols[i].forEach((col,k)=>cloth.push([col,[x+.85,g+9.55-k*.36,z,0,1.6,.36,.03]]));addWall(x-.1,z,x+.1,z);});
     instances(unit,0xd4d6d6,poles);for(const [col,box] of cloth)instances(unit,col,[box]);}
   {const L={},put=(k,x,z,y,hd,sx,sy,sz)=>(L[k]||(L[k]=[])).push([x,GY(x,z)+y,z,hd,sx,sy,sz]),hdOf=(x,z)=>Math.atan2(-z,x);
-    const bench=(x,z,fx,fz)=>{const hd=hdOf(-fz,fx);put('seat',x,z,.45,hd,1.7,.07,.42);put('seat',x-fx*.22,z-fz*.22,.78,hd,1.7,.36,.06);
+    const bench=(x,z,fx,fz)=>{(world.benches||(world.benches=[])).push([x,z,Math.atan2(fx,fz)]);const hd=hdOf(-fz,fx);put('seat',x,z,.45,hd,1.7,.07,.42);put('seat',x-fx*.22,z-fz*.22,.78,hd,1.7,.36,.06);
       for(const k of[-.7,.7])put('iron',x-fz*k,z+fx*k,.22,hd,.08,.45,.45);addWall(x-fx*.2+fz*.85,z-fz*.2-fx*.85,x-fx*.2-fz*.85,z-fz*.2+fx*.85);};
     const parks=FAC.parks.map(f=>f[1].map(q=>LL(...q)));
     for(const r of world.paths){let d0=0,next=7,j=0;const Q=r.pts;
