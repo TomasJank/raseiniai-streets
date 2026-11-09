@@ -1,0 +1,17 @@
+# builds and scratch: only the two canonical builds are tracked
+work/*
+!work/build/
+work/build/*
+!work/build/v37.html
+!work/build/v38.html
+!work/*.mjs
+_m.html
+_*.html
+backup/
+pilot/
+.DS_Store
+__pycache__/
+research/repositories/
+research/assets/**/*.zip
+research/assets/**/*.blend
+research/assets/**/*.fbx

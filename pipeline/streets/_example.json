@@ -1,0 +1,36 @@
+{
+  "street": "Kalno g.",
+  "slug": "kalno",
+  "flavour": [
+    ["Vėl Kalno gatvėj duobes lopo.", "Kiekvieną rudenį tas pats.", "Bent jau ne žiemą.", "Palauk, dar ir žiemą lopys."],
+    ["Į kalną pėsčiom ar autobusu?", "Pėsčiom, sveikiau.", "Tai tu ir eik, aš palauksiu."]
+  ],
+  "looks": {
+    "c3142": {"wall": [0.86, 0.78, 0.55], "roof": [0.55, 0.24, 0.17], "sty": "plaster", "pitched": true, "hip": false, "h": 3.2, "rh": 3.4},
+    "c3141": {"wall": [0.80, 0.77, 0.70], "roof": [0.36, 0.37, 0.36], "sty": "brick", "windows": true},
+    "c3180": {"wall": [0.62, 0.63, 0.62], "roof": [0.42, 0.43, 0.42], "sty": "sheet", "windows": false, "h": 2.6}
+  },
+  "props": [
+    {"k": "planter", "ll": [55.3793602, 23.1394014], "hd": 152},
+    {"k": "bollard", "ll": [55.3794632, 23.1397350], "knock": true},
+    {"k": "bench", "ll": [55.3795494, 23.1400130], "hd": 152},
+    {"k": "bin", "ll": [55.3796294, 23.1402710], "col": "#3b5a44"},
+    {"k": "lamp", "ll": [55.3797089, 23.1405551], "s": [0.5, 5.2, 0.5]},
+    {"k": "treeS", "ll": [55.3796747, 23.1409364], "solid": true},
+    {"k": "post", "ll": [55.3792487, 23.1395065]}
+  ],
+  "signs": [
+    {"text": "Kalno g.", "ll": [55.3792480, 23.1395058], "hd": 242, "w": 0.9, "h": 0.25, "y": 2.35, "bg": "#1f5fae", "fg": "#ffffff"},
+    {"text": "Kalno g.", "ll": [55.3792494, 23.1395072], "hd": 62, "w": 0.9, "h": 0.25, "y": 2.35, "bg": "#1f5fae", "fg": "#ffffff"}
+  ],
+  "fences": [
+    {"style": "picket", "ll": [[55.3797612, 23.1416082], [55.3798028, 23.1419806], [55.3798441, 23.1423674]], "h": 1.1}
+  ],
+  "parking": [
+    {"ll": [[55.3800348, 23.1428519], [55.3801380, 23.1437833]], "side": 0, "every": 6, "fill": 0.7}
+  ],
+  "views": [
+    {"ll": [55.3794031, 23.1395405], "hd": 62},
+    {"ll": [55.3803614, 23.1467116], "hd": 245}
+  ]
+}

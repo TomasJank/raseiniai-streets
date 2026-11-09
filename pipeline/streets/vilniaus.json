@@ -1,0 +1,989 @@
+{
+ "street": "Vilniaus g.",
+ "slug": "vilniaus",
+ "flavour": [
+  [
+   "Gal užeinam į kebabinę prie IKI?",
+   "Vėl kebabo? Vakar valgėm.",
+   "Tai kad ten skaniausi Raseiniuose.",
+   "Gerai, bet aš be svogūnų."
+  ],
+  [
+   "Kada tavo autobusas į Kauną?",
+   "Iš stoties po pusvalandžio.",
+   "Tai dar spėsi į Maximą užbėgti.",
+   "Spėsiu, jei prie kasų eilės nebus."
+  ],
+  [
+   "Vėl Vilniaus gatve sunkvežimiai lekia.",
+   "Ką padarysi, pagrindinė gatvė.",
+   "Gerai, kad bent turėklus pastatė.",
+   "Tai bent vaikai į gatvę neišbėga."
+  ],
+  [
+   "Matei, kiek degalinėj dyzelis kainuoja?",
+   "Mačiau, vėl pabrango.",
+   "Tai aš dabar į stadioną pėsčias.",
+   "Tu? Pėsčias? Norėčiau pamatyt."
+  ]
+ ],
+ "looks": {
+  "c2916": {
+   "wall": [
+    0.84,
+    0.82,
+    0.76
+   ],
+   "roof": [
+    0.4,
+    0.41,
+    0.42
+   ],
+   "sty": "brick",
+   "windows": true
+  },
+  "c2915": {
+   "wall": [
+    0.88,
+    0.82,
+    0.68
+   ],
+   "roof": [
+    0.4,
+    0.27,
+    0.2
+   ],
+   "sty": "plaster",
+   "windows": true
+  },
+  "c2914": {
+   "wall": [
+    0.78,
+    0.77,
+    0.72
+   ],
+   "roof": [
+    0.52,
+    0.26,
+    0.19
+   ],
+   "sty": "brick",
+   "windows": true,
+   "pitched": true,
+   "hip": false,
+   "h": 3.0,
+   "rh": 3.2
+  },
+  "c2913": {
+   "wall": [
+    0.86,
+    0.74,
+    0.46
+   ],
+   "roof": [
+    0.4,
+    0.27,
+    0.2
+   ],
+   "sty": "plaster",
+   "windows": true
+  },
+  "c2911": {
+   "wall": [
+    0.91,
+    0.9,
+    0.86
+   ],
+   "roof": [
+    0.28,
+    0.29,
+    0.31
+   ],
+   "sty": "plaster",
+   "windows": true
+  },
+  "c2910": {
+   "wall": [
+    0.91,
+    0.9,
+    0.86
+   ],
+   "roof": [
+    0.28,
+    0.29,
+    0.31
+   ],
+   "sty": "plaster",
+   "windows": true,
+   "pitched": true,
+   "hip": false,
+   "h": 6.0,
+   "rh": 3.6
+  },
+  "c2909": {
+   "wall": [
+    0.88,
+    0.82,
+    0.68
+   ],
+   "roof": [
+    0.4,
+    0.27,
+    0.2
+   ],
+   "sty": "plaster",
+   "windows": true,
+   "pitched": true,
+   "hip": false,
+   "h": 6.0,
+   "rh": 3.8
+  },
+  "c2908": {
+   "wall": [
+    0.84,
+    0.82,
+    0.76
+   ],
+   "roof": [
+    0.4,
+    0.41,
+    0.42
+   ],
+   "sty": "brick",
+   "windows": true,
+   "pitched": true,
+   "hip": false,
+   "h": 3.2,
+   "rh": 3.4
+  },
+  "c2186": {
+   "wall": [
+    0.9,
+    0.86,
+    0.76
+   ],
+   "roof": [
+    0.4,
+    0.41,
+    0.42
+   ],
+   "sty": "plaster",
+   "windows": true
+  },
+  "c2181": {
+   "wall": [
+    0.94,
+    0.94,
+    0.92
+   ],
+   "roof": [
+    0.45,
+    0.46,
+    0.47
+   ],
+   "sty": "shop",
+   "windows": true,
+   "h": 5.2
+  },
+  "c7195": {
+   "wall": [
+    0.93,
+    0.89,
+    0.8
+   ],
+   "roof": [
+    0.3,
+    0.3,
+    0.31
+   ],
+   "sty": "shop",
+   "windows": true,
+   "pitched": false,
+   "h": 2.7
+  },
+  "c7194": {
+   "wall": [
+    0.93,
+    0.89,
+    0.8
+   ],
+   "roof": [
+    0.3,
+    0.3,
+    0.31
+   ],
+   "sty": "shop",
+   "windows": true,
+   "pitched": false,
+   "h": 2.8
+  },
+  "c2221": {
+   "wall": [
+    0.86,
+    0.84,
+    0.78
+   ],
+   "roof": [
+    0.38,
+    0.38,
+    0.38
+   ],
+   "sty": "plaster",
+   "windows": true,
+   "pitched": false,
+   "h": 3.4
+  },
+  "c5679": {
+   "wall": [
+    0.84,
+    0.82,
+    0.76
+   ],
+   "roof": [
+    0.38,
+    0.38,
+    0.38
+   ],
+   "sty": "plaster",
+   "windows": true,
+   "pitched": false,
+   "h": 6.6
+  },
+  "c2904": {
+   "wall": [
+    0.74,
+    0.6,
+    0.42
+   ],
+   "roof": [
+    0.4,
+    0.35,
+    0.32
+   ],
+   "sty": "brick",
+   "windows": true,
+   "h": 10.2
+  },
+  "c2156": {
+   "wall": [
+    0.88,
+    0.86,
+    0.8
+   ],
+   "roof": [
+    0.4,
+    0.4,
+    0.4
+   ],
+   "sty": "plaster",
+   "windows": true,
+   "h": 6.5
+  },
+  "c7170": {
+   "wall": [
+    0.9,
+    0.9,
+    0.88
+   ],
+   "roof": [
+    0.42,
+    0.43,
+    0.44
+   ],
+   "sty": "shop",
+   "windows": true,
+   "pitched": false,
+   "h": 5.0
+  },
+  "c7620": {
+   "wall": [
+    0.86,
+    0.84,
+    0.8
+   ],
+   "roof": [
+    0.4,
+    0.4,
+    0.41
+   ],
+   "sty": "shop",
+   "windows": true,
+   "pitched": false,
+   "h": 4.6
+  },
+  "c7618": {
+   "wall": [
+    0.8,
+    0.82,
+    0.8
+   ],
+   "roof": [
+    0.3,
+    0.31,
+    0.32
+   ],
+   "sty": "shop",
+   "windows": true,
+   "pitched": false,
+   "h": 2.7
+  },
+  "c2515": {
+   "wall": [
+    0.84,
+    0.82,
+    0.76
+   ],
+   "roof": [
+    0.4,
+    0.41,
+    0.42
+   ],
+   "sty": "brick",
+   "windows": true,
+   "pitched": true,
+   "hip": false,
+   "h": 3.1,
+   "rh": 3.4
+  },
+  "c2514": {
+   "wall": [
+    0.91,
+    0.9,
+    0.86
+   ],
+   "roof": [
+    0.28,
+    0.29,
+    0.31
+   ],
+   "sty": "plaster",
+   "windows": true,
+   "pitched": true,
+   "hip": false
+  },
+  "c2467": {
+   "wall": [
+    0.91,
+    0.9,
+    0.86
+   ],
+   "roof": [
+    0.28,
+    0.29,
+    0.31
+   ],
+   "sty": "plaster",
+   "windows": true,
+   "pitched": true,
+   "hip": false
+  },
+  "c2466": {
+   "wall": [
+    0.84,
+    0.82,
+    0.76
+   ],
+   "roof": [
+    0.4,
+    0.27,
+    0.2
+   ],
+   "sty": "brick",
+   "windows": true
+  },
+  "c2465": {
+   "wall": [
+    0.9,
+    0.86,
+    0.76
+   ],
+   "roof": [
+    0.4,
+    0.41,
+    0.42
+   ],
+   "sty": "plaster",
+   "windows": true,
+   "pitched": true,
+   "hip": false
+  },
+  "c2464": {
+   "wall": [
+    0.78,
+    0.77,
+    0.72
+   ],
+   "roof": [
+    0.52,
+    0.26,
+    0.19
+   ],
+   "sty": "brick",
+   "windows": true
+  },
+  "c2463": {
+   "wall": [
+    0.91,
+    0.9,
+    0.86
+   ],
+   "roof": [
+    0.4,
+    0.41,
+    0.42
+   ],
+   "sty": "plaster",
+   "windows": true,
+   "pitched": true,
+   "hip": false
+  },
+  "c2026": {
+   "wall": [
+    0.88,
+    0.82,
+    0.68
+   ],
+   "roof": [
+    0.4,
+    0.27,
+    0.2
+   ],
+   "sty": "plaster",
+   "windows": true,
+   "pitched": true,
+   "hip": false,
+   "h": 3.2,
+   "rh": 3.6
+  },
+  "c2027": {
+   "wall": [
+    0.84,
+    0.82,
+    0.76
+   ],
+   "roof": [
+    0.4,
+    0.41,
+    0.42
+   ],
+   "sty": "brick",
+   "windows": true
+  },
+  "c2022": {
+   "wall": [
+    0.84,
+    0.82,
+    0.76
+   ],
+   "roof": [
+    0.42,
+    0.34,
+    0.3
+   ],
+   "sty": "brick",
+   "windows": true,
+   "pitched": true,
+   "hip": false
+  },
+  "c2019": {
+   "wall": [
+    0.9,
+    0.86,
+    0.76
+   ],
+   "roof": [
+    0.28,
+    0.29,
+    0.31
+   ],
+   "sty": "plaster",
+   "windows": true,
+   "pitched": true,
+   "hip": false
+  },
+  "c214": {
+   "wall": [
+    0.78,
+    0.77,
+    0.72
+   ],
+   "roof": [
+    0.4,
+    0.41,
+    0.42
+   ],
+   "sty": "brick",
+   "windows": true
+  },
+  "c213": {
+   "wall": [
+    0.8,
+    0.86,
+    0.78
+   ],
+   "roof": [
+    0.55,
+    0.56,
+    0.57
+   ],
+   "sty": "plaster",
+   "windows": true
+  },
+  "c206": {
+   "wall": [
+    0.88,
+    0.73,
+    0.38
+   ],
+   "roof": [
+    0.58,
+    0.24,
+    0.18
+   ],
+   "sty": "plaster",
+   "windows": true
+  },
+  "c204": {
+   "wall": [
+    0.84,
+    0.82,
+    0.76
+   ],
+   "roof": [
+    0.4,
+    0.27,
+    0.2
+   ],
+   "sty": "brick",
+   "windows": true,
+   "pitched": true,
+   "hip": false
+  }
+ },
+ "props": [
+  {
+   "k": "bench",
+   "ll": [
+    55.3803248,
+    23.1120149
+   ],
+   "hd": 26
+  },
+  {
+   "k": "bin",
+   "ll": [
+    55.3803304,
+    23.111995
+   ],
+   "knock": true
+  },
+  {
+   "k": "planter",
+   "ll": [
+    55.380297,
+    23.1121073
+   ],
+   "col": "#7d7a73"
+  },
+  {
+   "k": "lamp",
+   "ll": [
+    55.3803134,
+    23.1121424
+   ]
+  },
+  {
+   "k": "post",
+   "ll": [
+    55.3803163,
+    23.1122976
+   ],
+   "s": [
+    0.12,
+    3.6,
+    0.12
+   ]
+  },
+  {
+   "k": "post",
+   "ll": [
+    55.3803235,
+    23.112272
+   ],
+   "s": [
+    0.12,
+    3.6,
+    0.12
+   ]
+  },
+  {
+   "k": "bollard",
+   "ll": [
+    55.3803036,
+    23.1123501
+   ],
+   "knock": true
+  },
+  {
+   "k": "bollard",
+   "ll": [
+    55.3802957,
+    23.1123785
+   ],
+   "knock": true
+  },
+  {
+   "k": "bollard",
+   "ll": [
+    55.3802878,
+    23.1124069
+   ],
+   "knock": true
+  },
+  {
+   "k": "bollard",
+   "ll": [
+    55.3802798,
+    23.1124353
+   ],
+   "knock": true
+  },
+  {
+   "k": "box",
+   "ll": [
+    55.3806101,
+    23.1118114
+   ],
+   "hd": 206
+  },
+  {
+   "k": "bench",
+   "ll": [
+    55.3797975,
+    23.1138128
+   ],
+   "hd": 35
+  },
+  {
+   "k": "bin",
+   "ll": [
+    55.3798049,
+    23.1137948
+   ],
+   "knock": true
+  },
+  {
+   "k": "post",
+   "ll": [
+    55.3799311,
+    23.1139565
+   ]
+  },
+  {
+   "k": "bench",
+   "ll": [
+    55.3792496,
+    23.1152726
+   ],
+   "hd": 35
+  },
+  {
+   "k": "bin",
+   "ll": [
+    55.3792569,
+    23.1152545
+   ],
+   "knock": true
+  },
+  {
+   "k": "bench",
+   "ll": [
+    55.3791143,
+    23.1156088
+   ],
+   "hd": 35
+  },
+  {
+   "k": "bin",
+   "ll": [
+    55.3791216,
+    23.1155907
+   ],
+   "knock": true
+  },
+  {
+   "k": "bin",
+   "ll": [
+    55.3792841,
+    23.115547
+   ],
+   "knock": true
+  },
+  {
+   "k": "box",
+   "ll": [
+    55.3794172,
+    23.1152274
+   ],
+   "hd": 215
+  },
+  {
+   "k": "planter",
+   "ll": [
+    55.378694,
+    23.1170357
+   ],
+   "col": "#8d8a82"
+  },
+  {
+   "k": "planter",
+   "ll": [
+    55.3787169,
+    23.1169789
+   ],
+   "col": "#8d8a82"
+  },
+  {
+   "k": "bin",
+   "ll": [
+    55.3787203,
+    23.1169484
+   ],
+   "knock": true
+  },
+  {
+   "k": "post",
+   "ll": [
+    55.3772879,
+    23.1200846
+   ]
+  },
+  {
+   "k": "box",
+   "ll": [
+    55.3772889,
+    23.1204193
+   ],
+   "hd": 223
+  },
+  {
+   "k": "bush",
+   "ll": [
+    55.3774824,
+    23.1200721
+   ],
+   "s": [
+    1.0,
+    2.4,
+    1.0
+   ],
+   "col": "#2f4f2a"
+  },
+  {
+   "k": "bush",
+   "ll": [
+    55.3774368,
+    23.1196905
+   ],
+   "s": [
+    1.0,
+    2.4,
+    1.0
+   ],
+   "col": "#2f4f2a"
+  },
+  {
+   "k": "bush",
+   "ll": [
+    55.3774535,
+    23.1196532
+   ],
+   "s": [
+    1.0,
+    2.4,
+    1.0
+   ],
+   "col": "#2f4f2a"
+  },
+  {
+   "k": "bush",
+   "ll": [
+    55.3776626,
+    23.1196542
+   ],
+   "s": [
+    1.0,
+    2.4,
+    1.0
+   ],
+   "col": "#2f4f2a"
+  },
+  {
+   "k": "bin",
+   "ll": [
+    55.3733547,
+    23.1264122
+   ],
+   "knock": true
+  },
+  {
+   "k": "bench",
+   "ll": [
+    55.3733116,
+    23.126505
+   ],
+   "hd": 38
+  },
+  {
+   "k": "post",
+   "ll": [
+    55.3706917,
+    23.1327616
+   ],
+   "s": [
+    0.14,
+    4.4,
+    0.14
+   ]
+  }
+ ],
+ "signs": [
+  {
+   "text": "KEBABAI",
+   "ll": [
+    55.380291,
+    23.1120395
+   ],
+   "hd": 24,
+   "w": 2.0,
+   "h": 0.45,
+   "y": 2.25,
+   "bg": "#b8261d",
+   "fg": "#ffffff"
+  },
+  {
+   "text": "IKI",
+   "ll": [
+    55.3803199,
+    23.1122848
+   ],
+   "hd": 116,
+   "w": 1.6,
+   "h": 0.8,
+   "y": 3.0,
+   "bg": "#ffffff",
+   "fg": "#e2001a"
+  },
+  {
+   "text": "IKI",
+   "ll": [
+    55.3803199,
+    23.1122848
+   ],
+   "hd": 296,
+   "w": 1.6,
+   "h": 0.8,
+   "y": 3.0,
+   "bg": "#ffffff",
+   "fg": "#e2001a"
+  },
+  {
+   "text": "KEBABAI",
+   "ll": [
+    55.3796909,
+    23.1136222
+   ],
+   "hd": 33,
+   "w": 2.2,
+   "h": 0.45,
+   "y": 2.3,
+   "bg": "#b8261d",
+   "fg": "#ffffff"
+  },
+  {
+   "text": "Vilniaus g.",
+   "ll": [
+    55.3799311,
+    23.1139565
+   ],
+   "hd": 125,
+   "w": 1.1,
+   "h": 0.28,
+   "y": 2.35,
+   "bg": "#1f5fae",
+   "fg": "#ffffff"
+  },
+  {
+   "text": "Vilniaus g.",
+   "ll": [
+    55.3772879,
+    23.1200846
+   ],
+   "hd": 309,
+   "w": 1.1,
+   "h": 0.28,
+   "y": 2.35,
+   "bg": "#1f5fae",
+   "fg": "#ffffff"
+  },
+  {
+   "text": "Baltic Petroleum",
+   "ll": [
+    55.3706917,
+    23.1327616
+   ],
+   "hd": 128,
+   "w": 2.0,
+   "h": 0.5,
+   "y": 4.0,
+   "bg": "#0d4f9e",
+   "fg": "#ffffff"
+  },
+  {
+   "text": "Baltic Petroleum",
+   "ll": [
+    55.3706917,
+    23.1327616
+   ],
+   "hd": 308,
+   "w": 2.0,
+   "h": 0.5,
+   "y": 4.0,
+   "bg": "#0d4f9e",
+   "fg": "#ffffff"
+  }
+ ],
+ "parking": [
+  {
+   "ll": [
+    [
+     55.3790721,
+     23.1154937
+    ],
+    [
+     55.3791658,
+     23.115261
+    ]
+   ],
+   "side": 0,
+   "every": 6,
+   "fill": 0.6
+  }
+ ],
+ "views": [
+  {
+   "ll": [
+    55.3792325,
+    23.1153289
+   ],
+   "hd": 305
+  },
+  {
+   "ll": [
+    55.3803621,
+    23.1126396
+   ],
+   "hd": 297
+  }
+ ]
+}
