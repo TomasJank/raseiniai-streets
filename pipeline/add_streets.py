@@ -27,7 +27,7 @@ KINDS = {
 FENCES = {'picket': [1.1, .05, '#d8d2c0'], 'mesh': [1.5, .04, '#6f7a72'], 'hedge': [1.3, .7, '#3f5f2e'], 'wall': [1.6, .25, '#b9b4a8']}
 PLACES = {'shop': 'commercial', 'cafe': 'commercial', 'bank': 'commercial', 'pharmacy': 'commercial', 'school': 'civic',
           'church': 'church', 'monument': 'civic', 'bus_stop': 'civic'}
-STY = ['plaster', 'old', 'shop', 'block', 'brick', 'wood', 'industrial', 'glass', 'tiles', 'sheet', 'flat', 'none']
+STY = ['plaster', 'old', 'shop', 'block', 'brick', 'wood', 'industrial', 'glass', 'tiles', 'sheet', 'flat', 'none', 'silicate', 'panel', 'plank', 'corrugated', 'asbestos']  # last five are added to STY by add_facades.py, which runs after streets
 TOP = {'street', 'slug', 'flavour', 'looks', 'props', 'signs', 'fences', 'parking', 'places', 'views'}
 ITEM = {  # key -> (allowed keys, required keys)
     'props': ({'k', 'll', 'hd', 's', 'col', 'solid', 'knock'}, {'k', 'll'}),

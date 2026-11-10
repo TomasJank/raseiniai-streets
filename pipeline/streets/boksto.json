@@ -1,0 +1,217 @@
+{
+ "street": "Bokšto g.",
+ "slug": "boksto",
+ "flavour": [
+  [
+   "Bokšto gatvė jau už miesto, kur asfaltas baigiasi lauku.",
+   "Bent jau eismo čia mažai.",
+   "Tik traktoriai ir vienas kitas furgonas."
+  ],
+  [
+   "Ar šitas posūkis į Saulės gatvę?",
+   "Taip, už tų eglių.",
+   "Tada sukam, kol saulė nenusileido."
+  ],
+  [
+   "Beržai pakelėj gražūs, tik šaligatvio nėra.",
+   "Pėsčiom čia nevaikšto, visi važiuoja.",
+   "Tai ir mes važiuokim."
+  ]
+ ],
+ "props": [
+  {
+   "k": "post",
+   "ll": [
+    55.3594838,
+    23.1101452
+   ],
+   "hd": 0,
+   "s": [
+    0.12,
+    1.0,
+    0.12
+   ],
+   "col": "#e6e6de",
+   "knock": true
+  },
+  {
+   "k": "post",
+   "ll": [
+    55.3594977,
+    23.1100768
+   ],
+   "hd": 0,
+   "s": [
+    0.12,
+    1.0,
+    0.12
+   ],
+   "col": "#e6e6de",
+   "knock": true
+  },
+  {
+   "k": "post",
+   "ll": [
+    55.3595261,
+    23.1099387
+   ],
+   "hd": 0,
+   "s": [
+    0.12,
+    1.0,
+    0.12
+   ],
+   "col": "#e6e6de",
+   "knock": true
+  },
+  {
+   "k": "post",
+   "ll": [
+    55.359547,
+    23.1097933
+   ],
+   "hd": 0,
+   "s": [
+    0.12,
+    1.0,
+    0.12
+   ],
+   "col": "#e6e6de",
+   "knock": true
+  },
+  {
+   "k": "post",
+   "ll": [
+    55.3595791,
+    23.1095763
+   ],
+   "hd": 0,
+   "s": [
+    0.12,
+    1.0,
+    0.12
+   ],
+   "col": "#e6e6de",
+   "knock": true
+  },
+  {
+   "k": "post",
+   "ll": [
+    55.3596112,
+    23.1093593
+   ],
+   "hd": 0,
+   "s": [
+    0.12,
+    1.0,
+    0.12
+   ],
+   "col": "#e6e6de",
+   "knock": true
+  },
+  {
+   "k": "post",
+   "ll": [
+    55.3596433,
+    23.1091424
+   ],
+   "hd": 0,
+   "s": [
+    0.12,
+    1.0,
+    0.12
+   ],
+   "col": "#e6e6de",
+   "knock": true
+  },
+  {
+   "k": "post",
+   "ll": [
+    55.3596754,
+    23.1089254
+   ],
+   "hd": 0,
+   "s": [
+    0.12,
+    1.0,
+    0.12
+   ],
+   "col": "#e6e6de",
+   "knock": true
+  },
+  {
+   "k": "post",
+   "ll": [
+    55.3597075,
+    23.1087084
+   ],
+   "hd": 0,
+   "s": [
+    0.12,
+    1.0,
+    0.12
+   ],
+   "col": "#e6e6de",
+   "knock": true
+  },
+  {
+   "k": "post",
+   "ll": [
+    55.3597396,
+    23.1084915
+   ],
+   "hd": 0,
+   "s": [
+    0.12,
+    1.0,
+    0.12
+   ],
+   "col": "#e6e6de",
+   "knock": true
+  }
+ ],
+ "signs": [
+  {
+   "text": "Saulės g.",
+   "ll": [
+    55.379786,
+    23.14123
+   ],
+   "hd": 192,
+   "w": 0.6,
+   "h": 0.2,
+   "y": 2.3,
+   "bg": "#ffffff",
+   "fg": "#1a1a1a"
+  },
+  {
+   "text": "Saulės g.",
+   "ll": [
+    55.379787,
+    23.141231
+   ],
+   "hd": 12,
+   "w": 0.6,
+   "h": 0.2,
+   "y": 2.3,
+   "bg": "#ffffff",
+   "fg": "#1a1a1a"
+  }
+ ],
+ "views": [
+  {
+   "ll": [
+    55.3594465,
+    23.1100832
+   ],
+   "hd": 243
+  },
+  {
+   "ll": [
+    55.38177,
+    23.1405132
+   ],
+   "hd": 152
+  }
+ ]
+}
