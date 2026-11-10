@@ -24,23 +24,34 @@
    "Ne, eikit į stotį, prie Vilniaus gatvės.",
    "Toli?",
    "Kokios dešimt minučių pėsčiom."
+  ],
+  [
+   "Saldumynų namuose pyragų dar yra?",
+   "Po pietų jau būna tuščia lentyna.",
+   "Tai ryt anksčiau užsuksiu."
+  ],
+  [
+   "Rinkliavą už stovėjimą ties Joseda mokėjai?",
+   "Čia gi ne mėlyna zona, ką tu.",
+   "Ant ženklo tik sustoti draudžiama."
   ]
  ],
  "looks": {
   "c2660": {
    "wall": [
-    0.8,
-    0.78,
-    0.73
+    0.84,
+    0.83,
+    0.79
    ],
    "roof": [
-    0.4,
-    0.41,
-    0.41
+    0.34,
+    0.35,
+    0.36
    ],
    "sty": "shop",
    "windows": true,
-   "h": 6.8
+   "pitched": false,
+   "h": 9.0
   },
   "c2703": {
    "wall": [
@@ -89,75 +100,6 @@
    "sty": "plaster",
    "windows": true,
    "h": 9.0
-  },
-  "c2707": {
-   "wall": [
-    0.52,
-    0.37,
-    0.28
-   ],
-   "roof": [
-    0.22,
-    0.23,
-    0.25
-   ],
-   "sty": "brick",
-   "windows": true,
-   "h": 6.2
-  },
-  "c2709": {
-   "wall": [
-    0.34,
-    0.34,
-    0.35
-   ],
-   "roof": [
-    0.22,
-    0.23,
-    0.25
-   ],
-   "sty": "plaster",
-   "windows": true,
-   "pitched": true,
-   "hip": false,
-   "h": 6.0,
-   "rh": 3.0
-  },
-  "c2710": {
-   "wall": [
-    0.4,
-    0.39,
-    0.38
-   ],
-   "roof": [
-    0.22,
-    0.23,
-    0.25
-   ],
-   "sty": "plaster",
-   "windows": true,
-   "pitched": true,
-   "hip": true,
-   "h": 6.0,
-   "rh": 2.6
-  },
-  "c2711": {
-   "wall": [
-    0.83,
-    0.82,
-    0.78
-   ],
-   "roof": [
-    0.22,
-    0.23,
-    0.25
-   ],
-   "sty": "brick",
-   "windows": true,
-   "pitched": true,
-   "hip": false,
-   "h": 5.8,
-   "rh": 3.2
   },
   "c2713": {
    "wall": [
@@ -212,16 +154,16 @@
   },
   "c2972": {
    "wall": [
-    0.85,
-    0.84,
-    0.8
+    0.9,
+    0.89,
+    0.84
    ],
    "roof": [
+    0.18,
     0.4,
-    0.41,
-    0.41
+    0.28
    ],
-   "sty": "brick",
+   "sty": "plank",
    "windows": true,
    "pitched": true,
    "hip": false,
@@ -230,102 +172,101 @@
   },
   "c2962": {
    "wall": [
-    0.84,
-    0.76,
-    0.6
+    0.22,
+    0.23,
+    0.24
    ],
    "roof": [
-    0.45,
-    0.29,
-    0.21
+    0.16,
+    0.16,
+    0.17
    ],
-   "sty": "brick",
+   "sty": "plank",
    "windows": true,
-   "h": 3.4
+   "pitched": true,
+   "hip": false,
+   "h": 3.2,
+   "rh": 3.6
   },
   "c2982": {
    "wall": [
-    0.26,
-    0.27,
-    0.29
+    0.8,
+    0.75,
+    0.63
    ],
    "roof": [
-    0.18,
-    0.19,
-    0.2
+    0.34,
+    0.34,
+    0.35
    ],
-   "sty": "plaster",
+   "sty": "silicate",
    "windows": true,
-   "h": 5.6
+   "pitched": false,
+   "h": 13.5
   },
   "c2984": {
    "wall": [
-    0.32,
-    0.35,
-    0.4
+    0.8,
+    0.75,
+    0.63
    ],
    "roof": [
-    0.2,
-    0.21,
-    0.23
+    0.34,
+    0.34,
+    0.35
    ],
-   "sty": "wood",
+   "sty": "silicate",
    "windows": true,
-   "h": 3.6
+   "pitched": false,
+   "h": 13.5
   },
   "c3059": {
    "wall": [
-    0.33,
-    0.6,
-    0.43
+    0.8,
+    0.75,
+    0.63
    ],
    "roof": [
-    0.45,
-    0.29,
-    0.21
+    0.34,
+    0.34,
+    0.35
    ],
-   "sty": "wood",
+   "sty": "silicate",
    "windows": true,
-   "pitched": true,
-   "hip": false,
-   "h": 3.2,
-   "rh": 4.0
+   "pitched": false,
+   "h": 13.5
   },
   "c3060": {
    "wall": [
-    0.85,
+    0.8,
     0.75,
-    0.56
+    0.63
    ],
    "roof": [
-    0.3,
-    0.3,
-    0.31
+    0.34,
+    0.34,
+    0.35
    ],
-   "sty": "brick",
+   "sty": "silicate",
    "windows": true,
-   "pitched": true,
-   "hip": false,
-   "h": 3.4,
-   "rh": 4.2
+   "pitched": false,
+   "h": 13.5
   },
   "c3062": {
    "wall": [
-    0.86,
-    0.85,
-    0.81
+    0.8,
+    0.75,
+    0.63
    ],
    "roof": [
-    0.55,
-    0.26,
-    0.18
+    0.34,
+    0.34,
+    0.35
    ],
-   "sty": "brick",
+   "sty": "silicate",
    "windows": true,
-   "pitched": true,
-   "hip": false,
-   "h": 3.2,
-   "rh": 3.8
+   "pitched": false,
+   "h": 13.5
   },
   "c3380": {
    "wall": [
@@ -344,18 +285,19 @@
   },
   "c5130": {
    "wall": [
-    0.66,
-    0.67,
-    0.66
+    0.74,
+    0.12,
+    0.09
    ],
    "roof": [
-    0.46,
-    0.47,
-    0.47
+    0.6,
+    0.6,
+    0.62
    ],
-   "sty": "industrial",
+   "sty": "corrugated",
    "windows": false,
-   "h": 7.0
+   "pitched": false,
+   "h": 6.5
   },
   "c5114": {
    "wall": [
@@ -370,6 +312,190 @@
    ],
    "sty": "sheet",
    "windows": false,
+   "h": 5.5
+  },
+  "c2903": {
+   "wall": [
+    0.8,
+    0.68,
+    0.54
+   ],
+   "roof": [
+    0.6,
+    0.22,
+    0.15
+   ],
+   "sty": "plaster",
+   "windows": true,
+   "pitched": true,
+   "hip": true,
+   "h": 7.4,
+   "rh": 3.0
+  },
+  "c2921": {
+   "wall": [
+    0.88,
+    0.84,
+    0.74
+   ],
+   "roof": [
+    0.6,
+    0.22,
+    0.15
+   ],
+   "sty": "plaster",
+   "windows": true,
+   "pitched": true,
+   "hip": true,
+   "h": 7.4,
+   "rh": 3.0
+  },
+  "c2920": {
+   "wall": [
+    0.78,
+    0.7,
+    0.56
+   ],
+   "roof": [
+    0.36,
+    0.3,
+    0.28
+   ],
+   "sty": "plaster",
+   "windows": true,
+   "pitched": true,
+   "hip": false,
+   "h": 8.0,
+   "rh": 2.2
+  },
+  "c2158": {
+   "wall": [
+    0.9,
+    0.9,
+    0.88
+   ],
+   "roof": [
+    0.62,
+    0.63,
+    0.62
+   ],
+   "sty": "plaster",
+   "windows": true,
+   "pitched": false,
+   "h": 11.0
+  },
+  "c2960": {
+   "wall": [
+    0.32,
+    0.55,
+    0.46
+   ],
+   "roof": [
+    0.18,
+    0.19,
+    0.2
+   ],
+   "sty": "plank",
+   "windows": true,
+   "pitched": true,
+   "hip": false,
+   "h": 3.2,
+   "rh": 3.6
+  },
+  "c7745": {
+   "wall": [
+    0.8,
+    0.75,
+    0.63
+   ],
+   "roof": [
+    0.34,
+    0.34,
+    0.35
+   ],
+   "sty": "silicate",
+   "windows": true,
+   "pitched": false,
+   "h": 13.5
+  },
+  "c5176": {
+   "wall": [
+    0.8,
+    0.75,
+    0.63
+   ],
+   "roof": [
+    0.34,
+    0.34,
+    0.35
+   ],
+   "sty": "silicate",
+   "windows": true,
+   "pitched": false,
+   "h": 13.5
+  },
+  "c5181": {
+   "wall": [
+    0.8,
+    0.75,
+    0.63
+   ],
+   "roof": [
+    0.34,
+    0.34,
+    0.35
+   ],
+   "sty": "silicate",
+   "windows": true,
+   "pitched": false,
+   "h": 13.5
+  },
+  "c3120": {
+   "wall": [
+    0.8,
+    0.75,
+    0.63
+   ],
+   "roof": [
+    0.34,
+    0.34,
+    0.35
+   ],
+   "sty": "silicate",
+   "windows": true,
+   "pitched": false,
+   "h": 13.5
+  },
+  "c3436": {
+   "wall": [
+    0.42,
+    0.43,
+    0.44
+   ],
+   "roof": [
+    0.3,
+    0.31,
+    0.32
+   ],
+   "sty": "corrugated",
+   "windows": false,
+   "pitched": false,
+   "h": 5.0
+  },
+  "c3351": {
+   "wall": [
+    0.4,
+    0.42,
+    0.4
+   ],
+   "roof": [
+    0.3,
+    0.31,
+    0.32
+   ],
+   "sty": "corrugated",
+   "windows": false,
+   "pitched": false,
    "h": 5.5
   }
  },
@@ -780,6 +906,45 @@
    "h": 0.55,
    "y": 5.6,
    "bg": "#0d3c8c",
+   "fg": "#ffffff"
+  },
+  {
+   "text": "JOSEDA",
+   "ll": [
+    55.380399,
+    23.116391
+   ],
+   "hd": 325,
+   "w": 2.6,
+   "h": 0.8,
+   "y": 4.0,
+   "bg": "#ffffff",
+   "fg": "#1d3a7a"
+  },
+  {
+   "text": "SALDUMYNŲ NAMAI",
+   "ll": [
+    55.380201,
+    23.115984
+   ],
+   "hd": 145,
+   "w": 3.0,
+   "h": 0.5,
+   "y": 3.3,
+   "bg": "#f3efe6",
+   "fg": "#3a2a20"
+  },
+  {
+   "text": "ŽŪ TECHNIKOS SERVISAS",
+   "ll": [
+    55.3917,
+    23.1343
+   ],
+   "hd": 340,
+   "w": 6.0,
+   "h": 0.8,
+   "y": 5.6,
+   "bg": "#b3140f",
    "fg": "#ffffff"
   }
  ],
