@@ -28,5 +28,5 @@ research/assets/**/*.mp3
 research/assets/**/*.wav
 research/prototypes/**/shots/
 !work/build/v40.html
-!work/build/v43.html
+!work/build/v44.html
 research/geodata/ortho/tiles/
