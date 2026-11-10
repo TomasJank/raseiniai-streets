@@ -40,3 +40,6 @@ Rejected or deferred by evidence: Rapier (vehicle agent's note: ~2 weeks, +2.7 M
 
 ## Usage
 Subagent tokens (reported by the harness): chars 309k, gfx 281k, combat2 279k, survey 253k, animals2 247k, bld 239k, drive 199k, catalog 122k. Fable: this session only.
+
+## Published
+Pushed 2026-11-09 to https://github.com/TomasJank/raseiniai-streets (the pre-existing public repo, whose history held only `index.html`). `index.html` = v41. Local history was rewritten before the push so no Quaternius GLB was ever in a public commit; `pipeline/extract_assets.py` restores those build inputs from any shipped build.
