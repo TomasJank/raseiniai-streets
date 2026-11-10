@@ -14,8 +14,8 @@ const foes=()=>[...peds,...(club&&club.grp.visible&&club.bouncers||[])];
 const alive=q=>q.mode!=='hide'&&q.mode!=='down';
 function nearestFoe(r){let best=null,bd=r+1;for(const q of foes()){if(!alive(q))continue;const d=Math.hypot(q.x-player.x,q.z-player.z);if(d<bd&&arc2(player.x,player.z,player.h,q.x,q.z,r)){bd=d;best=q;}}return best;}
 function hitstop(s,a,b){cmb.hs=Math.max(cmb.hs,s);cmb.hsA=a;cmb.hsB=b;}
-// slide a person or the player, never into a building
-function slide(o,dx,dz){const nx=o.x+dx,nz=o.z+dz;if(world.inBuilding(nx,nz))return false;o.x=nx;o.z=nz;return true;}
+// nudge a person or the player, never into a building
+function nudge(o,dx,dz){const nx=o.x+dx,nz=o.z+dz;if(world.inBuilding(nx,nz))return false;o.x=nx;o.z=nz;return true;}
 
 function attack(key){
   if(!world||player.mode!=='foot'||fight.pDown>0||cmb.dodge)return;
@@ -44,7 +44,7 @@ function landHit(m){
   m.hit=1;
   const full=(F.hp??(F.bouncer?6:youngMale(F)?4:3))>=4;
   if(F.mode==='fight'&&full&&cmb.rand()<.3){
-    F.blk=.4;punchSnd(.4);hitstop(.04,player,F);fightEvent(player.x,player.z);if(!F.bouncer)slide(F,fx*.2,fz*.2);return;
+    F.blk=.4;punchSnd(.4);hitstop(.04,player,F);fightEvent(player.x,player.z);if(!F.bouncer)nudge(F,fx*.2,fz*.2);return;
   }
   const stg=F.mode==='stagger'||cmb.chain>=1;
   cmb.chain++;
@@ -82,7 +82,7 @@ function startDodge(side){
   if(!world||player.mode!=='foot'||fight.pDown>0||cmb.dodge||cmb.stam<18)return;
   const m=cmb.mv;if(m&&m.t<m.d.su+m.d.ac)return;
   cmb.mv=null;cmb.stam-=18;cmb.sT=pedClock;
-  cmb.dodge={t:0,dur:.3,iv:.25,dx:Math.cos(player.h)*side,dz:-Math.sin(player.h)*side,dist:1.2,done:0,side};
+  cmb.dodge={t:0,dur:.3,iv:.28,dx:Math.cos(player.h)*side,dz:-Math.sin(player.h)*side,dist:1.2,done:0,side};
 }
 function press(code){
   if(code==='KeyZ')attack('z');
@@ -112,15 +112,15 @@ function fightStep(p,dt){
   if(player.mode!=='foot'||fight.pDown>0||d>20){pedRejoin(p);p.nerv=10;p.mv=null;return[0,0];}
   if(frozen)return[0,0];
   const A=p.ai||(p.ai=aiInit());
-  p.h=lerpAngle(p.h,Math.atan2(dx,dz),Math.min(1,dt*8));
+  if(!p.mv)p.h=lerpAngle(p.h,Math.atan2(dx,dz),Math.min(1,dt*8));
   if(p.blk>0)p.blk-=dt;
   if(p.hp!=null&&p.hp<=1&&player.hp>=5){pedFlee(p,-dx,-dz,3+Math.random()*2,6);p.nerv=20;p.mv=null;return[0,0];}
   let mv=0;
-  const step=(ux,uz,s)=>{if(slide(p,ux*s*dt,uz*s*dt))mv+=s*dt;};
+  const step=(ux,uz,s)=>{if(nudge(p,ux*s*dt,uz*s*dt))mv+=s*dt;};
   const m=p.mv;
   if(m){
     m.t+=dt;const k=m.d;
-    if(m.t<k.su+k.ac&&d>1.05)step(dx/d,dz/d,2.4);
+    if(m.t<k.su*.4&&d>1.05)step(dx/d,dz/d,2.4);
     if(!m.hit&&m.t>=k.su&&m.t<k.su+k.ac&&arc2(p.x,p.z,p.h,player.x,player.z,k.reach+.1)){m.hit=1;hurtPlayer(p,k);fightEvent(player.x,player.z);}
     if(m.t>=k.su+k.ac+k.rc){p.mv=null;cmb.tokUntil=pedClock+.5;}
     return mv>1e-3?[11,.9]:[0,0];
@@ -164,21 +164,22 @@ function updateFight(dt){
   const D=cmb.dodge;
   if(D){
     D.t+=dt;const u=Math.min(1,D.t/D.dur),e=u*u*(3-2*u),s=D.dist*(e-D.done);D.done=e;
-    slide(player,D.dx*s,D.dz*s);
+    nudge(player,D.dx*s,D.dz*s);
     if(u>=1)cmb.dodge=null;
   }
   const L=cmb.lunge;
-  if(L&&cdt>0){const s=Math.min(L.left,L.left*cdt/L.t);L.left-=s;L.t-=cdt;slide(player,L.dx*s,L.dz*s);if(L.t<=0||L.left<=.01)cmb.lunge=null;}
+  if(L&&cdt>0){const s=Math.min(L.left,L.left*cdt/L.t);L.left-=s;L.t-=cdt;nudge(player,L.dx*s,L.dz*s);if(L.t<=0||L.left<=.01)cmb.lunge=null;}
   const K=cmb.pk;
-  if(K&&cdt>0){slide(player,K.vx*cdt,K.vz*cdt);if((K.t-=cdt)<=0)cmb.pk=null;}
+  if(K&&cdt>0){nudge(player,K.vx*cdt,K.vz*cdt);if((K.t-=cdt)<=0)cmb.pk=null;}
   for(const V of fight.victims){
     const k=V.kb;if(!k||cdt<=0)continue;
-    if(!slide(V,k.vx*cdt,k.vz*cdt)||(k.t-=cdt)<=0)V.kb=null;
+    if(!nudge(V,k.vx*cdt,k.vz*cdt)||(k.t-=cdt)<=0)V.kb=null;
   }
   for(const V of peds)if(V.kd&&V.mode!=='down'&&V.mode!=='stagger'){
     const nx=V.kd;V.kd=null;
     if(V.mode!=='hide'){if(nx==='fight'&&V.hp>0){V.mode='fight';V.lead=V.grp=null;V.ai=aiInit();}else{pedFlee(V,V.x-player.x,V.z-player.z,3+Math.random()*2,6);V.nerv=20;}}
   }
+  if(foot&&pedClock-fight.last<3){fight.x=player.x;fight.z=player.z;}
   if(foot&&(cmb.hb-=dt)<=0){cmb.hb=1.5;if(peds.some(q=>q.mode==='fight'&&Math.hypot(q.x-player.x,q.z-player.z)<20))fightEvent(player.x,player.z);}
   if(cmb.tok&&cmb.tok.mode!=='fight')cmb.tok=null;
   updateFight0(dt);
@@ -189,19 +190,19 @@ function updateFight(dt){
 }
 
 // ---------- animation: reaction and attack clips, procedural kick, block and dodge ----------
-const _q=new THREE.Quaternion(),_p=new THREE.Quaternion(),_v=new THREE.Vector3(),sm01=t=>{t=clamp(t,0,1);return t*t*(3-2*t);};
+const _kq=new THREE.Quaternion(),_kp=new THREE.Quaternion(),_kv=new THREE.Vector3(),kSm=t=>{t=clamp(t,0,1);return t*t*(3-2*t);};
 // rotate a bone about an axis given in the mannequin's own frame (x left, y up, z forward)
 function rotB(st,name,x,y,z,a){
   const b=st.bone[name];if(!b||!a)return;
-  _v.set(x,y,z).applyQuaternion(st.o.quaternion);_q.setFromAxisAngle(_v,a);
-  b.parent.getWorldQuaternion(_p);b.quaternion.premultiply(_p).premultiply(_q).premultiply(_p.invert());b.updateMatrixWorld(true);
+  _kv.set(x,y,z).applyQuaternion(st.o.quaternion);_kq.setFromAxisAngle(_kv,a);
+  b.parent.getWorldQuaternion(_kp);b.quaternion.premultiply(_kp).premultiply(_kq).premultiply(_kp.invert());b.updateMatrixWorld(true);
 }
 // no kick clip in the free packs: chamber, snap, recover on the right leg over the guard pose
 function kickAmt(m){
   const d=m.d,t=m.t;
-  if(t<d.su)return[sm01(t/d.su),0];
-  if(t<d.su+d.ac)return[1,sm01((t-d.su)/d.ac)];
-  return[1-sm01((t-d.su-d.ac)/d.rc),1-sm01((t-d.su-d.ac)/d.rc)];
+  if(t<d.su)return[kSm(t/d.su),0];
+  if(t<d.su+d.ac)return[1,kSm((t-d.su)/d.ac)];
+  return[1-kSm((t-d.su-d.ac)/d.rc),1-kSm((t-d.su-d.ac)/d.rc)];
 }
 function charAnim(st,dt){
   const i=CHAR.list.indexOf(st),pl=i===PLAYER_I,p=pl||i<0?null:peds[i],who=pl?player:p;
@@ -219,6 +220,6 @@ function charAnim(st,dt){
   if(kk){const[a,b]=kickAmt(mv);
     rotB(st,'thigh_r',1,0,0,-(1.0*a+.55*b));rotB(st,'calf_r',1,0,0,1.7*a-1.55*b);rotB(st,'spine_02',1,0,0,-.3*a);}
   if(dg){const e=Math.sin(Math.PI*Math.min(1,cmb.dodge.t/cmb.dodge.dur));
-    rotB(st,'spine_01',0,0,1,-.45*dg.side*e);rotB(st,'thigh_l',1,0,0,-.5*e);rotB(st,'thigh_r',1,0,0,-.5*e);rotB(st,'calf_l',1,0,0,.8*e);rotB(st,'calf_r',1,0,0,.8*e);}
+    rotB(st,'spine_01',0,0,1,-.3*dg.side*e);rotB(st,'spine_02',0,0,1,-.15*dg.side*e);}
   if(pl?cmb.blk:p&&p.blk>0){rotB(st,'spine_02',1,0,0,.22);rotB(st,'Head',1,0,0,.25);}
 }

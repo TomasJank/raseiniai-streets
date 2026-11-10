@@ -5,7 +5,7 @@ const [nm, out, ...jobs] = process.argv.slice(2);
 const req = createRequire(nm + '/');
 const {NodeIO} = req('@gltf-transform/core');
 const {ALL_EXTENSIONS} = req('@gltf-transform/extensions');
-const {prune, dedup, weld, join, quantize, resample, meshopt} = req('@gltf-transform/functions');
+const {prune, dedup, weld, quantize, resample, meshopt} = req('@gltf-transform/functions');
 const {MeshoptEncoder, MeshoptDecoder} = req('meshoptimizer');
 await MeshoptEncoder.ready; await MeshoptDecoder.ready;
 const io = new NodeIO().registerExtensions(ALL_EXTENSIONS).registerDependencies({'meshopt.encoder': MeshoptEncoder, 'meshopt.decoder': MeshoptDecoder});
@@ -34,8 +34,27 @@ for (const job of jobs) {
     p.setMaterial(mat);
     for (const s of p.listSemantics()) if (/TEXCOORD/.test(s)) p.setAttribute(s, null);
   }
+  // gltf-transform's join() leaves skinned primitives alone: concatenate them by hand into one
+  for (const m of root.listMeshes()) {
+    const ps = m.listPrimitives(), SEM = {POSITION: [3, Float32Array], NORMAL: [3, Float32Array], COLOR_0: [3, Float32Array], WEIGHTS_0: [4, Float32Array], JOINTS_0: [4, Uint16Array]};
+    const n = ps.reduce((t, p) => t + p.getAttribute('POSITION').getCount(), 0), ni = ps.reduce((t, p) => t + (p.getIndices()?.getCount() ?? p.getAttribute('POSITION').getCount()), 0);
+    const buf = root.listBuffers()[0], acc = {}, idx = new Uint32Array(ni), tmp = [0, 0, 0, 0];
+    for (const k in SEM) acc[k] = new SEM[k][1](n * SEM[k][0]);
+    let v0 = 0, i0 = 0;
+    for (const p of ps) {
+      const c = p.getAttribute('POSITION').getCount(), I = p.getIndices();
+      for (const k in SEM) { const a = p.getAttribute(k), w = SEM[k][0]; for (let i = 0; i < c; i++) { a.getElement(i, tmp); for (let j = 0; j < w; j++) acc[k][(v0 + i) * w + j] = tmp[j]; } }
+      const ic = I ? I.getCount() : c;
+      for (let i = 0; i < ic; i++) idx[i0 + i] = v0 + (I ? I.getScalar(i) : i);
+      v0 += c; i0 += ic;
+    }
+    const q = ps[0];
+    for (const p of ps.slice(1)) p.dispose();
+    for (const k in SEM) q.setAttribute(k, doc.createAccessor().setType(['SCALAR', 'VEC2', 'VEC3', 'VEC4'][SEM[k][0] - 1]).setArray(acc[k]).setBuffer(buf));
+    q.setIndices(doc.createAccessor().setType('SCALAR').setArray(idx).setBuffer(buf));
+  }
   mat.setBaseColorFactor([1, 1, 1, 1]).setMetallicFactor(0).setRoughnessFactor(1);
-  await doc.transform(join(), weld(), resample(), prune(), dedup(), quantize({quantizeNormal: 8}), meshopt({encoder: MeshoptEncoder, level: 'high'}));
+  await doc.transform(weld(), resample(), prune(), dedup(), quantize({quantizeNormal: 8}), meshopt({encoder: MeshoptEncoder, level: 'high'}));
   await io.write(`${out}/animal_${name}.glb`, doc);
   console.log(name, root.listAnimations().map(a => a.getName()).join(','));
 }

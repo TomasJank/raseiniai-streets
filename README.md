@@ -5,7 +5,7 @@ A browser game set in the real streets of Raseiniai, Lithuania: 6,675 OpenStreet
 **Play:** open the latest `work/build/vNN.html` in Chrome (desktop recommended). Internet is needed once for three.js and its addons from jsdelivr.
 
 ## Layout
-- `work/build/v37.html` frozen base. `work/build/v40.html` latest (characters, facades, graphics, water, driving feel).
+- `work/build/v37.html` frozen base. `work/build/v41.html` latest (characters, combat v2, animals, facades, graphics, water, driving feel).
 - `pipeline/` the real source: `build.sh` = v37 + one `add_*.py` splice per feature (`cars.js`, `fight.js`, `chars.js`, `facades.js`, `gfx.js`, `drive.js`, ...). `sh pipeline/build.sh out.html` rebuilds deterministically.
 - `work/test_*.mjs` Playwright + SwiftShader assertion suites; `work/fps.mjs` real-GPU fps and load time; `work/views.mjs` fixed reference views.
 - `research/` reports, licence report, asset catalogue, repository survey, prototypes. Start at `research/reports/00-fable-strategic-review.md` and `01-architecture.md`.

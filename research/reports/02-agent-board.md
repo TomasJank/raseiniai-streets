@@ -1,6 +1,6 @@
 # Agent board (orchestrator keeps this current)
 
-Checkpoint: work/build/v40.html = full chain incl. assets+chars (2026-11-09 19:35). v39 = without characters. Baseline: v38 = `sh pipeline/build.sh` (importmap step added 2026-11-09 16:50, no visual change, errors []). 60 fps Metal, 4.0 s cold load.
+Final: work/build/v41.html = full chain through fight2 (2026-11-09 20:55). v40 = before wave 2, v39 = before characters. Baseline: v38 = `sh pipeline/build.sh` (importmap step added 2026-11-09 16:50, no visual change, errors []). 60 fps Metal, 4.0 s cold load.
 
 | Agent | Model | Status | Files | Tests | Blockers | Next |
 |---|---|---|---|---|---|---|
@@ -10,5 +10,5 @@ Checkpoint: work/build/v40.html = full chain incl. assets+chars (2026-11-09 19:3
 | drive | sonnet | done + merged 18:20 (test_drive PASS, fight/solid PASS, 60.3 fps; SwiftShader halved by 2 SpotLights, phones skip them) | pipeline/drive.js add_drive.py work/test_drive.mjs | — | — | suspension + audio |
 | catalog | haiku | done 17:15 (2 downloads, licences resolved; see license-report addendum) | research/assets/* research/reports/asset-catalog.md license-report.md | n/a | — | — |
 | survey | haiku | done 17:30 (24 repos classified; top: niulai-game combat MIT, N8AO CC0, CSM, Water2) | research/repositories research/reports/repositories.md | n/a | — | — |
-| combat2 | sonnet | launched 19:40 | pipeline/fight2.js add_fight2.py | | needs clips | |
-| animals2 | sonnet | launched 19:40 | pipeline/animals2.js add_animals2.py | | needs assets.js | |
+| combat2 | sonnet | done + merged 20:50 (test_fight2 18/18, test_fight PASS, 60.3 fps) | pipeline/fight2.js add_fight2.py | | needs clips | |
+| animals2 | sonnet | done + merged 20:35 (5 GLB species, 397 KB, all animal suites PASS, 60.3 fps) | pipeline/animals2.js add_animals2.py | | needs assets.js | |

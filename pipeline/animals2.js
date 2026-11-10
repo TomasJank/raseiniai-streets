@@ -1,14 +1,14 @@
 // ---------- animals2: skinned GLB animals over the instanced quad rig; the rig stays for far animals and for species without a model ----------
 const CREDITS_ANIMALS='';  // Quaternius Asset License v1.0: no credit required
-const AG={
-  // species -> model, bbox height in metres (head included), yaw offset of the model's forward axis
+var AG=null;  // var: updateAnimals can run before this block is reached
+AG={
+  // species -> model, bbox height in metres (head included), yaw offset when the model does not face +z (the FBX cat faces +x)
   MAP:{dog_lead:{m:'shiba',h:.6},dog_lead_small:{m:'shiba',h:.4},dog_lead_big:{m:'husky',h:.8},dog_yard:{m:'husky',h:.7},
-    fox:{m:'fox',h:.5},deer:{m:'deer',h:1},cat:{m:'cat',h:.3}},
+    fox:{m:'fox',h:.5},deer:{m:'deer',h:1},cat:{m:'cat',h:.3,yaw:-Math.PI/2}},
   NEAR:60,FAR:68,src:{},free:{},rigs:[],dt:0,started:false,
   CLIP:{idle:'idle',walk:'walk',run:'run',eat:'eat',bark:'bark',death:'death'}
 };
-const AG_MAT=new THREE.MeshLambertMaterial({vertexColors:true});
-const AG_BOX=new THREE.Box3(),AG_V=new THREE.Vector3();
+const AG_MAT=new THREE.MeshLambertMaterial({vertexColors:true}),AG_BOX=new THREE.Box3();
 // the GLBs are embedded deflated (add_animals2.py): inflate into the plain-base64 block ASSETS.load reads
 async function agUnpack(n){
   if(ASSETS.has('animal_'+n))return;
@@ -42,8 +42,10 @@ function agAcquire(a){
 function agRelease(a){const r=a.glb;a.glb=null;if(!r)return;r.a=null;r.holder.visible=false;AG.free[r.n].push(r);}
 function agPose(a){
   const r=a.glb,sp=AG.MAP[a.name],k=sp.h,v=a.sp,A=r.act;let want='idle',ts=1;
-  r.holder.position.set(a.x,GY(a.x,a.z)+world.surf(a.x,a.z)+a.y,a.z);r.holder.rotation.y=a.h+(sp.yaw||0);
-  if(a.mode==='down')want='death';
+  r.holder.position.set(a.x,GY(a.x,a.z)+world.surf(a.x,a.z)+a.y,a.z);r.holder.rotation.order='YXZ';r.holder.rotation.y=a.h+(sp.yaw||0);
+  const lie=a.mode==='down'&&!A.death;   // no death clip (cat): idle pose rolled onto its side
+  r.holder.rotation.z=lie?Math.PI/2:0;if(lie)r.holder.position.y+=.1*k;
+  if(a.mode==='down')want=lie?'idle':'death';
   else if(r.bark>0&&A.bark)want='bark';
   else if(a.mode==='run'||v>4.5*k){want='run';ts=clamp(v/(9*k),.6,1.7);if(!A.run){want='walk';ts=1.8;}}
   else if(v>.08){want='walk';ts=clamp(v/(2*k),.35,1.8);}
@@ -55,18 +57,19 @@ function agPose(a){
 }
 // animals.js entry points, wrapped
 function poseQuad(a){
-  const sp=AG.MAP[a.name];
+  const sp=AG&&AG.MAP[a.name];
   if(sp&&AG.src[sp.m]&&a.d<(a.glb?AG.FAR:AG.NEAR)){if(!a.glb)agAcquire(a);if(a.glb){agPose(a);return;}}
   if(a.glb)agRelease(a);
   poseQuad_0(a);
 }
-function animHide(a){if(a.glb)agRelease(a);animHide_0(a);}
+function animHide(a){if(a&&a.glb)agRelease(a);animHide_0(a);}
 function animSound(a){
-  animSound_0(a);const r=a.glb;
+  animSound_0(a);const r=AG&&a.glb;
   if(r&&r.act.bark&&a.S.sound&&a.S.sound.kind==='bark'&&a.mode!=='down'&&a.sp<AG.MAP[a.name].h*2){r.bark=Math.min(1.1,r.act.bark.getClip().duration);r.act.bark.reset().play();r.cur='bark';}
 }
 function updateAnimals(dt){
+  if(!AG){updateAnimals_0(dt);return;}
   if(!AG.started)agStart();
   AG.dt=dt;updateAnimals_0(dt);
-  for(const r of AG.rigs)if(r.a){if(r.bark>0)r.bark-=dt;r.mx.update(dt);}
+  for(const r of AG.rigs)if(r.a){if(r.a.mode==='hide'){agRelease(r.a);continue;}if(r.bark>0)r.bark-=dt;r.mx.update(dt);}
 }

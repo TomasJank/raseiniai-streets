@@ -56,3 +56,6 @@ Fox by PixelMannen (https://opengameart.org/content/fox-and-shiba), rigging by t
 Read directly from https://quaternius.com/license.html: **Quaternius Asset License v1.0** (last updated 2026-08-28). Grant: "Use, copy, and modify the Assets", "Incorporate the Assets (in original or modified form) into a Product", "No attribution is required". Restriction 3(a): no redistribution "as a standalone asset, asset pack, stock file, template, or similar product", but "It does not restrict distributing a completed Product that merely incorporates the Assets".
 Verdict: Quaternius packs may be embedded in the built game HTML (a Product). Raw files stay out of git (`.gitignore` now excludes binaries under `research/assets/`). Record "QAL v1.0" in each SOURCE.md. The earlier "conflict" flag is withdrawn; the catalogue's Quaternius rows are usable.
 Kenney: CC0, but kenney.nl refuses scripted downloads; download by hand or from Kenney's itch.io page.
+
+## animals2 addendum (2026-11-09)
+Animals shipped by the `animals2` step are Quaternius only (Ultimate Animated Animals: deer, fox, shiba, husky; Animal Pack Vol.2: cat), treated as QAL v1.0: no credit required, nothing added to CREDITS above. The CC-BY Polyfork dog and Khronos fox GLBs were downloaded but are not used, so their credit lines stay out of the game. Details: `research/assets/animals/SOURCE.md`.
