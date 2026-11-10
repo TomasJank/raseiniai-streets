@@ -23,6 +23,17 @@
    "Gražu, kol neišdžiūsta.",
    "Kas nors palaistys, ne?",
    "Gal savivaldybė, ji čia pat."
+  ],
+  [
+   "Girdėjai, kas atsidarė prie Kudirkos?",
+   "Ten, kur žuvies reklama ant sienos.",
+   "Karpynė ta, per visą namo galą."
+  ],
+  [
+   "Prie savivaldybės perėja vėl užkimšta.",
+   "Visada, kai žmonės eina pietų.",
+   "Penkiasdešimt kilometrų per valandą rašo, o kas laikosi?",
+   "Niekas, bet ženklas gražus."
   ]
  ],
  "looks": {
@@ -41,29 +52,35 @@
   },
   "c4939": {
    "wall": [
-    0.89,
-    0.83,
-    0.64
+    0.86,
+    0.8,
+    0.62
    ],
    "roof": [
-    0.4,
-    0.4,
-    0.39
+    0.42,
+    0.42,
+    0.41
    ],
-   "sty": "shop"
+   "sty": "plaster",
+   "windows": true,
+   "pitched": false,
+   "h": 10
   },
   "c3709": {
    "wall": [
-    0.9,
-    0.83,
-    0.66
+    0.86,
+    0.86,
+    0.84
    ],
    "roof": [
-    0.72,
-    0.36,
-    0.22
+    0.42,
+    0.4,
+    0.38
    ],
-   "sty": "old"
+   "sty": "plaster",
+   "windows": true,
+   "pitched": false,
+   "h": 10.5
   },
   "c3519": {
    "wall": [
@@ -150,6 +167,91 @@
     0.7
    ],
    "sty": "shop"
+  },
+  "c2906": {
+   "wall": [
+    0.47,
+    0.6,
+    0.57
+   ],
+   "roof": [
+    0.3,
+    0.31,
+    0.32
+   ],
+   "sty": "panel",
+   "windows": true,
+   "pitched": false,
+   "h": 10.5
+  },
+  "c3716": {
+   "wall": [
+    0.55,
+    0.54,
+    0.51
+   ],
+   "roof": [
+    0.6,
+    0.26,
+    0.16
+   ],
+   "sty": "plaster",
+   "windows": true,
+   "pitched": true,
+   "hip": true,
+   "h": 11,
+   "rh": 3.5
+  },
+  "c3715": {
+   "wall": [
+    0.88,
+    0.85,
+    0.74
+   ],
+   "roof": [
+    0.52,
+    0.3,
+    0.22
+   ],
+   "sty": "plaster",
+   "pitched": true,
+   "hip": true,
+   "h": 9,
+   "rh": 2.4
+  },
+  "c3714": {
+   "wall": [
+    0.82,
+    0.88,
+    0.78
+   ],
+   "roof": [
+    0.55,
+    0.3,
+    0.21
+   ],
+   "sty": "plaster",
+   "pitched": true,
+   "hip": true,
+   "h": 9,
+   "rh": 2.4
+  },
+  "c3710": {
+   "wall": [
+    0.9,
+    0.88,
+    0.8
+   ],
+   "roof": [
+    0.7,
+    0.38,
+    0.25
+   ],
+   "sty": "plaster",
+   "pitched": true,
+   "hip": true,
+   "h": 8.5,
+   "rh": 2.4
   }
  },
  "props": [
@@ -439,6 +541,19 @@
    "y": 2.15,
    "bg": "#b3261e",
    "fg": "#ffd54a"
+  },
+  {
+   "text": "KARPYNĖ",
+   "ll": [
+    55.3818003,
+    23.1163664
+   ],
+   "hd": 50,
+   "w": 3.2,
+   "h": 4,
+   "y": 5.6,
+   "bg": "#1f6f8a",
+   "fg": "#ffffff"
   }
  ],
  "fences": [
