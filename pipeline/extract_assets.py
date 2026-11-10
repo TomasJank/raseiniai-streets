@@ -14,4 +14,10 @@ for m in re.finditer(r'<script type="application/octet-stream" id="agz_(\w+)">([
     raw = zlib.decompress(base64.b64decode(m.group(2)))
     out = os.path.join(cd, 'clips_kick.glb') if m.group(1) == 'kick_clips' else os.path.join(ad, 'animal_' + m.group(1) + '.glb')
     open(out, 'wb').write(raw); n += 1
-print('restored', n, 'GLBs')
+m = re.search(r'<script type="application/json" id="rasAnim">(\{.*?\})</script>', h)
+if m:
+    import json
+    sd = os.path.join(root, 'research/assets/sounds'); os.makedirs(sd, exist_ok=True)
+    for k, v in json.loads(m.group(1)).items():
+        open(os.path.join(sd, k + '.ogg'), 'wb').write(base64.b64decode(v)); n += 1
+print('restored', n, 'files')
