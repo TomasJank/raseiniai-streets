@@ -12,7 +12,10 @@ for m in re.finditer(r'<script type="application/octet-stream" id="asset_char_(\
     open(os.path.join(cd, m.group(1) + '.glb'), 'wb').write(base64.b64decode(m.group(2))); n += 1
 for m in re.finditer(r'<script type="application/octet-stream" id="agz_(\w+)">([A-Za-z0-9+/=]+)</script>', h):
     raw = zlib.decompress(base64.b64decode(m.group(2)))
-    out = os.path.join(cd, 'clips_kick.glb') if m.group(1) == 'kick_clips' else os.path.join(ad, 'animal_' + m.group(1) + '.glb')
+    k = m.group(1)
+    if k == 'kick_clips': out = os.path.join(cd, 'clips_kick.glb')
+    elif k.startswith('clothes_'): out = os.path.join(cd, 'clothes_body_' + k[8:] + '.glb')
+    else: out = os.path.join(ad, 'animal_' + k + '.glb')
     open(out, 'wb').write(raw); n += 1
 m = re.search(r'<script type="application/json" id="rasAnim">(\{.*?\})</script>', h)
 if m:

@@ -31,3 +31,11 @@ function fence2(f,at,h,l,st){
   if(s==='slat'){for(let y=.08;y<h-.05;y+=.17)at('slat',l/2,y,.05,.11,l);for(let t=0;t<=l+.01;t+=2.4)at('post',Math.min(t,l),h/2,.1,h+.05,.1);return true;}
   return false;
 }
+// one tile row of the facade atlas: wall grain on the painted pixels, fixed (glass, frames, plinths) pixels keep their own colour
+function atlasBand(a,b,out,y0,T,W,H,VN){
+  for(let y=y0;y<y0+T;y++)for(let x=0;x<W;x++){
+    const i=((y-y0)*W+x)*4,o=((H-1-y)*W+x)*4,s=(x/T)|0;
+    const f=b[i]>127?1+(((x*7+y*13)%11)/11-.5)*.04:1+(VN(s,x%T,y%T)-.5)*.1+(((x*7+y*13+s*5)%17)/17-.5)*.05;
+    out[o]=Math.min(255,a[i]*f);out[o+1]=Math.min(255,a[i+1]*f);out[o+2]=Math.min(255,a[i+2]*f);out[o+3]=b[i];
+  }
+}

@@ -57,3 +57,16 @@ Atlas: the 16x2 original tiles are byte-identical (hash of the old 2048x256 data
 - `dense` hedges are two stacked boxes, not a leafy volume; `col` on `panel` colours the panel only (plinth and posts stay grey).
 - `add_roofs.py` (another agent, untracked) sets `roofSty` strings automatically; `facades2` reads the same convention. Its automatic value is ignored on flat roofs here (only a look's own `roofSty` retextures a flat roof). Order in `build.sh`: `facades2` before or after `add_roofs`; its anchors on `roofSty` are different from the ones used here but apply to the same function, so run `facades2` first if one of them ever fails.
 - Still not expressible from the street reports: gate props, roof overhang amount, solar panels, removing an OSM building that does not exist, stepped lean-to volumes inside one footprint, cemetery wall with crossed pillars, per-wall billboard material.
+
+## Memory follow-up (orchestrator gate: 527 MB vs 289 MB raw JS heap)
+Measured with `--enable-precise-memory-info` on the full chain (`build.sh` as of this run), raw `usedJSHeapSize` 2 s after the loader hides (what `fps.mjs` reads), then after a forced GC.
+
+| build | raw at 2 s | after GC | scene textures / `renderer.info` geometries |
+|---|---|---|---|
+| without facades2 | 272-285 MB | 272 MB | 73 / 1079 |
+| facades2 as first delivered | 465-527 MB | 289-307 MB | 75 / 1091 |
+| facades2 now | 266-287 MB | about 289 MB | same as above |
+
+What it was: not retained data. After GC the first delivery was only +17 to +35 MB (`tone` attribute 8.6 MB, atlas 4 MB). The raw figure was garbage that V8 had not collected: the pixel loop that applies grain to the atlas ran inline at top level over twice as many pixels (1M, boxed doubles) and the extra garbage pushed the next major GC past the measurement point (bisected: restricting that loop to the first two tile rows alone brought raw back to 288 MB; canvases, textures, face masks and geometry copies were not involved).
+Changes (all in `add_facades2.py` / `facades2.js`): the loop runs in its own function `atlasBand` per 128-row band so it is optimised and allocation-free; grain noise is cached per tile (`VN`); the whole-canvas `getImageData` pair is read per tile row; the atlas canvases are released after the texture is built (`width=0`); the `tone` attribute is built from a list of toned triangle runs into one Float32Array only when a building has `wall2`, instead of pushing 12 numbers per triangle onto JS arrays for every mesh built.
+Checked after the change: atlas bytes identical to the old atlas (hash match on the original 16x2 tiles), no new scene textures (the 2-texture difference and the geometry difference are walking pedestrians, they change from run to run in the build without facades2 too), `test_facades2` PASS, `test_facades` PASS.

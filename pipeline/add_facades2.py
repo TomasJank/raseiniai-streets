@@ -31,16 +31,32 @@ rep("vec2 f=fract(vMapUv),sc=vec2(.0625,.5),auv=vec2((vSty+f.x)*sc.x,((vMapUv.y<
     "float bl=step(15.5,vSty),ws=vSty-16.*bl;vec2 f=fract(vMapUv),sc=vec2(.0625,.25),auv=vec2((ws+f.x)*sc.x,((vMapUv.y<1.?2.:3.)-2.*bl+f.y)*sc.y);")
 rep("(vSty<7.5||(vSty>10.5&&vSty<13.5))", "(ws<7.5||(ws>10.5&&ws<13.5))", 2)
 
+# atlas grain: the tall atlas ran vn (closure per call) over 1M pixels, 200 MB of garbage; the grain repeats per tile so it is cached
+rep("  const vn=(s,x,y)=>{const fx=x/16,fy=y/16,i=fx|0,j=fy|0,u=fx-i,v=fy-j,at=(p,q)=>lat[(s*8+(q&7))*8+(p&7)];\n    return(at(i,j)*(1-u)+at(i+1,j)*u)*(1-v)+(at(i,j+1)*(1-u)+at(i+1,j+1)*u)*v;};",
+    "  const at=(s,p,q)=>lat[(s*8+(q&7))*8+(p&7)];\n  const vn=(s,x,y)=>{const fx=x/16,fy=y/16,i=fx|0,j=fy|0,u=fx-i,v=fy-j;\n    return(at(s,i,j)*(1-u)+at(s,i+1,j)*u)*(1-v)+(at(s,i,j+1)*(1-u)+at(s,i+1,j+1)*u)*v;};\n  const NZ=new Float64Array(16*T*T).fill(-1),VN=(s,x,y)=>{const k=(s*T+y)*T+x;return NZ[k]<0?(NZ[k]=vn(s,x,y)):NZ[k];};")
+rep("(vn(s,x%T,y%T)-.5)", "(VN(s,x%T,y%T)-.5)")
+
+# the whole-canvas getImageData pair (2 x 4 MB of external memory) is read one tile row at a time
+rep("const W=c.width,H=c.height,a=g.getImageData(0,0,W,H).data,b=k.getImageData(0,0,W,H).data,out=", "const W=c.width,H=c.height,out=")
+rep("  for(let y=0;y<H;y++)for(let x=0;x<W;x++){const i=(y*W+x)*4,", "  for(let y0=0;y0<H;y0+=T){const a=g.getImageData(0,y0,W,T).data,b=k.getImageData(0,y0,W,T).data;for(let y=y0;y<y0+T;y++)for(let x=0;x<W;x++){const i=((y-y0)*W+x)*4,")
+rep("out[o+3]=b[i];}", "out[o+3]=b[i];}}")
+# the per-pixel loop runs in a function of its own so it gets optimised (inline it left ~200 MB of boxed doubles behind)
+i0 = h.index("for(let y=y0;y<y0+T;y++)for(let x=0;x<W;x++){const i=((y-y0)*W+x)*4,")
+i1 = h.index("out[o+3]=b[i];}}", i0)
+h = h[:i0] + "atlasBand(a,b,out,y0,T,W,H,VN);}" + h[i1 + len("out[o+3]=b[i];}}"):]
+
+rep("  const t=new THREE.DataTexture(out,W,H,THREE.RGBAFormat);", "  c.width=m.width=0;\n  const t=new THREE.DataTexture(out,W,H,THREE.RGBAFormat);")
+
 # two-tone shader: upper wall colour from the `tone` attribute
 rep("attribute float sty;\\nvarying float vSty;", "attribute float sty;\\nattribute vec4 tone;\\nvarying vec4 vTone;\\nvarying float vY;\\nvarying float vSty;")
 rep("#include <uv_vertex>\\nvSty=sty;", "#include <uv_vertex>\\nvSty=sty;vTone=tone;vY=position.y;")
 rep("#include <common>\\nvarying float vSty;\\nvarying float vUp;\\nuniform float uNight,uSnow;", "#include <common>\\nvarying vec4 vTone;\\nvarying float vY;\\nvarying float vSty;\\nvarying float vUp;\\nuniform float uNight,uSnow;")
 rep("    diffuseColor.rgb*=vColor.rgb;\n    if(vSty>-.5){", "    diffuseColor.rgb*=(vTone.w<-100.&&vY>-vTone.w-500.)?vTone.rgb:vColor.rgb;\n    if(vSty>-.5){")
-rep("const arr=()=>({pos:[],col:[],nor:[],uv:[],sty:[],cs:-1});", "const arr=()=>({pos:[],col:[],nor:[],uv:[],sty:[],cs:-1,tone:[],tn:NOTONE});")
-rep("  if(B.sty)B.sty.push(B.cs,B.cs,B.cs);", "  if(B.sty)B.sty.push(B.cs,B.cs,B.cs);\n  if(B.tone)B.tone.push(...B.tn,...B.tn,...B.tn);")
-rep("function mkGeo(pos,col,nor,uv,sty){", "function mkGeo(pos,col,nor,uv,sty,tone){")
-rep("  if(sty)g.setAttribute('sty',new THREE.Float32BufferAttribute(sty,1));", "  if(sty)g.setAttribute('sty',new THREE.Float32BufferAttribute(sty,1));\n  if(tone&&tone.length)g.setAttribute('tone',new THREE.Float32BufferAttribute(tone,4));")
-rep("mkGeo(BLD.pos,BLD.col,BLD.nor,BLD.uv,BLD.sty)", "mkGeo(BLD.pos,BLD.col,BLD.nor,BLD.uv,BLD.sty,BLD.tone)")
+rep("const arr=()=>({pos:[],col:[],nor:[],uv:[],sty:[],cs:-1});", "const arr=()=>({pos:[],col:[],nor:[],uv:[],sty:[],cs:-1,tr:[],tn:NOTONE});")
+rep("  if(B.sty)B.sty.push(B.cs,B.cs,B.cs);", "  if(B.sty)B.sty.push(B.cs,B.cs,B.cs);\n  if(B.tn!==NOTONE)B.tr.push(B.pos.length/3-3,...B.tn);")
+rep("function mkGeo(pos,col,nor,uv,sty){", "function mkGeo(pos,col,nor,uv,sty,tr){")
+rep("  if(sty)g.setAttribute('sty',new THREE.Float32BufferAttribute(sty,1));", "  if(sty)g.setAttribute('sty',new THREE.Float32BufferAttribute(sty,1));\n  if(tr&&tr.length){const n=pos.length/3,T=new Float32Array(n*4);for(let i=0;i<n;i++)T[i*4+3]=1;for(let k=0;k<tr.length;k+=5)for(let j=0;j<3;j++)T.set(tr.slice(k+1,k+5),(tr[k]+j)*4);g.setAttribute('tone',new THREE.BufferAttribute(T,4));}")
+rep("mkGeo(BLD.pos,BLD.col,BLD.nor,BLD.uv,BLD.sty)", "mkGeo(BLD.pos,BLD.col,BLD.nor,BLD.uv,BLD.sty,BLD.tr)")
 
 # addBuilding: two-tone, per-face windows, ridge direction
 rep("  let T=s.tops;\n  if(polyArea(p)>0){p=p.slice().reverse();if(T)T=T.slice().reverse();}",

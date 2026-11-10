@@ -1,6 +1,6 @@
 # Agent board (orchestrator keeps this current)
 
-Final: work/build/v43.html (2026-11-10 00:50) = v42 + fixwater fixground kick parked2 drive2 + 14 photo-matched streets + neural voices. Previous: v42: + cars2 fleet, fixgfx, fixpeople, fixtalk. v41 = before the bug round. v40 = before wave 2, v39 = before characters. Baseline: v38 = `sh pipeline/build.sh` (importmap step added 2026-11-09 16:50, no visual change, errors []). 60 fps Metal, 4.0 s cold load.
+Final: work/build/v45.html (2026-11-10 12:30) = v43 + fixfreeze sounds fixtalk2 roofs facades2 clothes. v44 = +fixfreeze +sounds. v43 = v42 + fixwater fixground kick parked2 drive2 + 14 photo-matched streets + neural voices. Previous: v42: + cars2 fleet, fixgfx, fixpeople, fixtalk. v41 = before the bug round. v40 = before wave 2, v39 = before characters. Baseline: v38 = `sh pipeline/build.sh` (importmap step added 2026-11-09 16:50, no visual change, errors []). 60 fps Metal, 4.0 s cold load.
 
 | Agent | Model | Status | Files | Tests | Blockers | Next |
 |---|---|---|---|---|---|---|
@@ -20,3 +20,4 @@ Final: work/build/v43.html (2026-11-10 00:50) = v42 + fixwater fixground kick pa
 | wave3 libs | sonnet | running (Yuka, pathfinding, InstancedMesh2, quarks, retarget, howler, troika, mesh-bvh, Sketchbook) |
 | fixwater fixground kick parked2 drive2 | sonnet | done + merged in v43 |
 | 14 street photo-match agents | sonnet | done + merged in v43 (Maironio 20, Jurbarko 36, Vilniaus 17, Stonų 13 buildings; outer streets thin coverage) |
+| fixfreeze sounds fixtalk2 roofs facades2 clothes | sonnet/opus | done + merged in v45 |
