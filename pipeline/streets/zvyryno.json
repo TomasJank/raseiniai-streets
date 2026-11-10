@@ -22,25 +22,35 @@
    "Žvyryno gatvė, o asfaltas lygesnis nei Vilniaus.",
    "Žvyras tik pavadinime ir liko.",
    "Ir gerai, bent dulkių nėra."
+  ],
+  [
+   "Naujas namas prie posūkio jau po stogu.",
+   "Tas pilkas, iš silikatinių plytų?",
+   "Taip, su tamsiu čerpių stogu."
+  ],
+  [
+   "Kiek greičio čia leidžia?",
+   "Keturiasdešimt, ženklas prie Stonų gatvės.",
+   "Tai niekas nesilaiko."
   ]
  ],
  "looks": {
   "c2206": {
    "wall": [
-    0.92,
-    0.91,
-    0.87
+    0.86,
+    0.82,
+    0.68
    ],
    "roof": [
-    0.55,
-    0.24,
-    0.17
+    0.3,
+    0.27,
+    0.28
    ],
    "sty": "plaster",
    "pitched": true,
    "hip": false,
-   "h": 3.3,
-   "rh": 4.2
+   "h": 5.4,
+   "rh": 3.4
   },
   "c2428": {
    "wall": [
@@ -368,19 +378,20 @@
   },
   "c1829": {
    "wall": [
-    0.82,
-    0.82,
-    0.8
+    0.74,
+    0.68,
+    0.56
    ],
    "roof": [
-    0.3,
-    0.31,
-    0.32
+    0.24,
+    0.25,
+    0.27
    ],
-   "sty": "plaster",
+   "sty": "silicate",
+   "windows": true,
    "pitched": true,
    "hip": false,
-   "h": 5.4,
+   "h": 5.6,
    "rh": 3.2
   },
   "c1857": {
@@ -461,6 +472,24 @@
    "sty": "wood",
    "pitched": false,
    "h": 2.6
+  },
+  "c2241": {
+   "wall": [
+    0.82,
+    0.77,
+    0.66
+   ],
+   "roof": [
+    0.28,
+    0.28,
+    0.3
+   ],
+   "sty": "plaster",
+   "windows": true,
+   "pitched": true,
+   "hip": false,
+   "h": 3.2,
+   "rh": 3.6
   }
  },
  "props": [
