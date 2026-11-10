@@ -1,0 +1,8 @@
+setup {"ok":true}
+faceOnEveryMannequin {"ok":true,"mannequins":12,"bad":[]}
+regionColours {"ok":true,"r":{"m":{"hand":1,"finger":1,"neck":1,"spine":1,"thigh":1,"calf":1,"foot":1,"upperArmShirtOrSleeve":1},"f":{"hand":1,"finger":1,"neck":1,"spine":1,"thigh":1,"calf":1,"foot":1,"upperArmShirtOrSleeve":1}},"rc":{"skin":14857363,"shirt":3368652,"legs":4478310,"shoe":1118481}}
+gearNearItsBone {"ok":true,"mannequins":12,"maxDist":{"long":0.126,"skirt":0.121,"hat":0.244,"pack":0.03,"bag":0.187,"coat":0.197,"scarf":0.143,"tail":0.169,"stick":0.031},"worst":[]}
+carHitTumble {"ok":true,"pitchWithin04s":85,"maxPitch":100,"rootDyFromGround":0,"clips":["death","getup","walk"],"modes":["down","walk"]}
+drawCalls {"ok":true,"calls":691,"glb":11}
+errors []
+PASS

@@ -38,7 +38,7 @@ const CARS2=(()=>{
   const P=S.models.liftback;S.police={...P,police:true,hood:topAt(P,1.6),roof:topAt(P,-.12)};
   const keys=Object.keys(MIX),weighted=keys.flatMap(k=>Array(MIX[k]).fill(S.models[k]));
   // the procedural slots map onto the fleet; the arrays are edited in place so every caller picks GLB cars
-  S.swap.set(carGeo,S.models.saloon90);S.swap.set(skodaGeo,S.police);
+  S.swap.set(skodaGeo,S.police); // carGeo (the Audi 80 'bulka', the starting car) stays procedural on purpose
   TRAFFIC_GEOS.forEach(G=>S.swap.set(G,S.models[keys[0]]));
   TRAFFIC_GEOS.splice(0,TRAFFIC_GEOS.length,...weighted);
   LOT_GEOS.splice(0,LOT_GEOS.length,...keys.map(k=>S.models[k].lot));

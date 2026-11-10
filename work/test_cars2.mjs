@@ -8,7 +8,7 @@ const [file,shotArg]=process.argv.slice(2);
 const dir=new URL('.',import.meta.url).pathname,out=shotArg||dir+'shots_cars2/';fs.mkdirSync(out,{recursive:true});
 const o='function drawMini(){';
 let h=fs.readFileSync(file,'utf8');if(h.split(o).length!==2)throw new Error('hook');
-const api=`window.__t={set paused(v){mapOpen=v},set sinkS(v){sinkS=v},get world(){return world},get player(){return player},get CARS2(){return CARS2},get PARKED(){return PARKED},get LOT_GEOS(){return LOT_GEOS},get smoke(){return smoke},
+const api=`window.__t={enterExit,camera,get GY(){return GY},get heat(){return heat},set heat(v){heat=v},set paused(v){mapOpen=v},set sinkS(v){sinkS=v},get world(){return world},get player(){return player},get CARS2(){return CARS2},get PARKED(){return PARKED},get LOT_GEOS(){return LOT_GEOS},get smoke(){return smoke},
 get cops(){return cops},get drv(){return drv},get ENV(){return ENV},KEY,driveCar,syncCar,resetToRoad,makeCarMesh,makeCop,dent,fixCar,breakLamps,kick,fumes,inWater,worldGroup,renderer,scene,camera,get GY(){return GY},
 step(n,dt=.033,each){for(let i=0;i<n&&player.car;i++){driveCar(player.car,dt);if(each)each(i);}},
 render(){renderer.render(scene,camera);},
@@ -30,7 +30,7 @@ await check('assetsDecode',()=>{const C=__t.CARS2,M=C.models,k=Object.keys(M);
 
 await check('glbBacked',()=>{const T=__t,cs=T.world.cars,ai=cs.filter(c=>c.ai),g=c=>!!c.g.userData.car2;
   const share=ai.filter(g).length/ai.length;
-  return{ok:g(T.player.car)&&share>=.8&&cs.every(c=>c.g.userData.wheels.length===4),player:T.player.car.g.userData.car2.key,traffic:ai.length,glbShare:+share.toFixed(2),all:cs.length,allGlb:cs.filter(g).length};});
+  return{ok:!g(T.player.car)&&share>=.8&&cs.every(c=>c.g.userData.wheels.length===4),player:T.player.car.g.userData.car2?T.player.car.g.userData.car2.key:'procedural audi80',traffic:ai.length,glbShare:+share.toFixed(2),all:cs.length,allGlb:cs.filter(g).length};});
 
 await check('drawCallsPerCar',()=>{const T=__t,c=T.world.cars.find(q=>q.ai),meshes=[];c.g.traverse(o=>{if(o.isMesh)meshes.push(o.name||o.geometry.type);});
   return{ok:meshes.length<=3,meshes:meshes.length};});
@@ -42,6 +42,7 @@ await check('wheelsSpinAndSteer',()=>{const T=__t,c=T.player.car;T.resetToRoad()
   return{ok:d.every((v,i)=>Math.abs(Math.abs(v)-1/.3)<.01&&Math.sign(v)===(left[i]?-1:1))&&st.every((v,i)=>front[i]?Math.abs(v-.28)<1e-3:v===0)&&front.filter(Boolean).length===2&&left.filter(Boolean).length===2,
     spinPerMetre:d,steer:st};});
 
+await check('stealGlbCar',()=>{const T=__t,c=T.world.cars.find(q=>q.ai&&q.g.userData.car2);T.player.car.speed=0;T.enterExit();T.player.x=c.x+1.2;T.player.z=c.z+1.2;T.heat=0;T.enterExit();T.heat=0;return{ok:T.player.car===c&&T.player.mode==='car',key:c.g.userData.car2.key};});
 await check('wheelsDrawnOnGround',()=>{const T=__t,c=T.player.car;T.resetToRoad();c.speed=0;c.ride=null;T.syncCar(c);
   const y=T.GY(c.x,c.z);T.shot([c.x+Math.sin(c.h)*4.3+Math.cos(c.h)*3.6,y+.95,c.z+Math.cos(c.h)*4.3-Math.sin(c.h)*3.6],[c.x,y+.6,c.z]);
   const F=c.g.userData.car2,I=F.inst,e=c.g.matrixWorld.clone(),pos=[];for(let i=0;i<I.count;i++){I.getMatrixAt(i,e);pos.push([e.elements[12],e.elements[13],e.elements[14]]);}
@@ -52,7 +53,7 @@ await check('wheelsDrawnOnGround',()=>{const T=__t,c=T.player.car;T.resetToRoad(
   return{ok:mine.every(y=>y!=null&&Math.abs(y)<.05)&&total%4===0&&total>=4&&total<=4*vis,tyreBottomAboveGround:mine,instances:total,visibleCars:vis};});
 
 await check('brakeLights',()=>{const T=__t,c=T.player.car;T.resetToRoad();c.speed=14;c.hp=1;for(const k in T.KEY)T.KEY[k]=false;T.step(10,.033,()=>{c.speed=14;});
-  const m=c.lamps.tm,lamp=c.g.userData.body.children[4].material.userData,tail=()=>(T.render(),+lamp.uTail.value.r.toFixed(2));const idle=m.color.r,idleL=tail();
+  const m=c.lamps.tm,lamp=c.g.userData.body.children[4].material.userData,tail=()=>(T.render(),+lamp.uTail.value.r.toFixed(2));T.camera.position.set(c.x-8*Math.sin(c.h),T.GY(c.x,c.z)+3,c.z-8*Math.cos(c.h));T.camera.lookAt(c.x,T.GY(c.x,c.z)+.8,c.z);T.camera.updateMatrixWorld();const idle=m.color.r,idleL=tail();
   T.KEY.KeyS=true;T.step(4);const on=m.color.r,onL=tail();T.KEY.KeyS=false;T.step(3);const off=m.color.r;
   return{ok:c.g.userData.body.children[3].material===m&&on>1.5&&idle<1&&off<1&&onL>1.5&&idleL<1,tail:[idle,on,off].map(x=>+x.toFixed(2)),lampUniform:[idleL,onL]};});
 
