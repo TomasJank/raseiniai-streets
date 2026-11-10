@@ -1,0 +1,49 @@
+<!doctype html><meta charset=utf-8><title>three.quarks exhaust + rain vs game sprite smoke</title>
+<style>html,body{margin:0;background:#8fb0c8}</style>
+<div id=loader hidden></div>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.187.0/build/three.module.js","three.quarks":"https://cdn.jsdelivr.net/npm/three.quarks@0.17.1/dist/three.quarks.esm.js","quarks.core":"https://cdn.jsdelivr.net/npm/quarks.core@0.17.1/dist/quarks.core.esm.js"}}</script>
+<script type="module">
+import * as THREE from 'three';
+import * as Q from 'three.quarks';
+const MODE=window.MODE||'quarks',CARS=8,RAIN=2600;
+const R=new THREE.WebGLRenderer({antialias:true});R.setSize(1280,720);document.body.appendChild(R.domElement);
+const scene=new THREE.Scene();scene.background=new THREE.Color(0x7d8d99);scene.fog=new THREE.Fog(0x7d8d99,40,220);
+scene.add(new THREE.HemisphereLight(0xffffff,0x556655,1.2));const sun=new THREE.DirectionalLight(0xffffff,1.2);sun.position.set(30,60,20);scene.add(sun);
+const cam=new THREE.PerspectiveCamera(60,1280/720,.5,300);cam.position.set(0,5,-30);cam.lookAt(0,1.5,0);
+scene.add(new THREE.Mesh(new THREE.PlaneGeometry(600,600).rotateX(-Math.PI/2),new THREE.MeshLambertMaterial({color:0x4d5a40})));
+const carG=new THREE.BoxGeometry(1.8,1.1,4.2).translate(0,.7,0),carM=new THREE.MeshLambertMaterial({color:0xb04040});
+const cars=[];for(let i=0;i<CARS;i++){const g=new THREE.Group();g.add(new THREE.Mesh(carG,carM));scene.add(g);cars.push({g,a:i/CARS*Math.PI*2,r:8+i*1.8,sp:.5+.05*i,t:0});}
+const smokeTex=(()=>{const c=document.createElement('canvas');c.width=c.height=64;const g=c.getContext('2d'),r=g.createRadialGradient(32,32,2,32,32,32);r.addColorStop(0,'rgba(235,235,232,.85)');r.addColorStop(1,'rgba(235,235,232,0)');g.fillStyle=r;g.fillRect(0,0,64,64);return new THREE.CanvasTexture(c);})();
+let tick;const t0=performance.now();let frames=0,upd=0,calls=0,tris=0;
+function stepCars(dt){for(const c of cars){c.a+=c.sp*dt/ c.r*8;c.g.position.set(Math.cos(c.a)*c.r,0,Math.sin(c.a)*c.r);c.g.rotation.y=-c.a;}}
+if(MODE==='legacy'){
+  // verbatim shape of the game: 26 pooled sprites (smoke/updateSmoke/fumes) and 2600 CPU-moved LineSegments (rainPos loop)
+  const smoke=Array.from({length:26},()=>{const s=new THREE.Sprite(new THREE.SpriteMaterial({map:smokeTex,transparent:true,opacity:0,depthWrite:false}));s.visible=false;s.userData.life=0;scene.add(s);return s;});let si=0;
+  const rainPos=new Float32Array(RAIN*6),rg=new THREE.BufferGeometry();rg.setAttribute('position',new THREE.BufferAttribute(rainPos,3));
+  const rain=new THREE.LineSegments(rg,new THREE.LineBasicMaterial({color:0xc9d3dc,transparent:true,opacity:.6,depthWrite:false}));rain.frustumCulled=false;scene.add(rain);
+  for(let i=0;i<RAIN;i++){rainPos[i*6]=Math.random()*70-35;rainPos[i*6+1]=Math.random()*40-15;rainPos[i*6+2]=Math.random()*70-35;}
+  const wrap=(v,c)=>((v-c+35)%70+70)%70-35+c;let fT=0;
+  tick=dt=>{stepCars(dt);fT-=dt;if(fT<=0){fT=.06;for(const c of cars){const s=smoke[si=(si+1)%26];s.position.set(c.g.position.x,1,c.g.position.z);s.scale.setScalar(.7);s.material.opacity=.6;s.userData.life=1.1;s.visible=true;}}
+    for(const s of smoke){if(s.userData.life<=0)continue;s.userData.life-=dt;s.position.y+=dt*.7;s.scale.setScalar(s.scale.x+dt*3.2);s.material.opacity=Math.max(0,s.userData.life*.55);if(s.userData.life<=0)s.visible=false;}
+    const cx=cam.position.x,cy=cam.position.y,cz=cam.position.z;
+    for(let i=0;i<RAIN;i++){const o=i*6;let y=rainPos[o+1]-24*dt;if(y<cy-15)y+=40;const x=wrap(rainPos[o],cx),z=wrap(rainPos[o+2],cz);rainPos[o]=x;rainPos[o+1]=y;rainPos[o+2]=z;rainPos[o+3]=x+.05;rainPos[o+4]=y+.75;rainPos[o+5]=z+.03;}rg.attributes.position.needsUpdate=true;};
+}else{
+  const br=new Q.BatchedRenderer();scene.add(br);
+  const mat=new THREE.MeshBasicMaterial({map:smokeTex,transparent:true,depthWrite:false});
+  const ex=[];
+  for(const c of cars){
+    const ps=new Q.ParticleSystem({duration:1,looping:true,worldSpace:true,startLife:new Q.IntervalValue(.8,1.2),startSpeed:new Q.IntervalValue(.5,1.2),startSize:new Q.IntervalValue(.5,.8),
+      startColor:new Q.ConstantColor(new THREE.Vector4(.9,.9,.9,.6)),maxParticle:40,emissionOverTime:new Q.ConstantValue(16),shape:new Q.ConeEmitter({radius:.05,angle:.3,thickness:1,arc:Math.PI*2}),
+      material:mat,renderMode:Q.RenderMode.BillBoard,behaviors:[new Q.SizeOverLife(new Q.PiecewiseBezier([[new Q.Bezier(1,1.6,2.6,4),0]])),new Q.ColorOverLife(new Q.ColorRange(new THREE.Vector4(1,1,1,.6),new THREE.Vector4(1,1,1,0))),new Q.ApplyForce(new THREE.Vector3(0,1,0),new Q.ConstantValue(.7))]});
+    ps.emitter.position.set(0,.5,-2.2);ps.emitter.rotation.y=Math.PI;c.g.add(ps.emitter);br.addSystem(ps);ex.push(ps);}
+  const rm=new THREE.MeshBasicMaterial({color:0xc9d3dc,transparent:true,opacity:.6,depthWrite:false});
+  const rain=new Q.ParticleSystem({duration:1,looping:true,prewarm:true,worldSpace:true,startLife:new Q.ConstantValue(1.6),startSpeed:new Q.ConstantValue(24),startSize:new Q.ConstantValue(.05),
+    startColor:new Q.ConstantColor(new THREE.Vector4(1,1,1,1)),maxParticle:RAIN,emissionOverTime:new Q.ConstantValue(RAIN/1.6),shape:new Q.ConeEmitter({radius:35,angle:0,thickness:1,arc:Math.PI*2}),material:rm,renderMode:Q.RenderMode.StretchedBillBoard,rendererEmitterSettings:{speedFactor:.04,lengthFactor:2}});
+  rain.emitter.position.set(0,26,0);rain.emitter.rotation.x=Math.PI/2;scene.add(rain.emitter);br.addSystem(rain);window.__rainPS=rain;
+  tick=dt=>{stepCars(dt);rain.emitter.position.set(cam.position.x,cam.position.y+20,cam.position.z);br.update(dt);};
+}
+window.__rain=typeof rain!=="undefined"?0:0;let last=performance.now();
+function loop(){const n=performance.now(),dt=Math.min(.05,(n-last)/1000);last=n;tick(dt);upd+=performance.now()-n;R.render(scene,cam);frames++;calls=R.info.render.calls;tris=R.info.render.triangles;
+  if(n-t0>3500)window.__stats={mode:MODE,updateMs:+(upd/frames).toFixed(3),calls,tris};requestAnimationFrame(loop);}
+requestAnimationFrame(loop);
+</script>

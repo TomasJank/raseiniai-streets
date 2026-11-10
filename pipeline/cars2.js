@@ -54,7 +54,8 @@ CARS2_LAMP.onBeforeCompile=function(sh){sh.uniforms.uHead=this.userData.uHead;sh
 function cars2Lamps(F,head,tail){
   const m=CARS2_LAMP.clone();m.onBeforeCompile=CARS2_LAMP.onBeforeCompile;m.userData={uHead:{value:1},uTail:{value:new THREE.Color(1,1,1)}};
   const l=new THREE.Mesh(F.lamps,m);
-  l.onBeforeRender=()=>{m.userData.uHead.value=head.visible?1:0;m.userData.uTail.value.copy(tail.material.color).multiplyScalar(tail.visible?1:0);};
+  // a smashed lamp is a dead lens, not a hole: .3 of its colour (black read as a missing panel)
+  l.onBeforeRender=()=>{m.userData.uHead.value=head.visible?1:.3;m.userData.uTail.value.copy(tail.material.color).multiplyScalar(tail.visible?1:.3);};
   return l;
 }
 function makeCarMesh(color,G=carGeo){

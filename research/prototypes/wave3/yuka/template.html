@@ -1,0 +1,69 @@
+<!doctype html><meta charset=utf-8><title>Yuka path following on the game's road graph</title>
+<style>html,body{margin:0;background:#8fb0c8}</style>
+<div id=loader hidden></div>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.187.0/build/three.module.js","yuka":"https://cdn.jsdelivr.net/npm/yuka@0.7.8/build/yuka.module.js"}}</script>
+<script>window.CFG=__CFG__;window.GRAPH=__GRAPH__;</script>
+<script type="module">
+import * as THREE from 'three';
+import * as YUKA from 'yuka';
+const {mode,N,avoid}=window.CFG;
+const G=new Map(window.GRAPH.map(([k,x,z,c,out])=>[k,{x,z,out}]));
+const keys=[...G.keys()].filter(k=>G.get(k).out.length);
+let seed=7;const rnd=()=>(seed=(seed*1664525+1013904223)>>>0)/4294967296;
+const OFF=1.7;
+// random walk like aiNext: never straight back unless dead end
+function walk(from,to,len){const r=[from,to];while(r.length<len){const a=r[r.length-2],n=G.get(r[r.length-1]);let o=n.out.filter(k=>k!==a&&G.has(k));if(!o.length)o=n.out.filter(k=>G.has(k));if(!o.length)break;r.push(o[Math.floor(rnd()*o.length)]);}return r;}
+// right-hand lane offset points for a node walk: one per node using the incoming segment normal, plus the outgoing one so corners are explicit
+function lane(nodes){const pts=[];for(let i=0;i<nodes.length-1;i++){const A=G.get(nodes[i]),B=G.get(nodes[i+1]),dx=B.x-A.x,dz=B.z-A.z,L=Math.hypot(dx,dz)||1,nx=-dz/L*OFF,nz=dx/L*OFF;pts.push([A.x+nx,A.z+nz],[B.x+nx,B.z+nz]);}return pts;}
+const pickStart=()=>{const k=keys[Math.floor(rnd()*keys.length)];const o=G.get(k).out.filter(x=>G.has(x));return [k,o[Math.floor(rnd()*o.length)]];};
+const cars=[];
+let step;
+if(mode==='yuka'){
+  const em=new YUKA.EntityManager();
+  for(let i=0;i<N;i++){
+    const v=new YUKA.Vehicle();v.maxSpeed=8+rnd()*5;v.maxForce=30;v.mass=1;v.boundingRadius=2.2;v.updateNeighborhood=false;
+    const c={v,fp:null,nodes:null,seg:0};
+    const plan=(from,to)=>{c.nodes=walk(from,to,14);const path=new YUKA.Path();for(const [x,z] of lane(c.nodes))path.add(new YUKA.Vector3(x,0,z));c.fp=new YUKA.FollowPathBehavior(path,3.5);c.fp.active=true;return path;};
+    const [a,b]=pickStart();const path=plan(a,b);const p0=path.current();v.position.set(p0.x,0,p0.z);
+    v.steering.add(c.fp);c.replan=()=>{const last=c.nodes[c.nodes.length-1],prev=c.nodes[c.nodes.length-2];v.steering.clear();const np=plan(prev,last);v.steering.add(c.fp);if(avoid)v.steering.add(c.av);};
+    cars.push(c);em.add(v);
+  }
+  if(avoid){const obs=cars.map(c=>c.v);for(const c of cars){c.av=new YUKA.ObstacleAvoidanceBehavior(obs.filter(o=>o!==c.v));c.av.weight=1;c.v.steering.add(c.av);}}
+  step=dt=>{for(const c of cars)if(c.fp.path.finished()&&c.v.getSpeed()<1)c.replan();em.update(dt);};
+}else{
+  // the game's model: t along an edge, aiNext picks a random out-edge, aiPlace eases onto the lane
+  const lerpA=(a,b,t)=>{let d=((b-a+Math.PI)%(2*Math.PI)+2*Math.PI)%(2*Math.PI)-Math.PI;return a+d*t;};
+  for(let i=0;i<N;i++){const [from,to]=pickStart(),A=G.get(from),B=G.get(to);const c={from,to,t:rnd(),len:Math.hypot(B.x-A.x,B.z-A.z),cruise:8+rnd()*5,x:0,z:0,h:0};place(c,true);cars.push(c);}
+  function place(c,snap){const A=G.get(c.from),B=G.get(c.to),dx=B.x-A.x,dz=B.z-A.z,L=c.len,hx=dx/L,hz=dz/L;const tx=A.x+dx*c.t+(-hz)*OFF,tz=A.z+dz*c.t+hx*OFF,th=Math.atan2(dx,dz);if(snap){c.x=tx;c.z=tz;c.h=th;}else{c.x+=(tx-c.x)*.25;c.z+=(tz-c.z)*.25;c.h=lerpA(c.h,th,.12);}}
+  function next(c){const n=G.get(c.to);let o=n.out.filter(k=>k!==c.from&&G.has(k));if(!o.length)o=n.out.filter(k=>G.has(k));const nk=o[Math.floor(rnd()*o.length)],M=G.get(nk);c.from=c.to;c.to=nk;c.t=0;c.len=Math.max(.1,Math.hypot(M.x-n.x,M.z-n.z));}
+  step=dt=>{for(const c of cars){let s=c.cruise*dt,g=0;while(s>0&&g++<6){const rem=(1-c.t)*c.len;if(s<rem){c.t+=s/c.len;s=0;}else{s-=rem;next(c);}}place(c,false);}};
+}
+const pos=i=>mode==='yuka'?[cars[i].v.position.x,cars[i].v.position.z]:[cars[i].x,cars[i].z];
+const hdg=i=>{if(mode!=='yuka')return cars[i].h;const v=cars[i].v;return Math.atan2(v.velocity.x,v.velocity.z);};
+// deterministic headless run: 30 simulated seconds at 60 Hz
+const prevH=new Float64Array(N);for(let i=0;i<N;i++)prevH[i]=hdg(i);
+const DT=1/60,T=1800;let ms=0,maxRate=0,rates=[],close=0,samples=0,stopped=0;
+// nearest-road distance (m) for off-road check, sampled once a second
+const segs=[];for(const [k,n] of G)for(const o of n.out)if(G.has(o)&&k<o){const m=G.get(o);segs.push([n.x,n.z,m.x,m.z]);}
+const dseg=(x,z,s)=>{const dx=s[2]-s[0],dz=s[3]-s[1],t=Math.max(0,Math.min(1,((x-s[0])*dx+(z-s[1])*dz)/(dx*dx+dz*dz||1)));return Math.hypot(x-(s[0]+dx*t),z-(s[1]+dz*t));};
+let offMax=0,offSum=0,offN=0;
+for(let f=0;f<T;f++){const a=performance.now();step(DT);ms+=performance.now()-a;
+  if(f>120)for(let i=0;i<N;i++){const h=hdg(i);let d=Math.abs(((h-prevH[i]+Math.PI)%(2*Math.PI)+2*Math.PI)%(2*Math.PI)-Math.PI);prevH[i]=h;const sp=mode==='yuka'?cars[i].v.getSpeed():1;if(sp>2||mode!=='yuka')rates.push(d/DT);}
+  else for(let i=0;i<N;i++)prevH[i]=hdg(i);
+  if(f%60===0&&f>120){for(let i=0;i<N;i++){const [x,z]=pos(i);for(let j=i+1;j<N;j++){const [x2,z2]=pos(j);if((x-x2)**2+(z-z2)**2<9)close++;}let md=1e9;for(const s of segs){const d=dseg(x,z,s);if(d<md)md=d;}offSum+=md;offN++;if(md>offMax)offMax=md;}samples++;}
+  if(mode==='yuka'&&f===T-1)for(const c of cars)if(c.v.getSpeed()<.5)stopped++;}
+rates.sort((a,b)=>a-b);
+const sim={mode,N,avoid,stepMs:+(ms/T).toFixed(4),turnRateP99:+rates[Math.floor(rates.length*.99)].toFixed(2),turnRateMax:+rates[rates.length-1].toFixed(2),closePairsPerSample:+(close/samples).toFixed(2),offLaneMean:+(offSum/offN).toFixed(2),offLaneMax:+offMax.toFixed(2),stopped};
+// render
+const R=new THREE.WebGLRenderer({antialias:true});R.setSize(1280,720);document.body.appendChild(R.domElement);
+const scene=new THREE.Scene();scene.background=new THREE.Color(0x8fb0c8);scene.add(new THREE.HemisphereLight(0xffffff,0x556655,1.3));const sun=new THREE.DirectionalLight(0xffffff,1.4);sun.position.set(80,120,40);scene.add(sun);
+const cam=new THREE.OrthographicCamera(-340*1280/720,340*1280/720,340,-340,1,1000);cam.position.set(0,400,0);cam.lookAt(0,0,0);cam.up.set(0,0,-1);cam.lookAt(0,0,0);
+const lg=new THREE.BufferGeometry();const lp=[];for(const s of segs)lp.push(s[0],.1,s[1],s[2],.1,s[3]);lg.setAttribute('position',new THREE.Float32BufferAttribute(lp,3));scene.add(new THREE.LineSegments(lg,new THREE.LineBasicMaterial({color:0x555555})));
+const im=new THREE.InstancedMesh(new THREE.BoxGeometry(5,3,10).translate(0,1.5,0),new THREE.MeshLambertMaterial({color:0xd04030}),N);im.frustumCulled=false;scene.add(im);
+const M=new THREE.Matrix4(),Q=new THREE.Quaternion(),V=new THREE.Vector3(),S=new THREE.Vector3(1,1,1),Y=new THREE.Vector3(0,1,0);
+let frames=0,upd=0,t0=performance.now(),last=t0;
+function loop(){const n=performance.now(),dt=Math.min(.05,(n-last)/1000);last=n;const a=performance.now();step(dt);upd+=performance.now()-a;
+  for(let i=0;i<N;i++){const [x,z]=pos(i);Q.setFromAxisAngle(Y,hdg(i));M.compose(V.set(x,0,z),Q,S);im.setMatrixAt(i,M);}im.instanceMatrix.needsUpdate=true;
+  R.render(scene,cam);frames++;if(n-t0>3000)window.__stats={...sim,liveUpdateMs:+(upd/frames).toFixed(4),calls:R.info.render.calls};requestAnimationFrame(loop);}
+requestAnimationFrame(loop);
+</script>

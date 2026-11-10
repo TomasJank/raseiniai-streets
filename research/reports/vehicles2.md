@@ -184,3 +184,43 @@ four function heads `function makeCarMesh(color,G=carGeo){`, `function addParked
 `research/assets/vehicles/{quaternius-cars,quaternius-zombie-kit,poly-google,pukkbumxdd-van,rejected}/SOURCE.md` (+ raw
 GLBs, gitignored), `research/assets/vehicles/fleet/{build.py,glb.py,SOURCE.md}` (+ `built/*.glb`, gitignored),
 `research/prototypes/vehicles/fleet/{compare.mjs,compare.png,shots/}`, this report.
+
+## 8. Fix: "cars have holes sometimes" (owner's play session, 2026-11-09 evening)
+
+Reported: a grey `estate80` from the low rear three-quarter, see-through behind the rear wheel and a flat black tail-light
+panel. Two causes, neither of them bad winding:
+
+1. **Arch cavity round a shrunk wheel.** build.py shrinks the oversized Google / Zombie-kit wheels (`wr` .72-.85) and lowers
+   the body, but the arch stayed at the old wheel size. That left a 10-19 cm ring of open wheel well round the tyre, and the
+   dark cavity read as a hole into the body. Fix in `build.py`: body points near a hub are pulled towards it by the radius
+   lost, fading out over .35 m and never closer than 3 cm to the tyre. The same map applies to paint, trim and lamps, so the
+   panels stay joined. Affected and rebuilt: `estate`, `estate80`, `van`, `truck`, `pickup`. The five models with `wr` 1
+   come out byte-identical. Arch gap above the tyre (front/rear, m): estate .105→.029, estate80 .151/.154→.041/.047,
+   pickup .189→.055; the Quaternius cars keep their authored .04-.12.
+2. **Smashed lamps went pure black.** A hit traffic car's tail lamp (breakLamps) multiplied the lamp colour by 0, so the lens
+   rendered as a black rectangle. `cars2.js` now dims a smashed lamp to .3 of its colour, so it reads as a dead lens.
+
+Winding / missing faces, checked first: every model was rendered from 6 angles (front and rear 3/4, low front and rear 3/4,
+and low at the front and rear arch) with back faces drawn in a contrast colour. All models show 0-9 back-face pixels except
+the pickup, whose open front-bumper ends show a 40-130 px slit (about 0.1 % of the silhouette). It is left as is: a reversed
+trim copy would cost 1.5k triangles and fight the back-face test. Stored normals never disagree with the winding.
+No model needed DoubleSide or removal from `MIX`.
+
+New check in `work/test_cars2.mjs`, `noHolesRear34`. It renders each model alone on white: front faces flat grey, back faces
+black, wheels mid grey. Views are rear 3/4, low rear 3/4 and low at the rear arch. It fails on a near-black cluster inside
+the silhouette (over max(60 px, 0.3 %)) or an arch gap above a tyre over .13 m. `breakAndFixLamps` now expects .3.
+
+On the build before the fix it fails, as it should:
+```
+breakAndFixLamps {"ok":false,"broken":[0,0],"fixed":[1,1]}
+noHolesRear34 ok false: estate80 archGapM [0.151,0.154], pickup [0.189,null]  (black px: 0 everywhere, pickup 71/96/137)
+```
+On `sh pipeline/build.sh` (now with cars2, fixgfx, fixpeople; the starting car is the procedural Audi 80 again):
+```
+glbBacked {"ok":true,"player":"procedural audi80","traffic":26,"glbShare":1,"all":82,"allGlb":81}
+stealGlbCar {"ok":true,"key":"hatch"}
+breakAndFixLamps {"ok":true,"broken":[0.3,0.3],"fixed":[1,1]}
+noHolesRear34 {"ok":true, estate80 black px r34/lowR34/arch 0/0/0 of 57.6k/64.6k/118.8k, archGapM [0.041,0.047]; ...
+  pickup 65/76/124 of 59.4k/68.0k/134.8k, [0.055,null]}
+... all other checks ok, errors [], PASS
+```

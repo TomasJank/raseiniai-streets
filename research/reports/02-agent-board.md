@@ -1,6 +1,6 @@
 # Agent board (orchestrator keeps this current)
 
-Final: work/build/v41.html = full chain through fight2 (2026-11-09 20:55). v40 = before wave 2, v39 = before characters. Baseline: v38 = `sh pipeline/build.sh` (importmap step added 2026-11-09 16:50, no visual change, errors []). 60 fps Metal, 4.0 s cold load.
+Final: work/build/v42.html = full chain through fixtalk (2026-11-09 23:40): + cars2 fleet, fixgfx, fixpeople, fixtalk. v41 = before the bug round. v40 = before wave 2, v39 = before characters. Baseline: v38 = `sh pipeline/build.sh` (importmap step added 2026-11-09 16:50, no visual change, errors []). 60 fps Metal, 4.0 s cold load.
 
 | Agent | Model | Status | Files | Tests | Blockers | Next |
 |---|---|---|---|---|---|---|
@@ -12,3 +12,9 @@ Final: work/build/v41.html = full chain through fight2 (2026-11-09 20:55). v40 =
 | survey | haiku | done 17:30 (24 repos classified; top: niulai-game combat MIT, N8AO CC0, CSM, Water2) | research/repositories research/reports/repositories.md | n/a | — | — |
 | combat2 | sonnet | done + merged 20:50 (test_fight2 18/18, test_fight PASS, 60.3 fps) | pipeline/fight2.js add_fight2.py | | needs clips | |
 | animals2 | sonnet | done + merged 20:35 (5 GLB species, 397 KB, all animal suites PASS, 60.3 fps) | pipeline/animals2.js add_animals2.py | | needs assets.js | |
+
+| cars2 | opus | done + merged (10-model GLB fleet, holes fixed in build.py, test_cars2 PASS) |
+| fixgfx | sonnet | done + merged (smoke quads, sun elevation) |
+| fixpeople | sonnet | done + merged (faces, gear refit, car-hit tumble) |
+| fixtalk | sonnet | done + merged (companion rest, goodbye rotation, test_talk2) |
+| wave3 libs | sonnet | running (Yuka, pathfinding, InstancedMesh2, quarks, retarget, howler, troika, mesh-bvh, Sketchbook) |

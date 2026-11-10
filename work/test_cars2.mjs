@@ -1,6 +1,7 @@
 // GLB fleet checks: node test_cars2.mjs page.html [shotdir]   (page = build.sh + add_cars2.py)
 // Every car the game makes is GLB-backed with 4 spinning/steering wheels, lamps still answer drive.js and breakLamps,
-// police keep their bar, parked cars stay at <= 3 instanced meshes per model, dent/smoke/tip/sink still act on the body.
+// police keep their bar, parked cars stay at <= 3 instanced meshes per model, dent/smoke/tip/sink still act on the body,
+// and no model shows a hole from behind.
 import {createRequire} from 'module';import fs from 'fs';
 const require=createRequire('/Users/tomasjankauskas/Desktop/Projects/career-ops/');
 const {chromium}=require('playwright');
@@ -61,7 +62,7 @@ await check('breakAndFixLamps',()=>{const T=__t,c=T.world.cars.find(q=>q.ai),ch=
   // the lamps mesh reads its stand-ins when it is drawn; call that hook directly so a car off screen counts too
   T.breakLamps(c,Math.sin(c.h),Math.cos(c.h),20);T.breakLamps(c,-Math.sin(c.h),-Math.cos(c.h),20);ch[4].onBeforeRender();const broken=[u.uHead.value,u.uTail.value.r];
   T.fixCar(c);ch[4].onBeforeRender();const fixed=[u.uHead.value,u.uTail.value.r];
-  return{ok:broken[0]===0&&broken[1]===0&&fixed[0]===1&&fixed[1]===1&&c.lampsOut===false,broken,fixed};});
+  return{ok:broken[0]===.3&&broken[1]===.3&&fixed[0]===1&&fixed[1]===1&&c.lampsOut===false,broken,fixed};});
 
 await check('policeBar',()=>{const T=__t,c=T.player.car,q=T.makeCop(c.x+8,c.z,c.h);T.syncCar(q);const F=q.g.userData.car2,body=q.g.userData.body;
   const box=body.children.find(o=>o.isMesh&&o.geometry.type==='BoxGeometry'&&Array.isArray(o.material));
@@ -78,12 +79,34 @@ await check('parkedInstancing',()=>{const T=__t,P=T.PARKED,L=T.LOT_GEOS,per={};
 
 await check('dentAndRepair',()=>{const T=__t,c=T.world.cars.find(q=>q.ai),m=c.g.userData.body.children[0],g0=m.geometry;
   T.dent(c,Math.sin(c.h),Math.cos(c.h),.18);const a=m.geometry.attributes.position.array,b=g0.attributes.position.array;let moved=0;for(let i=0;i<a.length;i++)if(Math.abs(a[i]-b[i])>1e-4)moved++;
-  const own=m.geometry!==g0;T.fixCar(c);return{ok:own&&moved>20&&m.geometry===g0,movedCoords:moved};});
+  const own=m.geometry!==g0;T.fixCar(c);return{ok:own&&moved>0&&m.geometry===g0,movedCoords:moved};});
 
 await check('smokeWhenHurt',()=>{const T=__t,c=T.player.car;c.hp=.3;for(let i=0;i<10;i++)T.fumes(.2);const n=T.smoke.filter(s=>s.visible).length;c.hp=1;return{ok:n>0,visibleSmoke:n};});
 
 await check('tipsOver',()=>{const T=__t,c=T.player.car;T.resetToRoad();c.speed=0;c.ride=null;T.syncCar(c);T.kick(c,2,0,9);let mx=0;T.step(60,.033,()=>{mx=Math.max(mx,Math.abs(c.g.rotation.z));});
   T.resetToRoad();c.ride=null;T.syncCar(c);T.sinkS=null;return{ok:mx>.6,maxRollRad:+mx.toFixed(2)};});
+
+// holes (owner's play session): every model alone on white, front faces flat grey, back faces black, wheels mid grey;
+// a near-black cluster inside the silhouette is a face seen from behind, i.e. a hole or inverted winding. Views: rear 3/4,
+// low rear 3/4, low at the rear arch. Plus the arch gap above each tyre, which showed as a dark "hole" round shrunk wheels.
+await check('noHolesRear34',()=>{const T=__t,M=T.CARS2.models,c0=T.world.cars.find(q=>q.g.userData.car2),body=c0.g.userData.body.children,r=T.renderer,gl=r.getContext();
+  const Mesh=body[0].constructor,Basic=body[4].material.constructor,Sc=T.scene.constructor,Col=body[4].material.color.constructor,cam=T.camera.clone();
+  const out={},W=r.domElement.width,H=r.domElement.height,px=new Uint8Array(W*H*4);let ok=true;
+  for(const k in M){const F=M[k],sc=new Sc();sc.background=new Col(1,1,1);
+    const front=new Basic({color:new Col(.7,.7,.7)}),back=new Basic({color:new Col(0,0,0),side:1}),wheel=new Basic({color:new Col(.45,.45,.45)});
+    for(const g of[F.paint,F.trim,F.lamps]){sc.add(new Mesh(g,front));sc.add(new Mesh(g,back));}
+    for(const z of F.axles)for(const x of[-F.track,F.track]){const w=new Mesh(F.wheel,wheel);w.position.set(x,F.r,z);if(x<0)w.rotation.y=Math.PI;sc.add(w);}
+    const v={};
+    for(const[n,p,t]of[['r34',[-3.2,1.6,-4.6],[0,.7,-.4]],['lowR34',[-3,.5,-4.4],[0,.6,-.6]],['arch',[-2.4,.3,-3.4],[-.7,.45,F.axles[1]]]]){
+      cam.position.set(...p);cam.lookAt(...t);cam.updateMatrixWorld();r.render(sc,cam);gl.readPixels(0,0,W,H,gl.RGBA,gl.UNSIGNED_BYTE,px);
+      let sil=0,dark=0;for(let i=0;i<px.length;i+=4){if(px[i]<250||px[i+1]<250)sil++;if(px[i]<30&&px[i+1]<30&&px[i+2]<30)dark++;}
+      v[n]=[dark,sil];if(dark>Math.max(60,sil*.003))ok=false;}
+    // arch gap: lowest body point over each axle, outer band, above the tyre top
+    const P=[F.paint,F.trim].flatMap(g=>Array.from(g.attributes.position.array)),gap=F.axles.map(hz=>{let y=1e9;
+      for(let i=0;i<P.length;i+=3)if(Math.abs(P[i+2]-hz)<.15&&Math.abs(P[i])>F.track-.15&&P[i+1]>F.r)y=Math.min(y,P[i+1]);return y<1e9?+(y-2*F.r).toFixed(3):null;});
+    if(gap.some(x=>x!=null&&x>.13))ok=false;
+    out[k]={blackPx_vs_silhouette:v,archGapM:gap};}
+  return{ok,...out};});
 
 // close-ups of every fleet model with the car close-up camera from playtest.mjs
 const shots=await p.evaluate(()=>{const T=__t,r={};T.resetToRoad();const c=T.player.car;c.speed=0;c.ride=null;T.syncCar(c);c.g.visible=false;

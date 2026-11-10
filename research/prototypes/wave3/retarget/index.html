@@ -1,0 +1,43 @@
+<!doctype html><meta charset=utf-8><title>retargetClip: KayKit kick onto the game's mannequin</title>
+<style>html,body{margin:0;background:#8fb0c8}</style>
+<div id=loader hidden></div>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.187.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.187.0/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from 'three';
+import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
+import {MeshoptDecoder} from 'three/addons/libs/meshopt_decoder.module.js';
+import * as SU from 'three/addons/utils/SkeletonUtils.js';
+const L=new GLTFLoader();L.setMeshoptDecoder(MeshoptDecoder);
+const load=u=>new Promise((r,j)=>L.load(u,r,undefined,j));
+const [body,kk]=await Promise.all([load('src/body_m.glb'),load('src/kk_melee.glb')]);
+const clip=kk.animations.find(a=>a.name==='Melee_Unarmed_Attack_Kick');
+let tgt,src;body.scene.traverse(o=>{if(o.isSkinnedMesh&&!tgt)tgt=o;});kk.scene.traverse(o=>{if(o.isSkinnedMesh&&!src)src=o;});
+// UE-style names on the game's mannequin -> KayKit Rig_Medium names. No clavicle / neck / spine_02 on the source, they keep their rest pose.
+const names={pelvis:'hips',spine_01:'spine',spine_03:'chest',Head:'head',upperarm_l:'upperarml',lowerarm_l:'lowerarml',hand_l:'handl',upperarm_r:'upperarmr',lowerarm_r:'lowerarmr',hand_r:'handr',
+  thigh_l:'upperlegl',calf_l:'lowerlegl',foot_l:'footl',ball_l:'toesl',thigh_r:'upperlegr',calf_r:'lowerlegr',foot_r:'footr',ball_r:'toesr'};
+body.scene.updateMatrixWorld(true);kk.scene.updateMatrixWorld(true);
+const hipY=s=>{const b=s.skeleton.bones.find(x=>x.name===(s===tgt?'pelvis':'hips'));return new THREE.Vector3().setFromMatrixPosition(b.matrixWorld).y;};
+const scale=hipY(tgt)/hipY(src);
+const helper=new THREE.SkeletonHelper(kk.scene);helper.skeleton=src.skeleton;
+const t0=performance.now();
+const out=SU.retargetClip(tgt,helper,clip,{names,hip:'hips',scale,fps:30});out.name='kick';
+const retargetMs=performance.now()-t0;
+// montage: top row = KayKit source, bottom row = retargeted onto body_m
+const R=new THREE.WebGLRenderer({antialias:true});R.setSize(1280,720);R.setScissorTest(true);document.body.appendChild(R.domElement);
+const scene=new THREE.Scene();scene.background=new THREE.Color(0xa7bccb);scene.add(new THREE.HemisphereLight(0xffffff,0x667766,1.6));const sun=new THREE.DirectionalLight(0xffffff,2);sun.position.set(2,4,3);scene.add(sun);
+const kkMats=[];kk.scene.traverse(o=>{if(o.isMesh)o.material=new THREE.MeshLambertMaterial({color:0xd09060});});
+body.scene.traverse(o=>{if(o.isMesh)o.material=new THREE.MeshLambertMaterial({color:0x7aa0d0});});
+kk.scene.position.x=0;body.scene.position.x=0;scene.add(kk.scene);scene.add(body.scene);
+const mk=new THREE.AnimationMixer(kk.scene),mb=new THREE.AnimationMixer(tgt);mk.clipAction(clip).play();mb.clipAction(out).play();
+const cam=new THREE.PerspectiveCamera(30,1280/2/360*5/5,.1,50);
+const K=5,w=1280/K;cam.aspect=w/360;cam.updateProjectionMatrix();cam.position.set(2.8,1.2,2.8);cam.lookAt(0,.85,0);
+const d=clip.duration;let k0=0;
+const times=Array.from({length:K},(_,i)=>d*(.18+.58*i/(K-1)));
+const draw=()=>{for(let row=0;row<2;row++){kk.scene.visible=row===0;body.scene.visible=row===1;for(let i=0;i<K;i++){mk.setTime(times[i]);mb.setTime(times[i]);kk.scene.updateMatrixWorld(true);body.scene.updateMatrixWorld(true);
+  R.setViewport(i*w,(1-row)*360,w,360);R.setScissor(i*w,(1-row)*360,w,360);R.render(scene,cam);}}};
+draw();
+// peak foot height above hip proves the kick lands: max foot_r/foot_l y over the clip, both rigs
+const peak=(root,fn)=>{let m=0;const m2=new THREE.AnimationMixer(fn===0?root:tgt);const a=m2.clipAction(fn===0?clip:out);a.play();for(let t=0;t<d;t+=d/60){m2.setTime(t);root.updateMatrixWorld(true);root.traverse(o=>{if(o.isBone&&/^(foot_|ball_|footl|footr|toesl|toesr)/.test(o.name)){m=Math.max(m,new THREE.Vector3().setFromMatrixPosition(o.matrixWorld).y);}});}return +m.toFixed(2);};
+window.__dbg={src:src.skeleton.bones.map(b=>b.name),tgtN:tgt.skeleton.bones.length,hy:[hipY(tgt),hipY(src)],tpos:tgt.skeleton.bones.slice(0,0)};window.__stats={clip:clip.name,dur:+d.toFixed(2),srcTracks:clip.tracks.length,outTracks:out.tracks.length,hipScale:+scale.toFixed(3),retargetMs:+retargetMs.toFixed(1),peakFootY_src:peak(kk.scene,0),peakFootY_out:peak(body.scene,1),clips:body.animations.length};
+requestAnimationFrame(function f(){draw();requestAnimationFrame(f);});
+</script>

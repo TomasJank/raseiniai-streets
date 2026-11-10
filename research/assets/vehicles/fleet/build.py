@@ -172,7 +172,23 @@ def build(key, cfg, cache):
     r = r0 * ws
     ty = r - hy * sy
     cx, cz = (lo[0] + hi[0]) / 2, (lo[2] + hi[2]) / 2
-    X = lambda p: ((p[0] - cx) * sx, p[1] * sy + ty, (p[2] - cz) * sz)
+    X0 = lambda p: ((p[0] - cx) * sx, p[1] * sy + ty, (p[2] - cz) * sz)
+    # a shrunk wheel (wr < 1) leaves a ring of open arch around it that reads as a hole into the body; pull the arch in
+    # with it: body points near a hub move towards it by the radius lost, fading out over .35 m (same map for every list,
+    # so panels stay joined). This was the owner's "hole behind the rear wheel": the dark well showing round a small wheel
+    rf, dr = r / cfg.get('wr', 1), r / cfg.get('wr', 1) - r
+    H4 = [((v[0] - cx) * sx, (v[2] - cz) * sz) for v in hub.values()]
+
+    def X(p):
+        q = X0(p)
+        for hx, hz in H4:
+            d = math.hypot(q[1] - r, q[2] - hz)
+            if dr <= 0 or q[0] * hx <= 0 or abs(q[0]) < abs(hx) - .35 or d >= rf + .35 or d < 1e-6:
+                continue
+            # never closer than 3 cm to the tyre, so nothing already near it is pushed into it
+            k = min(dr * min(1, (rf + .35 - d) / .32), max(0, d - r - .03)) / d
+            q = (q[0], q[1] - (q[1] - r) * k, q[2] - (q[2] - hz) * k)
+        return q
     Nn = lambda n: (lambda v: tuple(x / (math.sqrt(sum(y * y for y in v)) or 1) for x in v))((n[0] / sx, n[1] / sy, n[2] / sz))
     out = {'paint': [], 'trim': [], 'lamps': [], 'wheel': []}
     Hc = H
