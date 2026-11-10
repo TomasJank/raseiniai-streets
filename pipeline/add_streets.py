@@ -8,7 +8,7 @@ import argparse, glob, json, math, os, re, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
-from street_ids import PAGE, Town, along, nearest
+from street_ids import PAGE, Town, along, nearest, seg_dist
 
 # default size [sx,sy,sz] m (x across, y up, z = the side the front faces), colour, collision footprint [fx,fz] at that size,
 # parts [w,h,d, x,y,z, shade, ico] in m with y from the ground; one InstancedMesh per kind, coloured per instance
@@ -24,7 +24,8 @@ KINDS = {
     'bush': {'s': [1.2, .9, 1.2], 'col': '#4a6b35', 'f': [1.0, 1.0], 'parts': [[1.2, .9, 1.2, 0, .45, 0, 1, 1]]},
     'treeS': {'s': [2.2, 4.5, 2.2], 'col': '#4f7a3a', 'f': [.25, .25], 'parts': [[.18, 1.8, .18, 0, .9, 0, .4], [2.2, 2.9, 2.2, 0, 3.05, 0, 1, 1]]},
 }
-FENCES = {'picket': [1.1, .05, '#d8d2c0'], 'mesh': [1.5, .04, '#6f7a72'], 'hedge': [1.3, .7, '#3f5f2e'], 'wall': [1.6, .25, '#b9b4a8']}
+FENCES = {'picket': [1.1, .05, '#d8d2c0'], 'mesh': [1.5, .04, '#6f7a72'], 'hedge': [1.3, .7, '#3f5f2e'], 'wall': [1.6, .25, '#b9b4a8'],
+          'panel': [1.8, .1, '#b9b6ae'], 'slat': [1.7, .04, '#3a2d24']}
 PLACES = {'shop': 'commercial', 'cafe': 'commercial', 'bank': 'commercial', 'pharmacy': 'commercial', 'school': 'civic',
           'church': 'church', 'monument': 'civic', 'bus_stop': 'civic'}
 STY = ['plaster', 'old', 'shop', 'block', 'brick', 'wood', 'industrial', 'glass', 'tiles', 'sheet', 'flat', 'none', 'silicate', 'panel', 'plank', 'corrugated', 'asbestos']  # last five are added to STY by add_facades.py, which runs after streets
@@ -32,12 +33,14 @@ TOP = {'street', 'slug', 'flavour', 'looks', 'props', 'signs', 'fences', 'parkin
 ITEM = {  # key -> (allowed keys, required keys)
     'props': ({'k', 'll', 'hd', 's', 'col', 'solid', 'knock'}, {'k', 'll'}),
     'signs': ({'text', 'll', 'hd', 'w', 'h', 'y', 'bg', 'fg'}, {'text', 'll', 'hd'}),
-    'fences': ({'style', 'll', 'h'}, {'style', 'll'}),
+    'fences': ({'style', 'll', 'h', 'col', 'dense'}, {'style', 'll'}),
     'parking': ({'ll', 'side', 'every', 'fill'}, {'ll'}),
     'places': ({'name', 'll', 'kind'}, {'name', 'll', 'kind'}),
     'views': ({'ll', 'hd'}, {'ll', 'hd'}),
 }
-LOOK_KEYS = {'wall', 'roof', 'sty', 'windows', 'pitched', 'hip', 'h', 'rh'}
+LOOK_KEYS = {'wall', 'roof', 'sty', 'windows', 'pitched', 'hip', 'h', 'rh',
+             'wall2', 'band', 'faces', 'blankGable', 'balcony', 'chimney', 'dormer', 'roofSty', 'ridge'}  # facades2 step
+ROOF_STY = ['tiles', 'sheet', 'flat', 'corrugated', 'asbestos']
 MAX_SIGNS, NEAR, LOOK_NEAR = 10, 60, 45
 
 RUNTIME = r"""
@@ -179,7 +182,7 @@ def validate(path, d, T, page_look):
             continue
         for k in sorted(set(L) - LOOK_KEYS):
             err(w + '.' + k, 'unknown key (allowed: %s)' % ', '.join(sorted(LOOK_KEYS)))
-        for k in ('wall', 'roof'):
+        for k in ('wall', 'roof', 'wall2'):
             if k in L and not (isinstance(L[k], list) and len(L[k]) == 3 and all(is_num(c) and 0 <= c <= 1 for c in L[k])):
                 err(w + '.' + k, 'want [r, g, b] with each 0..1')
         if 'sty' in L and L['sty'] not in STY:
@@ -191,6 +194,21 @@ def validate(path, d, T, page_look):
             err(w + '.h', 'wall height in m, 2.2..80')
         if 'rh' in L and not (is_num(L['rh']) and 0 <= L['rh'] <= 12):
             err(w + '.rh', 'roof rise in m, 0..12')
+        if 'band' in L and not ('wall2' in L and is_num(L['band']) and .5 <= L['band'] <= 60):
+            err(w + '.band', 'metres above the ground where wall2 starts, 0.5..60, needs wall2')
+        for k in ('blankGable', 'balcony', 'chimney', 'dormer'):
+            if k in L and not isinstance(L[k], bool):
+                err(w + '.' + k, 'want true/false')
+        if 'roofSty' in L and L['roofSty'] not in ROOF_STY:
+            err(w + '.roofSty', '%r not one of %s' % (L['roofSty'], ', '.join(ROOF_STY)))
+        if 'ridge' in L and L['ridge'] not in ('street', 'across'):
+            err(w + '.ridge', 'want "street" (ridge along the road) or "across" (gable ends face the road)')
+        if 'faces' in L:
+            f, n = L['faces'], len(T.ll[int(m.group(1))]) - 1
+            if not (isinstance(f, dict) and set(f) == {'windows'}):
+                err(w + '.faces', 'want {"windows": [1, 0, ...]}')
+            elif not (isinstance(f['windows'], list) and len(f['windows']) == n and all(q in (0, 1) and not isinstance(q, bool) for q in f['windows'])):
+                err(w + '.faces.windows', 'want %d entries of 0/1, one per outline edge (python3 pipeline/edge_ids.py %s)' % (n, bid))
 
     for key, (allowed, required) in ITEM.items():
         items = d.get(key, [])
@@ -239,6 +257,8 @@ def validate(path, d, T, page_look):
                     err(w + '.style', '%r not one of %s' % (o['style'], ', '.join(FENCES)))
                 if 'h' in o and not (is_num(o['h']) and .2 <= o['h'] <= 4):
                     err(w + '.h', 'metres, 0.2..4')
+                if 'dense' in o and not (isinstance(o['dense'], bool) and o.get('style') == 'hedge'):
+                    err(w + '.dense', 'true/false, hedge only')
             elif key == 'parking':
                 if 'side' in o and o['side'] not in (-1, 0, 1):
                     err(w + '.side', 'want -1, 0 or 1')
@@ -302,6 +322,15 @@ def load(paths, T, page_look):
     return streets, hooks, E
 
 
+def ridge_dir(T, name, bid, mode):
+    """unit [x, z] the roof ridge should run along: the nearest street segment ('street') or its normal ('across')"""
+    x, z = T.centre(int(bid[1:]))[:2]
+    s = min(T.segments(T.street_ways(name)), key=lambda q: seg_dist(x, z, q)[0])
+    dx, dz = s[2] - s[0], s[3] - s[1]
+    l = math.hypot(dx, dz) or 1
+    return [round(dx / l, 4), round(dz / l, 4)] if mode == 'street' else [round(-dz / l, 4), round(dx / l, 4)]
+
+
 def js_value(k, v):
     if k == 'sty':
         return '-1' if v == 'none' else 'STY.' + v
@@ -348,7 +377,8 @@ def main():
         assert h.count(x) == 1, (h.count(x), x[:80])
         h = h.replace(x, y)
 
-    looks = ''.join('%s:{%s,street:1},' % (bid, ','.join('%s:%s' % (k, js_value(k, v)) for k, v in sorted(L.items())))
+    looks = ''.join('%s:{%s,street:1},' % (bid, ','.join('%s:%s' % (k, js_value(k, v)) for k, v in sorted(
+        (dict(L, rdir=ridge_dir(T, s['street'], bid, L['ridge'])) if 'ridge' in L else L).items())))
                     for s in streets for bid, L in sorted(s.get('looks', {}).items(), key=lambda kv: int(kv[0][1:])))
     if looks:
         rep('const LOOK={', 'const LOOK={' + looks)

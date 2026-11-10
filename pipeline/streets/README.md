@@ -61,10 +61,10 @@ Unknown keys anywhere are errors. `street`, `slug` and `views` are required, eve
 | `street` | exact OSM highway name as `street_ids.py` takes it, e.g. `"Vytauto Didžiojo g."` |
 | `slug` | lowercase ascii words joined by `-`; the file must be `{slug}.json` |
 | `flavour` | pedestrian dialogues heard on this street, in Lithuanian. Each is a list of 2-6 lines, speakers alternating; a goodbye pair is added by the game. They join `TALKS` tagged `street:{slug}` and are picked (weight 4, like `day`/`shop` talks) when a group stands within 22 m of the street's centreline. |
-| `looks` | building restyles keyed by id. Only ids `street_ids.py` prints for your street, never one marked `*`, never one another street file has. Keys: `wall`, `roof` `[r,g,b]` 0..1; `sty` one of `plaster old shop block brick wood industrial glass tiles sheet flat none` (facade texture, `none` = plain); `windows` true/false; `pitched`, `hip` true/false (pitched roof only works on 4-corner outlines); `h` wall height m 2.2..80; `rh` roof rise m 0..12. Anything left out keeps the game's own guess. |
+| `looks` | building restyles keyed by id. Only ids `street_ids.py` prints for your street, never one marked `*`, never one another street file has. Keys: `wall`, `roof` `[r,g,b]` 0..1; `sty` one of `plaster old shop block brick wood industrial glass tiles sheet flat none` (facade texture, `none` = plain); `windows` true/false; `pitched`, `hip` true/false (pitched roof only works on 4-corner outlines); `h` wall height m 2.2..80; `rh` roof rise m 0..12. Anything left out keeps the game's own guess. More per-building keys (two-tone walls, per-face windows, balcony/chimney/dormer, roof material, ridge direction) are in "Facade keys" below. |
 | `props` | street furniture, see the catalogue. `k` and `ll` required; `hd` default 0; `s` default the kind's size; `col` `"#rrggbb"`, default the kind's colour; `solid` default true; `knock` default false. |
 | `signs` | flat panels with text, at most 10 per street. `text` 1-40 chars, `ll`, `hd` required; `w` 2.4, `h` 0.6, `y` (height of the centre above ground) 3.2, `bg` `#1f5fae`, `fg` `#fff` by default. Front face only, so put wall signs ~0.1 m in front of the wall, facing out. A free-standing sign needs a `post` prop under it. |
-| `fences` | a polyline `ll` of 2+ points. `style`: `picket` (pickets and rails, 1.1 m), `mesh` (see-through panel with posts every 2.5 m, 1.5 m), `hedge` (0.7 m thick, 1.3 m), `wall` (0.25 m, 1.6 m); `h` overrides the height, 0.2..4. Solid for cars and people. |
+| `fences` | a polyline `ll` of 2+ points. `style`: `picket` (pickets and rails, 1.1 m), `mesh` (see-through panel with posts every 2.5 m, 1.5 m), `hedge` (0.7 m thick, 1.3 m), `wall` (0.25 m, 1.6 m); `h` overrides the height, 0.2..4. Solid for cars and people. Also `panel` (concrete panel, 1.8 m, grey plinth and posts), `slat` (dark wooden slats, 1.7 m); `col` `"#rrggbb"` recolours the fence; `dense: true` (hedge only) makes it a thick two-layer hedge. |
 | `parking` | a row of parked cars from `ll[0]` to `ll[1]` (the row's centre line). `side` 0 = parallel, cars along the line; 1 / -1 = bays, noses to the right / left of the `ll[0]`→`ll[1]` direction. `every` metres per car (default 6 parallel, 2.6 bays), `fill` share of slots taken (default 0.6). Cars come from the game's own parked-car fleet and are solid. |
 | `places` | named points that join the game's place labels (floating name, minimap, taxi/errand targets, ped destinations). `kind`: `shop cafe bank pharmacy school church monument bus_stop`. Skipped when a label of the same name is already within 60 m. Real places only. |
 | `views` | exactly the two reference shots for the test: camera 2.2 m above `ll`, looking 30 m ahead towards `hd`. Put them on your street (pavement or verge); the test checks the game resolves both to your street name. |
@@ -90,6 +90,24 @@ circle. `solid: false` makes a prop walk-through and drive-through. `knock: true
 a car above 5 m/s knocks it over (`snap`, `minSp: 5`, `h` = its height); use it for bollards, bins, posts, small signs'
 posts. Knocking needs the solid step (`add_solid.py`) in the build; on plain v37 the patcher prints a note and the prop
 stays a fixed solid.
+
+## Facade keys
+
+More keys for a `looks` entry (step `facades2`, after `drive2` in `build.sh`). All optional; `--check` validates them.
+
+| key | meaning |
+|---|---|
+| `wall2` | `[r,g,b]` colour of everything above `band`, walls and gable ends; `wall` stays below. Two-tone facades: yellow brick base under cream plaster, glass shop floor under a grey box. The window texture continues across the line. |
+| `band` | metres above the lowest corner where `wall2` starts, 0.5..60, default 3 (one storey). Needs `wall2`. |
+| `faces` | `{"windows": [1,0,1,1]}`: one 0/1 per outline edge, 0 = a plain wall of the same material with no windows (and no balconies). Edge `i` runs from outline vertex `i` to `i+1` in OSM order: `python3 pipeline/edge_ids.py c4185` prints each edge's length and the compass side it faces. The array must have exactly one entry per edge. |
+| `blankGable` | `true`: both gable-end walls of a gable roof (not hip) get no windows. Nothing happens on flat or hip roofs. |
+| `balcony` | `false` = no balconies, `true` = balconies on the long walls, every other bay, from the second floor up (needs windows and 2+ floors). Left out: the automatic rule, which no longer fires on a building whose street look sets `sty`. |
+| `chimney` | `false` = none, `true` = one on the ridge of a 4-corner pitched roof (any kind, any height). Left out: the automatic 75 % rule on low houses. |
+| `dormer` | `false` = none, `true` = a dormer (both slopes on long roofs) on a 4-corner pitched roof with at least 1.2 m rise, 5 m span, 6 m ridge. Left out: the automatic rule. |
+| `roofSty` | roof material: `tiles` (clay), `sheet` (standing seam), `flat` (bitumen), `corrugated`, `asbestos`. Tinted by `roof`. Left out: the game's guess from the roof colour. |
+| `ridge` | `"street"` = the ridge runs along the nearest street (eaves face the road), `"across"` = it runs across it (gable ends face the road). 4-corner pitched roofs only; the engine's guess is used where it is left out. |
+
+`pitched: false` now flattens the roof for every building, including those the data gave a LiDAR hip or single slope. A brick wall tints with `wall` (the brick texture is neutral grey), so `sty: "brick"` with `wall: [.86,.72,.4]` is yellow brick; it is not always red.
 
 ## Hooks: `{slug}.js`
 

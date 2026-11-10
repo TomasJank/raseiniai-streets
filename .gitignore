@@ -30,3 +30,5 @@ research/prototypes/**/shots/
 !work/build/v40.html
 !work/build/v44.html
 research/geodata/ortho/tiles/
+!work/build_facades2_test.sh
+!work/facades2_test/
