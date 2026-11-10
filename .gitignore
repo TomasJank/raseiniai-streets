@@ -28,7 +28,7 @@ research/assets/**/*.mp3
 research/assets/**/*.wav
 research/prototypes/**/shots/
 !work/build/v40.html
-!work/build/v45.html
+!work/build/v46.html
 research/geodata/ortho/tiles/
 !work/build_facades2_test.sh
 !work/facades2_test/
