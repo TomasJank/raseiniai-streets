@@ -30,6 +30,11 @@
    "Vilkupis po lietaus vėl išsiliejo.",
    "Prie Pieninės visą pievą apsėmė.",
    "Kasmet tas pats, griovių niekas nevalo."
+  ],
+  [
+   "Kultūros centras kaip balta dėžė stovi.",
+   "Bent turi kur anūkei pašokti.",
+   "O už jo geltonieji mediniai namai lyg iš kito laiko."
   ]
  ],
  "looks": {
@@ -245,17 +250,20 @@
   },
   "c4148": {
    "wall": [
-    0.87,
-    0.79,
-    0.58
+    0.72,
+    0.42,
+    0.34
    ],
    "roof": [
-    0.35,
-    0.22,
-    0.17
+    0.42,
+    0.2,
+    0.16
    ],
    "sty": "brick",
-   "windows": true
+   "windows": true,
+   "pitched": true,
+   "h": 3.4,
+   "rh": 2.2
   },
   "c4147": {
    "wall": [
@@ -273,17 +281,20 @@
   },
   "c4336": {
    "wall": [
-    0.86,
-    0.84,
-    0.77
+    0.8,
+    0.64,
+    0.36
    ],
    "roof": [
+    0.42,
     0.4,
-    0.41,
-    0.41
+    0.38
    ],
-   "sty": "brick",
-   "windows": true
+   "sty": "plank",
+   "windows": true,
+   "pitched": true,
+   "h": 3.4,
+   "rh": 2.4
   },
   "c4180": {
    "wall": [
@@ -301,17 +312,20 @@
   },
   "c4182": {
    "wall": [
-    0.86,
-    0.84,
-    0.77
+    0.55,
+    0.5,
+    0.44
    ],
    "roof": [
-    0.4,
-    0.41,
-    0.41
+    0.18,
+    0.18,
+    0.2
    ],
-   "sty": "brick",
-   "windows": true
+   "sty": "plaster",
+   "windows": true,
+   "pitched": true,
+   "h": 5.4,
+   "rh": 3.4
   },
   "c4191": {
    "wall": [
@@ -385,31 +399,72 @@
   },
   "c4181": {
    "wall": [
-    0.6,
-    0.33,
-    0.25
+    0.72,
+    0.42,
+    0.34
    ],
    "roof": [
-    0.58,
-    0.25,
-    0.17
+    0.4,
+    0.22,
+    0.18
    ],
    "sty": "brick",
-   "windows": true
+   "windows": true,
+   "pitched": true,
+   "h": 3.4,
+   "rh": 2.4
   },
   "c4188": {
    "wall": [
-    0.88,
-    0.83,
-    0.7
+    0.8,
+    0.62,
+    0.4
    ],
    "roof": [
-    0.24,
-    0.25,
-    0.27
+    0.4,
+    0.34,
+    0.3
    ],
    "sty": "plaster",
-   "windows": true
+   "windows": true,
+   "pitched": true,
+   "hip": true,
+   "h": 6.4,
+   "rh": 3
+  },
+  "c4321": {
+   "wall": [
+    0.62,
+    0.55,
+    0.4
+   ],
+   "roof": [
+    0.4,
+    0.4,
+    0.4
+   ],
+   "sty": "plank",
+   "windows": true,
+   "pitched": true,
+   "h": 3.2,
+   "rh": 2.2
+  },
+  "c4156": {
+   "wall": [
+    0.55,
+    0.72,
+    0.66
+   ],
+   "roof": [
+    0.4,
+    0.4,
+    0.4
+   ],
+   "sty": "plank",
+   "windows": true,
+   "pitched": true,
+   "h": 3,
+   "rh": 2
   }
  },
  "props": [
