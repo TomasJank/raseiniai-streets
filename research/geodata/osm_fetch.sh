@@ -1,0 +1,1 @@
+curl -sS -A raseiniai-research/1.0 -m 120 --data-urlencode 'data=[out:json][timeout:90];(way["building"](55.3545,23.0797,55.4003,23.1604););out geom tags;' https://overpass-api.de/api/interpreter -o osm_raw.json

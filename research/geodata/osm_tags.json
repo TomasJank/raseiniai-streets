@@ -1,0 +1,36 @@
+{
+ "187983099": {
+  "game_id": "c2182",
+  "tags": {
+   "roof:shape": "gabled",
+   "building:levels": "2"
+  }
+ },
+ "189139020": {
+  "game_id": "c2909",
+  "tags": {
+   "roof:shape": "gabled",
+   "building:levels": "3"
+  }
+ },
+ "189139021": {
+  "game_id": "c2910",
+  "tags": {
+   "roof:shape": "hipped",
+   "building:levels": "3"
+  }
+ },
+ "390050107": {
+  "game_id": "c5133",
+  "tags": {
+   "roof:shape": "gabled"
+  }
+ },
+ "1000652258": {
+  "game_id": "c5679",
+  "tags": {
+   "roof:shape": "flat",
+   "building:levels": "2"
+  }
+ }
+}

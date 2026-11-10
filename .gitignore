@@ -29,3 +29,4 @@ research/assets/**/*.wav
 research/prototypes/**/shots/
 !work/build/v40.html
 !work/build/v43.html
+research/geodata/ortho/tiles/
