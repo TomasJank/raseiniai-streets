@@ -8,7 +8,9 @@ async function clLoad(id){
   const u=new Uint8Array(await new Response(new Blob([b]).stream().pipeThrough(new DecompressionStream('deflate'))).arrayBuffer());
   let t='';for(let i=0;i<u.length;i+=8192)t+=String.fromCharCode.apply(null,u.subarray(i,i+8192));
   const d=document.createElement('script');d.type='application/octet-stream';d.id='asset_'+id;d.textContent=btoa(t);document.body.appendChild(d);
-  return ASSETS.load(id);
+  const g=await ASSETS.load(id);
+  d.remove();e.remove();// the parsed scene is cached; the base64 text is not needed again
+  return g;
 }
 // one outfit per look, kept for the person's lifetime; shorts mean warm weather
 function clOutfit(look,i){
