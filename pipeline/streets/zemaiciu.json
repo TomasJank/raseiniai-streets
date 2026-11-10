@@ -24,6 +24,16 @@
    "Sugrėbiau, o vėjas vėl atnešė iš kaimyno kiemo.",
    "Kaip kasmet, ir per Vėlines tas pats.",
    "Tai bent maišų nepirk, kompostui tiks."
+  ],
+  [
+   "Prie Maironio vėl balta nuo sniego, važiuok atsargiai.",
+   "Važiuoju, tik per tą duobėtą kelią lėtai ir tenka.",
+   "Pavasarį užlopys."
+  ],
+  [
+   "Girdėjai, ar autoservisas dar dirba šeštadieniais?",
+   "Iki antros, kaip ir užrašyta ant sienos.",
+   "Tai spėsiu pakeisti padangas."
   ]
  ],
  "looks": {
@@ -932,18 +942,21 @@
   },
   "c3350": {
    "wall": [
-    0.88,
-    0.84,
-    0.74
+    0.78,
+    0.68,
+    0.52
    ],
    "roof": [
-    0.36,
-    0.37,
-    0.36
+    0.27,
+    0.3,
+    0.35
    ],
-   "sty": "plaster",
-   "windows": true,
-   "h": 4.2
+   "sty": "plank",
+   "windows": false,
+   "h": 3.0,
+   "pitched": true,
+   "hip": false,
+   "rh": 1.2
   },
   "c3354": {
    "wall": [
