@@ -25,6 +25,18 @@
    "Mačiau, vėl pabrango.",
    "Tai aš dabar į stadioną pėsčias.",
    "Tu? Pėsčias? Norėčiau pamatyt."
+  ],
+  [
+   "Eini pro veterinarijos vaistinę?",
+   "Taip, katinui maisto reikia.",
+   "Tik pažiūrėk į abi puses, čia vilkikai važiuoja.",
+   "Žinau, žinau, vaikystėj pramokau."
+  ],
+  [
+   "Kodėl tie turėklai prie šaligatvio tokie aukšti?",
+   "Kad žmonės neperbėgtų per gatvę.",
+   "Man jie labiau kaip suoliukai atrodo.",
+   "Tik nesėsk, nes užsirauksi ant jų."
   ]
  ],
  "looks": {
@@ -58,103 +70,107 @@
   },
   "c2914": {
    "wall": [
+    0.86,
     0.78,
-    0.77,
-    0.72
+    0.52
    ],
    "roof": [
-    0.52,
     0.26,
-    0.19
+    0.21,
+    0.18
    ],
-   "sty": "brick",
+   "sty": "plank",
    "windows": true,
    "pitched": true,
    "hip": false,
    "h": 3.0,
-   "rh": 3.2
+   "rh": 3.6
   },
   "c2913": {
    "wall": [
-    0.86,
-    0.74,
-    0.46
+    0.92,
+    0.88,
+    0.78
    ],
    "roof": [
-    0.4,
-    0.27,
-    0.2
+    0.52,
+    0.22,
+    0.17
    ],
    "sty": "plaster",
-   "windows": true
+   "windows": true,
+   "pitched": true,
+   "hip": false,
+   "h": 5.2,
+   "rh": 3.0
   },
   "c2911": {
    "wall": [
-    0.91,
     0.9,
-    0.86
+    0.86,
+    0.74
    ],
    "roof": [
-    0.28,
-    0.29,
-    0.31
+    0.52,
+    0.22,
+    0.17
    ],
    "sty": "plaster",
-   "windows": true
+   "windows": true,
+   "pitched": true,
+   "hip": false,
+   "h": 5.6,
+   "rh": 3.2
   },
   "c2910": {
    "wall": [
-    0.91,
     0.9,
-    0.86
+    0.86,
+    0.74
    ],
    "roof": [
-    0.28,
-    0.29,
-    0.31
+    0.52,
+    0.22,
+    0.17
    ],
    "sty": "plaster",
    "windows": true,
    "pitched": true,
    "hip": false,
-   "h": 6.0,
-   "rh": 3.6
+   "h": 5.6,
+   "rh": 3.4
   },
   "c2909": {
    "wall": [
-    0.88,
-    0.82,
-    0.68
+    0.74,
+    0.47,
+    0.38
    ],
    "roof": [
-    0.4,
-    0.27,
-    0.2
+    0.34,
+    0.34,
+    0.35
    ],
    "sty": "plaster",
    "windows": true,
-   "pitched": true,
-   "hip": false,
-   "h": 6.0,
-   "rh": 3.8
+   "pitched": false,
+   "h": 10.0
   },
   "c2908": {
    "wall": [
-    0.84,
-    0.82,
-    0.76
+    0.93,
+    0.9,
+    0.82
    ],
    "roof": [
-    0.4,
-    0.41,
-    0.42
+    0.55,
+    0.56,
+    0.57
    ],
-   "sty": "brick",
+   "sty": "shop",
    "windows": true,
-   "pitched": true,
-   "hip": false,
-   "h": 3.2,
-   "rh": 3.4
+   "pitched": false,
+   "h": 4.2
   },
   "c2186": {
    "wall": [
@@ -251,17 +267,18 @@
   },
   "c2904": {
    "wall": [
-    0.74,
-    0.6,
-    0.42
+    0.72,
+    0.46,
+    0.36
    ],
    "roof": [
     0.4,
-    0.35,
-    0.32
+    0.4,
+    0.41
    ],
-   "sty": "brick",
+   "sty": "plaster",
    "windows": true,
+   "pitched": false,
    "h": 10.2
   },
   "c2156": {
@@ -313,19 +330,21 @@
   },
   "c7618": {
    "wall": [
-    0.8,
-    0.82,
-    0.8
+    0.28,
+    0.22,
+    0.18
    ],
    "roof": [
-    0.3,
-    0.31,
-    0.32
+    0.22,
+    0.2,
+    0.2
    ],
-   "sty": "shop",
+   "sty": "plank",
    "windows": true,
-   "pitched": false,
-   "h": 2.7
+   "pitched": true,
+   "hip": false,
+   "h": 2.6,
+   "rh": 2.6
   },
   "c2515": {
    "wall": [
@@ -363,33 +382,39 @@
   },
   "c2467": {
    "wall": [
-    0.91,
-    0.9,
-    0.86
+    0.86,
+    0.87,
+    0.87
    ],
    "roof": [
-    0.28,
-    0.29,
-    0.31
+    0.27,
+    0.27,
+    0.29
    ],
    "sty": "plaster",
    "windows": true,
    "pitched": true,
-   "hip": false
+   "hip": false,
+   "h": 6.0,
+   "rh": 3.2
   },
   "c2466": {
    "wall": [
-    0.84,
-    0.82,
-    0.76
+    0.93,
+    0.88,
+    0.8
    ],
    "roof": [
-    0.4,
-    0.27,
-    0.2
+    0.36,
+    0.3,
+    0.28
    ],
-   "sty": "brick",
-   "windows": true
+   "sty": "plaster",
+   "windows": true,
+   "pitched": true,
+   "hip": false,
+   "h": 3.0,
+   "rh": 3.4
   },
   "c2465": {
    "wall": [
@@ -471,19 +496,21 @@
   },
   "c2022": {
    "wall": [
-    0.84,
-    0.82,
-    0.76
+    0.8,
+    0.8,
+    0.77
    ],
    "roof": [
-    0.42,
-    0.34,
-    0.3
+    0.3,
+    0.28,
+    0.27
    ],
-   "sty": "brick",
+   "sty": "silicate",
    "windows": true,
    "pitched": true,
-   "hip": false
+   "hip": true,
+   "h": 3.3,
+   "rh": 2.2
   },
   "c2019": {
    "wall": [
@@ -558,6 +585,130 @@
    "windows": true,
    "pitched": true,
    "hip": false
+  },
+  "c1417": {
+   "wall": [
+    0.8,
+    0.72,
+    0.55
+   ],
+   "roof": [
+    0.5,
+    0.51,
+    0.5
+   ],
+   "sty": "plaster",
+   "windows": true,
+   "pitched": true,
+   "hip": false,
+   "h": 3.1,
+   "rh": 2.8
+  },
+  "c1418": {
+   "wall": [
+    0.82,
+    0.84,
+    0.8
+   ],
+   "roof": [
+    0.16,
+    0.42,
+    0.3
+   ],
+   "sty": "plank",
+   "windows": true,
+   "pitched": true,
+   "hip": false,
+   "h": 3.0,
+   "rh": 2.6
+  },
+  "c1419": {
+   "wall": [
+    0.86,
+    0.86,
+    0.82
+   ],
+   "roof": [
+    0.3,
+    0.3,
+    0.32
+   ],
+   "sty": "plank",
+   "windows": true,
+   "pitched": true,
+   "hip": false,
+   "h": 3.0,
+   "rh": 2.6
+  },
+  "c2941": {
+   "wall": [
+    0.88,
+    0.82,
+    0.7
+   ],
+   "roof": [
+    0.34,
+    0.34,
+    0.35
+   ],
+   "sty": "plaster",
+   "windows": true,
+   "pitched": false,
+   "h": 7.2
+  },
+  "c2185": {
+   "wall": [
+    0.62,
+    0.6,
+    0.56
+   ],
+   "roof": [
+    0.5,
+    0.25,
+    0.19
+   ],
+   "sty": "plaster",
+   "windows": true,
+   "pitched": true,
+   "hip": true,
+   "h": 7.5,
+   "rh": 3.0
+  },
+  "c2504": {
+   "wall": [
+    0.87,
+    0.88,
+    0.88
+   ],
+   "roof": [
+    0.27,
+    0.27,
+    0.29
+   ],
+   "sty": "plaster",
+   "windows": true,
+   "pitched": true,
+   "hip": false,
+   "h": 5.6,
+   "rh": 3.0
+  },
+  "c1525": {
+   "wall": [
+    0.86,
+    0.78,
+    0.62
+   ],
+   "roof": [
+    0.38,
+    0.18,
+    0.15
+   ],
+   "sty": "plaster",
+   "windows": true,
+   "pitched": true,
+   "hip": true,
+   "h": 5.6,
+   "rh": 2.6
   }
  },
  "props": [
@@ -950,6 +1101,19 @@
    "h": 0.5,
    "y": 4.0,
    "bg": "#0d4f9e",
+   "fg": "#ffffff"
+  },
+  {
+   "text": "VETERINARIJOS VAISTINĖ",
+   "ll": [
+    55.38026,
+    23.11318
+   ],
+   "hd": 205,
+   "w": 2.6,
+   "h": 0.6,
+   "y": 3.1,
+   "bg": "#2f3f8f",
    "fg": "#ffffff"
   }
  ],
