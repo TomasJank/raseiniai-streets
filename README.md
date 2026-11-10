@@ -2,7 +2,7 @@
 
 A browser game set in the real streets of Raseiniai, Lithuania: 6,675 OpenStreetMap building footprints on LiDAR terrain, drivable roads with traffic, police, missions, pedestrians who talk, fight back and call the police, animals by day and night, weather and a day/night cycle. One HTML file, three.js 0.187, no install.
 
-**Play:** open the latest `work/build/vNN.html` in Chrome (desktop recommended). Internet is needed once for three.js and its addons from jsdelivr.
+**Play:** open `index.html` (same file as the latest `work/build/vNN.html`) in Chrome (desktop recommended). Internet is needed once for three.js and its addons from jsdelivr.
 
 ## Layout
 - `work/build/v37.html` frozen base. `work/build/v41.html` latest (characters, combat v2, animals, facades, graphics, water, driving feel).
@@ -13,4 +13,4 @@ A browser game set in the real streets of Raseiniai, Lithuania: 6,675 OpenStreet
 ## Data and asset credits
 OpenStreetMap contributors (ODbL) · geoportal.lt LiDAR · Copernicus DEM · GlobalBuildingAtlas, TUM (CC BY-NC 4.0) · three.js and addons (MIT) · Quaternius Universal Animation Library characters (Quaternius Asset License v1.0, embedded only) · Dog by Polyfork (https://polyfork.dev/asset/dog-base), CC BY 4.0 · Fox from Khronos glTF Sample Assets (CC BY 4.0). Full table: `research/reports/license-report.md`.
 
-Because of the CC BY-NC data source and the QAL character files tracked for reproducible builds, this repository is private and the game is non-commercial.
+The game is non-commercial (CC BY-NC data source). The processed Quaternius character and animal GLBs are not in the repository (their licence forbids redistributing raw files); run `python3 pipeline/extract_assets.py work/build/v41.html` once after cloning to restore them from the shipped build, then `sh pipeline/build.sh out.html` reproduces it byte for byte.
