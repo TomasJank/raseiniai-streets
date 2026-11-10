@@ -1,4 +1,14 @@
 {
+  "car2_estate": "research/assets/vehicles/fleet/built/car2_estate.glb",
+  "car2_estate80": "research/assets/vehicles/fleet/built/car2_estate80.glb",
+  "car2_hatch": "research/assets/vehicles/fleet/built/car2_hatch.glb",
+  "car2_liftback": "research/assets/vehicles/fleet/built/car2_liftback.glb",
+  "car2_pickup": "research/assets/vehicles/fleet/built/car2_pickup.glb",
+  "car2_saloon90": "research/assets/vehicles/fleet/built/car2_saloon90.glb",
+  "car2_sedan": "research/assets/vehicles/fleet/built/car2_sedan.glb",
+  "car2_suv": "research/assets/vehicles/fleet/built/car2_suv.glb",
+  "car2_truck": "research/assets/vehicles/fleet/built/car2_truck.glb",
+  "car2_van": "research/assets/vehicles/fleet/built/car2_van.glb",
   "char_body_f": "research/assets/characters/body_f.glb",
   "char_body_m": "research/assets/characters/body_m.glb",
   "char_clips": "research/assets/characters/clips.glb"

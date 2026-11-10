@@ -3,8 +3,11 @@
 import base64, os, re, sys, zlib
 here = os.path.dirname(os.path.abspath(__file__)); root = os.path.join(here, '..')
 h = open(sys.argv[1], encoding='utf-8').read()
-cd = os.path.join(root, 'research/assets/characters'); ad = os.path.join(root, 'research/assets/animals/built')
-os.makedirs(cd, exist_ok=True); os.makedirs(ad, exist_ok=True); n = 0
+cd = os.path.join(root, 'research/assets/characters'); ad = os.path.join(root, 'research/assets/animals/built'); vd = os.path.join(root, 'research/assets/vehicles/fleet/built')
+for d in (cd, ad, vd): os.makedirs(d, exist_ok=True)
+n = 0
+for m in re.finditer(r'<script type="application/octet-stream" id="asset_car2_(\w+)">([A-Za-z0-9+/=]+)</script>', h):
+    open(os.path.join(vd, 'car2_' + m.group(1) + '.glb'), 'wb').write(base64.b64decode(m.group(2))); n += 1
 for m in re.finditer(r'<script type="application/octet-stream" id="asset_char_(\w+)">([A-Za-z0-9+/=]+)</script>', h):
     open(os.path.join(cd, m.group(1) + '.glb'), 'wb').write(base64.b64decode(m.group(2))); n += 1
 for m in re.finditer(r'<script type="application/octet-stream" id="agz_(\w+)">([A-Za-z0-9+/=]+)</script>', h):

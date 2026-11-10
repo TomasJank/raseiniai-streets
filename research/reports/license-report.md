@@ -59,3 +59,13 @@ Kenney: CC0, but kenney.nl refuses scripted downloads; download by hand or from 
 
 ## animals2 addendum (2026-11-09)
 Animals shipped by the `animals2` step are Quaternius only (Ultimate Animated Animals: deer, fox, shiba, husky; Animal Pack Vol.2: cat), treated as QAL v1.0: no credit required, nothing added to CREDITS above. The CC-BY Polyfork dog and Khronos fox GLBs were downloaded but are not used, so their credit lines stay out of the game. Details: `research/assets/animals/SOURCE.md`.
+
+## cars2 addendum (2026-11-09)
+Vehicles shipped by the `cars2` step (details and sha256 per file: `research/assets/vehicles/*/SOURCE.md`):
+- Quaternius Cars Pack (sedan, saloon90, hatch, liftback incl. the police car, suv) and Zombie Apocalypse Kit (truck, pickup), via Poly Pizza: QAL v1.0, no credit.
+- Poly by Google "Car" and "Van" (estate, estate80) and PuKkBuMXDD "Generic Van" (van), via Poly Pizza: **CC-BY 3.0**, credit required. Modified (recoloured, rescaled, wheels split and resized, quantized). The line below is also the `CREDITS_CARS` string in `pipeline/cars2.js`.
+
+```
+"Car" (https://poly.pizza/m/75h3mi6uHuC) and "Van" (https://poly.pizza/m/aT_24cDaW1a) by Poly by Google, CC BY 3.0 (https://creativecommons.org/licenses/by/3.0/), modified. "Generic Van" (https://poly.pizza/m/BbRojf2v3H) by PuKkBuMXDD, CC BY 3.0, modified.
+```
+Rejected candidates downloaded only for the comparison sheet (KayKit, Poly by Google, jeremy, Quaternius police/taxi) are not embedded: `research/assets/vehicles/rejected/SOURCE.md`.
