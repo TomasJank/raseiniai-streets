@@ -28,6 +28,12 @@
    "Savaitgalį važiuojam prie Dubysos su meškerėm?",
    "Jei nelis, važiuojam.",
    "Kirmėlių aš prikasiu."
+  ],
+  [
+   "Prie šviesoforo vėl eilė iki pat Dariaus ir Girėno.",
+   "Pusė valandos ir tos pačios mašinos.",
+   "O pėsčiom per penkias minutes būčiau mieste.",
+   "Taip, bet krepšiai sunkūs."
   ]
  ],
  "looks": {
@@ -140,55 +146,54 @@
   },
   "c3731": {
    "wall": [
-    0.84,
-    0.82,
-    0.76
+    0.89,
+    0.78,
+    0.65
    ],
    "roof": [
     0.42,
     0.43,
     0.42
    ],
-   "sty": "brick",
+   "sty": "panel",
    "windows": true,
    "pitched": false,
    "hip": false,
-   "h": 14.6
+   "h": 15.0
   },
   "c3736": {
    "wall": [
-    0.84,
-    0.82,
-    0.76
+    0.89,
+    0.78,
+    0.65
    ],
    "roof": [
     0.42,
     0.43,
     0.42
    ],
-   "sty": "brick",
+   "sty": "panel",
    "windows": true,
    "pitched": false,
    "hip": false,
-   "h": 14.6
+   "h": 15.0
   },
   "c3753": {
    "wall": [
-    0.89,
-    0.84,
-    0.72
+    0.9,
+    0.79,
+    0.66
    ],
    "roof": [
-    0.38,
-    0.22,
-    0.16
+    0.4,
+    0.41,
+    0.42
    ],
-   "sty": "plaster",
+   "sty": "panel",
    "windows": true,
-   "pitched": true,
+   "pitched": false,
    "hip": false,
-   "h": 3.4,
-   "rh": 3.2
+   "h": 12.5
   },
   "c3757": {
    "wall": [
@@ -865,6 +870,41 @@
    "pitched": false,
    "hip": false,
    "h": 2.6
+  },
+  "c3752": {
+   "wall": [
+    0.88,
+    0.77,
+    0.65
+   ],
+   "roof": [
+    0.4,
+    0.41,
+    0.42
+   ],
+   "sty": "panel",
+   "windows": true,
+   "pitched": false,
+   "hip": false,
+   "h": 12.5
+  },
+  "c2928": {
+   "wall": [
+    0.64,
+    0.48,
+    0.33
+   ],
+   "roof": [
+    0.3,
+    0.3,
+    0.31
+   ],
+   "sty": "brick",
+   "windows": true,
+   "pitched": true,
+   "hip": true,
+   "h": 6.6,
+   "rh": 2.4
   }
  },
  "props": [
