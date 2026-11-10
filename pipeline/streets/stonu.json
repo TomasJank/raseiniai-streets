@@ -31,6 +31,12 @@
    "Pavasarį visada taip.",
    "Rūsį užpylė?",
    "Dar ne, bet maišus jau prisipyliau."
+  ],
+  [
+   "Naują šaligatvį prie Stonų jau nutiesė?",
+   "Nutiesė, tik suoliukų neįdėjo.",
+   "Bent kulkšnies nebesuversi.",
+   "Tai taip, pažanga."
   ]
  ],
  "looks": {
@@ -114,33 +120,33 @@
   },
   "c3891": {
    "wall": [
-    0.86,
-    0.85,
-    0.8
+    0.82,
+    0.77,
+    0.68
    ],
    "roof": [
-    0.38,
-    0.38,
-    0.38
+    0.36,
+    0.36,
+    0.37
    ],
-   "sty": "brick",
+   "sty": "silicate",
    "windows": true,
-   "h": 8.6
+   "h": 13.5
   },
   "c2918": {
    "wall": [
-    0.86,
-    0.85,
-    0.8
+    0.82,
+    0.77,
+    0.68
    ],
    "roof": [
-    0.38,
-    0.38,
-    0.38
+    0.36,
+    0.36,
+    0.37
    ],
-   "sty": "brick",
+   "sty": "silicate",
    "windows": true,
-   "h": 8.6
+   "h": 13.5
   },
   "c5678": {
    "wall": [
@@ -159,18 +165,19 @@
   },
   "c2204": {
    "wall": [
-    0.86,
-    0.85,
-    0.8
+    0.8,
+    0.82,
+    0.84
    ],
    "roof": [
-    0.5,
-    0.51,
-    0.51
+    0.28,
+    0.3,
+    0.32
    ],
-   "sty": "brick",
+   "sty": "shop",
    "windows": true,
-   "h": 3.6
+   "h": 6.4,
+   "pitched": false
   },
   "c2209": {
    "wall": [
@@ -219,33 +226,39 @@
   },
   "c2189": {
    "wall": [
-    0.6,
-    0.17,
-    0.14
+    0.42,
+    0.2,
+    0.16
    ],
    "roof": [
-    0.25,
-    0.26,
-    0.28
+    0.45,
+    0.22,
+    0.17
    ],
-   "sty": "wood",
+   "sty": "plank",
    "windows": true,
-   "h": 3.6
+   "pitched": true,
+   "hip": false,
+   "h": 3.4,
+   "rh": 3.0
   },
   "c2195": {
    "wall": [
-    0.87,
+    0.8,
     0.75,
-    0.42
+    0.6
    ],
    "roof": [
-    0.42,
+    0.26,
     0.27,
-    0.19
+    0.29
    ],
-   "sty": "plaster",
+   "sty": "silicate",
    "windows": true,
-   "h": 5.6
+   "pitched": true,
+   "hip": false,
+   "h": 3.5,
+   "rh": 4.0
   },
   "c2193": {
    "wall": [
@@ -264,18 +277,21 @@
   },
   "c2198": {
    "wall": [
-    0.56,
-    0.7,
-    0.52
+    0.72,
+    0.76,
+    0.8
    ],
    "roof": [
-    0.34,
-    0.35,
-    0.36
+    0.2,
+    0.21,
+    0.24
    ],
-   "sty": "plaster",
+   "sty": "plank",
    "windows": true,
-   "h": 3.4
+   "pitched": true,
+   "hip": false,
+   "h": 3.4,
+   "rh": 3.8
   },
   "c2197": {
    "wall": [
@@ -294,16 +310,16 @@
   },
   "c2334": {
    "wall": [
-    0.63,
-    0.33,
-    0.24
+    0.74,
+    0.77,
+    0.74
    ],
    "roof": [
-    0.5,
-    0.51,
-    0.51
+    0.36,
+    0.48,
+    0.44
    ],
-   "sty": "brick",
+   "sty": "plank",
    "windows": true,
    "pitched": true,
    "hip": false,
@@ -312,21 +328,21 @@
   },
   "c2332": {
    "wall": [
-    0.86,
-    0.85,
-    0.8
+    0.82,
+    0.52,
+    0.36
    ],
    "roof": [
-    0.62,
-    0.26,
-    0.17
+    0.28,
+    0.23,
+    0.21
    ],
-   "sty": "brick",
+   "sty": "plaster",
    "windows": true,
    "pitched": true,
-   "hip": true,
-   "h": 3.2,
-   "rh": 2.8
+   "hip": false,
+   "h": 3.3,
+   "rh": 3.0
   },
   "c2320": {
    "wall": [
@@ -564,6 +580,78 @@
    "hip": false,
    "h": 3.2,
    "rh": 3.6
+  },
+  "c2250": {
+   "wall": [
+    0.78,
+    0.73,
+    0.58
+   ],
+   "roof": [
+    0.25,
+    0.26,
+    0.28
+   ],
+   "sty": "silicate",
+   "windows": true,
+   "pitched": true,
+   "hip": false,
+   "h": 3.4,
+   "rh": 4.0
+  },
+  "c2317": {
+   "wall": [
+    0.82,
+    0.77,
+    0.62
+   ],
+   "roof": [
+    0.24,
+    0.25,
+    0.28
+   ],
+   "sty": "silicate",
+   "windows": true,
+   "pitched": true,
+   "hip": false,
+   "h": 3.4,
+   "rh": 4.2
+  },
+  "c2331": {
+   "wall": [
+    0.8,
+    0.76,
+    0.62
+   ],
+   "roof": [
+    0.3,
+    0.31,
+    0.33
+   ],
+   "sty": "silicate",
+   "windows": true,
+   "pitched": true,
+   "hip": false,
+   "h": 3.6,
+   "rh": 4.4
+  },
+  "c2324": {
+   "wall": [
+    0.8,
+    0.76,
+    0.62
+   ],
+   "roof": [
+    0.28,
+    0.29,
+    0.31
+   ],
+   "sty": "silicate",
+   "windows": true,
+   "pitched": true,
+   "hip": false,
+   "h": 3.4,
+   "rh": 4.0
   }
  },
  "props": [
@@ -1228,6 +1316,47 @@
     ]
    ],
    "h": 2.0
+  },
+  {
+   "style": "wall",
+   "ll": [
+    [
+     55.3777624,
+     23.1054101
+    ],
+    [
+     55.377602,
+     23.1051094
+    ]
+   ],
+   "h": 1.5
+  },
+  {
+   "style": "wall",
+   "ll": [
+    [
+     55.379496,
+     23.108423
+    ],
+    [
+     55.3792633,
+     23.1081787
+    ]
+   ],
+   "h": 1.7
+  },
+  {
+   "style": "hedge",
+   "ll": [
+    [
+     55.3790675,
+     23.1079983
+    ],
+    [
+     55.3788814,
+     23.1078029
+    ]
+   ]
   }
  ],
  "parking": [
