@@ -3,10 +3,10 @@
  "slug": "zemaiciu",
  "flavour": [
   [
-   "Katilinė vėl rūksta, šildymo sezonas prasidėjo.",
-   "Tai ir sąskaitos prasidės.",
-   "Gerai, kad pas mus krosnis, malkų dar turiu.",
-   "O aš jau trečią vakarą kapoju."
+   "Katilinė vėl rūksta.",
+   "Tai ir sąskaitos už šildymą ateis.",
+   "Gerai, kad pas mane krosnis.",
+   "Užtat tu malkas kapoji."
   ],
   [
    "Kaimynas vėl tujas sodina palei tvorą.",
@@ -17,23 +17,16 @@
    "Iki centro pėsčiom eini?",
    "Pėsčiom, per Maironio greičiau nei laukt.",
    "Palauk, užvesiu mašiną, pavešiu.",
-   "Jei užsives šitam šalty."
+   "Jei tas tavo kibiras užsives."
   ],
   [
-   "Lapus jau sugrėbei?",
-   "Sugrėbiau, o vėjas vėl atnešė iš kaimyno kiemo.",
-   "Kaip kasmet, ir per Vėlines tas pats.",
-   "Tai bent maišų nepirk, kompostui tiks."
+   "Kaimyno katinas vėl mano lysvėj.",
+   "Tai bent pelių neturėsi."
   ],
   [
-   "Prie Maironio vėl balta nuo sniego, važiuok atsargiai.",
-   "Važiuoju, tik per tą duobėtą kelią lėtai ir tenka.",
-   "Pavasarį užlopys."
-  ],
-  [
-   "Girdėjai, ar autoservisas dar dirba šeštadieniais?",
-   "Iki antros, kaip ir užrašyta ant sienos.",
-   "Tai spėsiu pakeisti padangas."
+   "Autoservisas šeštadieniais dirba?",
+   "Iki antros, ant durų parašyta.",
+   "Tai spėsiu padangas pakeist."
   ]
  ],
  "looks": {

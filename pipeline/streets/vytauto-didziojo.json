@@ -3,15 +3,15 @@
  "slug": "vytauto-didziojo",
  "flavour": [
   [
-   "Ar BENU dar atidaryta?",
-   "Iki šešių, spėsi.",
-   "Tai bėgu, mamai vaistų reikia."
+   "BENU rytoj dirba?",
+   "Dirba, nuo aštuonių.",
+   "Tai ryte užsuksiu, mamai vaistų reikia."
   ],
   [
    "Vėl lekia kaip per lenktynes.",
    "Vienpusis, tai ir galvoja, kad greitkelis.",
    "Prie parko bent greitį mažintų.",
-   "Mažins, kai kas nors pakliūs."
+   "Sumažins, kai ką nors partrenks."
   ],
   [
    "Einam per parką iki Žemaičio?",
@@ -19,20 +19,12 @@
    "Tu vis apie tuos kebabus."
   ],
   [
-   "Prie cerkvės vėl gėles pasodino.",
-   "Gražu, kol neišdžiūsta.",
-   "Kas nors palaistys, ne?",
-   "Gal savivaldybė, ji čia pat."
+   "Prie cerkvės gražiai sutvarkyta.",
+   "Savivaldybė gi čia pat, mato.",
+   "Kad visur taip matytų."
   ],
   [
-   "Girdėjai, kas atsidarė prie Kudirkos?",
-   "Ten, kur žuvies reklama ant sienos.",
-   "Karpynė ta, per visą namo galą."
-  ],
-  [
-   "Prie savivaldybės perėja vėl užkimšta.",
-   "Visada, kai žmonės eina pietų.",
-   "Penkiasdešimt kilometrų per valandą rašo, o kas laikosi?",
+   "Penkiasdešimt rašo, o kas laikosi?",
    "Niekas, bet ženklas gražus."
   ]
  ],

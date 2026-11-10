@@ -1,0 +1,455 @@
+set	tag	strangers_only	script	line	speaker	text	q	verdict
+TALKS	kid		0	0	A	Pavargai?	?	new
+TALKS	kid		0	1	B	Kojos skauda.		new
+TALKS	kid		0	2	A	Dar truputį, jau beveik namie.		new
+TALKS	kid		0	3	B	Paimk ant rankų.		new
+TALKS	kid		1	0	A	Duok ranką, eisim per gatvę.		new
+TALKS	kid		1	1	B	Aš jau ne darželyje.		new
+TALKS	kid		1	2	A	Vis tiek duok.		new
+TALKS	kid		1	3	B	Gerai jau, gerai.		new
+TALKS	kid		2	0	A	Ko tyli?	?	new
+TALKS	kid		2	1	B	Galvoju.		new
+TALKS	kid		2	2	A	Apie ką?	?	new
+TALKS	kid		2	3	B	Ar nupirksi ledų.		new
+TALKS	kid		3	0	A	Kaip mokykloj sekasi?	?	new
+TALKS	kid		3	1	B	Normaliai.		new
+TALKS	kid		3	2	A	O pažymiai?	?	new
+TALKS	kid		3	3	B	Irgi normaliai.		new
+TALKS	kid		4	0	A	Nebėk prie kelio!		new
+TALKS	kid		4	1	B	Aš tik į balą.		new
+TALKS	kid		4	2	A	Batai bus šlapi.		new
+TALKS	kid		4	3	B	Jie jau šlapi.		new
+TALKS	-	yes	5	0	A	Labas! Seniai nesimatėm!		new
+TALKS	-	yes	5	1	B	Labas! Kaip gyveni?	?	kept
+TALKS	-	yes	5	2	A	Po truputį. O tu?	?	kept
+TALKS	-	yes	5	3	B	Nieko, dirbu.		new
+TALKS	shop		6	0	A	Buvai Maximoj?	?	kept
+TALKS	shop		6	1	B	Buvau. Viskas pabrango.		kept
+TALKS	shop		6	2	A	Ir sviestas?	?	kept
+TALKS	shop		6	3	B	Ir sviestas, ir kava.		kept
+TALKS	shop		6	4	A	Nu ką padarysi...		kept
+TALKS	shop		7	0	A	Ką pirkai?	?	kept
+TALKS	shop		7	1	B	Duonos ir pieno.		kept
+TALKS	shop		7	2	A	Aš tik kavos užbėgau.		kept
+TALKS	shop		7	3	B	Kava dabar akcijoj.		new
+TALKS	stop		8	0	A	Kada autobusas į Kauną?	?	kept
+TALKS	stop		8	1	B	Rodos, po dvidešimt minučių.		kept
+TALKS	stop		8	2	A	Dar spėsiu kavos išgert.		kept
+TALKS	stop		8	3	B	Spėsi, jis vis tiek vėluos.		new
+TALKS	stop		9	0	A	Vėl vėluoja autobusas.		kept
+TALKS	stop		9	1	B	Kaip visada.		kept
+TALKS	stop		9	2	A	Pėsčiom būčiau greičiau.		kept
+TALKS	stop		9	3	B	Tai eik, aš palauksiu.		kept
+TALKS	cold		10	0	A	Šalta šiandien.		new
+TALKS	cold		10	1	B	Ką tu nori, ne vasara.		new
+TALKS	cold		10	2	A	Kad bent sniego būtų.		new
+TALKS	cold		10	3	B	Dar pasnigs, pamatysi.		new
+TALKS	cops		11	0	A	Matei tą durnių su mašina?	?	kept
+TALKS	cops		11	1	B	Mačiau! Vos manęs nepartrenkė.		kept
+TALKS	cops		11	2	A	Policija jau ieško.		kept
+TALKS	cops		11	3	B	Tegu greičiau pagauna.		kept
+TALKS	cops		12	0	A	Kas čia per sirenos?	?	kept
+TALKS	cops		12	1	B	Kažką gaudo.		kept
+TALKS	cops		12	2	A	Ramus miestas buvo...		kept
+TALKS	cops		12	3	B	Buvo, buvo.		kept
+TALKS	day		13	0	A	Kaip vaikams mokykloj?	?	kept
+TALKS	day		13	1	B	Gerai, tik namų darbų daug.		kept
+TALKS	day		13	2	A	Mūsų irgi. Ta matematika...		kept
+TALKS	day		13	3	B	Nieko ten nebesuprantu.		new
+TALKS	-		14	0	A	Važiuosi prie Dubysos?	?	kept
+TALKS	-		14	1	B	Jei oras leis, su meškere.		kept
+TALKS	-		14	2	A	Pasiimk ir mane.		kept
+TALKS	-		14	3	B	Gerai, šeštadienį ryte.		kept
+TALKS	-		15	0	A	Turguj buvai šeštadienį?	?	kept
+TALKS	-		15	1	B	Buvau, bulvių nusipirkau.		kept
+TALKS	-		15	2	A	Pigiai?	?	kept
+TALKS	-		15	3	B	Normaliai. Ir kiaušinių.		kept
+TALKS	-		16	0	A	Žiūrėjai vakar Žalgirį?	?	kept
+TALKS	-		16	1	B	Žiūrėjau. Vos laimėjo.		kept
+TALKS	-		16	2	A	Paskutinį kėlinį vos atsilaikė.		kept
+TALKS	-		16	3	B	Svarbu, kad laimėjo.		kept
+TALKS	-		17	0	A	Kaip mama?	?	kept
+TALKS	-		17	1	B	Geriau, jau išleido iš ligoninės.		kept
+TALKS	-		17	2	A	Tai gerai. Perduok linkėjimų.		kept
+TALKS	-		17	3	B	Būtinai perduosiu.		kept
+TALKS	-	yes	18	0	A	Girdėjau, naują darbą radai?	?	kept
+TALKS	-	yes	18	1	B	Taip, Kaune. Kasdien važinėju.		kept
+TALKS	-	yes	18	2	A	Toli gi.		kept
+TALKS	-	yes	18	3	B	Bet moka geriau.		kept
+TALKS	-		19	0	A	Degalai vėl pabrango.		kept
+TALKS	-		19	1	B	Dviračiu važinėsiu.		kept
+TALKS	-		19	2	A	Tu? Dviračiu?	?	new
+TALKS	-		19	3	B	Nu tai pėsčiom.		new
+TALKS	day		20	0	A	Eisi sekmadienį į bažnyčią?	?	kept
+TALKS	day		20	1	B	Eisiu, į dešimtą.		kept
+TALKS	day		20	2	A	Tai ten ir susitiksim.		kept
+TALKS	-		21	0	A	Gražiai aikštę sutvarkė.		kept
+TALKS	-		21	1	B	Gražiai. Ypač vakare su šviesom.		kept
+TALKS	-		21	2	A	Ir Žemaitis kaip naujas.		kept
+TALKS	-		22	0	A	Anūkai atvažiuos per šventes?	?	kept
+TALKS	-		22	1	B	Žadėjo. Pyragą kepsiu.		kept
+TALKS	-		22	2	A	Kokį?	?	kept
+TALKS	-		22	3	B	Obuolių, aišku.		kept
+TALKS	-		23	0	A	Kaip tavo mašina?	?	new
+TALKS	-		23	1	B	Vėl servise. Pasatas sensta.		kept
+TALKS	-		23	2	A	Tai gal Zafirą pirk.		kept
+TALKS	-		23	3	B	Juokauji? Dar blogiau.		kept
+TALKS	night		24	0	A	Einam į L klubą?	?	kept
+TALKS	night		24	1	B	Šiandien? Rytoj į darbą.		kept
+TALKS	night		24	2	A	Tik vienas kokteilis.		kept
+TALKS	night		24	3	B	Nu gerai, vienas.		kept
+TALKS	night	yes	25	0	A	Vėlu jau.		kept
+TALKS	night	yes	25	1	B	Nu, laikas namo.		kept
+TALKS	night	yes	25	2	A	Palydėt?	?	kept
+TALKS	night	yes	25	3	B	Nereikia, čia netoli.		kept
+TALKS	-		26	0	A	Girdėjai apie Petrą?	?	kept
+TALKS	-		26	1	B	Ne, o kas?	?	kept
+TALKS	-		26	2	A	Vedė! Rugsėjį.		kept
+TALKS	-		26	3	B	Tai pasveikink nuo manęs.		new
+TALKS	-	yes	27	0	A	Kur skubi?	?	kept
+TALKS	-	yes	27	1	B	Pas gydytoją.		kept
+TALKS	-	yes	27	2	A	Kas atsitiko?	?	kept
+TALKS	-	yes	27	3	B	Nieko, tik patikrinimas.		kept
+TALKS	day		28	0	A	Gimnazijoj penktadienį koncertas.		kept
+TALKS	day		28	1	B	Kelintą?	?	new
+TALKS	day		28	2	A	Šeštą vakaro.		kept
+TALKS	day		28	3	B	Ateisim su vaikais.		kept
+TALKS	nov		29	0	A	Per Vėlines kapinėse buvai?	?	new
+TALKS	nov		29	1	B	Buvau. Tiek žvakių, gražu.		new
+TALKS	nov		29	2	A	Ir žmonių pilna.		new
+TALKS	nov		29	3	B	Visi savus aplankė.		new
+TALKS	-		30	0	A	Turistai vėl klausė apie tankų mūšį.		kept
+TALKS	-		30	1	B	Tą, keturiasdešimt pirmų metų?	?	new
+TALKS	-		30	2	A	Tą patį, prie Dubysos.		kept
+TALKS	-		30	3	B	Istorija, ką padarysi.		kept
+TALKS	-		31	0	A	Rugsėjį į Šilines važiavai?	?	kept
+TALKS	-		31	1	B	Važiavau, kaip kasmet.		kept
+TALKS	-		31	2	A	Daug žmonių buvo?	?	new
+TALKS	-		31	3	B	Visa Lietuva suvažiavo.		new
+TALKS	-		32	0	A	Einam prie tvenkinio pasivaikščiot?	?	kept
+TALKS	-		32	1	B	Prie Prūdo gatvės?	?	kept
+TALKS	-		32	2	A	Taip, ten ramu.		kept
+TALKS	-		32	3	B	Einam, tik apsirenk šilčiau.		kept
+TALKS	-		33	0	A	Vilniaus gatvėj vėl kamštis.		kept
+TALKS	-		33	1	B	Raseiniuose kamštis? Juokauji.		kept
+TALKS	-		33	2	A	Trys mašinos prie šviesoforo.		kept
+TALKS	-		33	3	B	Nu tai jau kamštis.		kept
+TALKS	cold		34	0	A	Žemaitis vėl su balandžiais.		new
+TALKS	cold		34	1	B	Kiekvieną dieną jie ten.		new
+TALKS	cold		34	2	A	Kas nors kepurę jam uždėtų.		new
+TALKS	cold		34	3	B	Šalta gi žmogui.		new
+TALKS	-		35	0	A	Tavo mažasis dar Kalno mokykloj?	?	new
+TALKS	-		35	1	B	Ne, jau gimnazijoj.		new
+TALKS	-		35	2	A	Tai jau nebe mažasis.		new
+TALKS	-		35	3	B	Dvyliktoj klasėj jau.		new
+TALKS	shop		36	0	A	Į Maximą prie parko ar į Norfą?	?	kept
+TALKS	shop		36	1	B	Maxima arčiau.		kept
+TALKS	shop		36	2	A	Norfoj pigiau.		kept
+TALKS	shop		36	3	B	Tai einam į Norfą.		kept
+TALKS	stop		37	0	A	Iš stoties į Vilnių kada?	?	kept
+TALKS	stop		37	1	B	Rodos, aštuntą.		kept
+TALKS	stop		37	2	A	Ilgai važiuot.		kept
+TALKS	stop		37	3	B	Trys valandos, ne mažiau.		kept
+TALKS	day		38	0	A	Parke krepšinį žaisim?	?	kept
+TALKS	day		38	1	B	Vakare, prie Vytauto Didžiojo.		kept
+TALKS	day		38	2	A	Pasiimk kamuolį.		kept
+TALKS	day		38	3	B	Mano nuleistas.		kept
+TALKS	-		39	0	A	Važiuoji į Kauną magistrale?	?	kept
+TALKS	-		39	1	B	Taip, valanda kelio.		kept
+TALKS	-		39	2	A	Ten vėl remontai.		kept
+TALKS	-		39	3	B	Tai anksčiau išvažiuosiu.		kept
+TALKS	day		40	0	A	Gal trenkiam po bokalą?	?	new
+TALKS	day		40	1	B	Dabar? Dar net ne vakaras.		new
+TALKS	day		40	2	A	Tai ir ką?	?	new
+TALKS	day		40	3	B	Nu... vieną.		new
+TALKS	-		41	0	A	Gal į klubą šiandien?	?	kept
+TALKS	-		41	1	B	Ką tu, velnias, rytoj darbas.		kept
+TALKS	-		41	2	A	Vieną kartą gyvenam.		kept
+TALKS	-		41	3	B	Gerai, bet tik iki dvylikos.		kept
+TALKS	-		41	4	A	Tu kiekvieną kartą taip sakai.		kept
+TALKS	night		42	0	A	Gal kortom palošiam pas Aivarą?	?	new
+TALKS	night		42	1	B	Vėl? Praeitą kartą viską pralošiau.		kept
+TALKS	night		42	2	A	Šįkart atsilošim.		kept
+TALKS	night		42	3	B	Nu jo, žinom tuos atsilošimus.		kept
+TALKS	-	yes	43	0	A	Ką tu, velnias, čia veiki?	?	kept
+TALKS	-	yes	43	1	B	Nu stoviu.		kept
+TALKS	-	yes	43	2	A	Matau, kad stovi.		kept
+TALKS	-	yes	43	3	B	Tai ir neklausk.		new
+TALKS	-		44	0	A	Matei, kaip tas su Pasatu parkavosi?	?	kept
+TALKS	-		44	1	B	Per dvi vietas?	?	kept
+TALKS	-		44	2	A	Per tris!		kept
+TALKS	-		44	3	B	Nu, Pasatas.		kept
+TALKS	-		45	0	A	Paskolink dešimt eurų.		kept
+TALKS	-		45	1	B	Dar penkių neatidavei.		new
+TALKS	-		45	2	A	Tai bus penkiolika.		kept
+TALKS	-		45	3	B	Ką tu, velnias...		kept
+TALKS	night	yes	46	0	A	Vėl iš klubo?	?	kept
+TALKS	night	yes	46	1	B	Ne, iš bibliotekos.		kept
+TALKS	night	yes	46	2	A	Tokiu laiku?	?	new
+TALKS	night	yes	46	3	B	Daug skaityt reikėjo.		kept
+TALKS	-		47	0	A	Ko čia šypsaisi?	?	new
+TALKS	-		47	1	B	Algą gavau.		kept
+TALKS	-		47	2	A	Tai statai alų!		kept
+TALKS	-		47	3	B	Ką tu, jos jau nebėra.		new
+TALKS	-		48	0	A	Girdėjai, dar vieną šviesoforą pastatė?	?	kept
+TALKS	-		48	1	B	Antrą jau?	?	kept
+TALKS	-		48	2	A	Trečią!		kept
+TALKS	-		48	3	B	Nu, didmiestis.		kept
+TALKS	-		49	0	A	Kur tavo mašina?	?	kept
+TALKS	-		49	1	B	Sūnus paėmė.		new
+TALKS	-		49	2	A	Tai kaip dabar?	?	kept
+TALKS	-		49	3	B	Pėsčiom, kaip senais laikais.		kept
+TALKS	cops		50	0	A	Vėl kažkas policiją erzina.		kept
+TALKS	cops		50	1	B	Ir vėl ta pati mašina.		kept
+TALKS	cops		50	2	A	Turbūt koks kaunietis.		kept
+TALKS	cops		50	3	B	Aišku, ne raseiniškis.		kept
+street	street:boksto		0	0	A	Čia jau beveik kaimas.		new
+street	street:boksto		0	1	B	Bent mašinų mažai.		new
+street	street:boksto		0	2	A	Tik traktoriai kartais pravažiuoja.		new
+street	street:boksto		1	0	A	Ar šitas posūkis į Saulės gatvę?	?	kept
+street	street:boksto		1	1	B	Taip, už tų eglių.		kept
+street	street:boksto		1	2	A	Ačiū, jau maniau, kad pasiklydau.		new
+street	street:boksto		2	0	A	Beržai pakelėj gražūs, tik šaligatvio nėra.		kept
+street	street:boksto		2	1	B	Pėsčiom čia niekas nevaikšto, visi mašinom.		new
+street	street:boksto		2	2	A	Tai ko mes čia tada einam.		new
+street	street:dominikonu		3	0	A	Swedbanke prie aikštės vėl eilė.		kept
+street	street:dominikonu		3	1	B	Pensijų diena, ko tu nori.		kept
+street	street:dominikonu		3	2	A	Tai pirma į Norfą nueisiu, paskui grįšiu.		new
+street	street:dominikonu		4	0	A	Šeštadienį į L klubą eini?	?	kept
+street	street:dominikonu		4	1	B	Eisiu, jei kas eis kartu.		new
+street	street:dominikonu		4	2	A	Tai aš eisiu.		new
+street	street:dominikonu		4	3	B	Nu tai sutarta.		new
+street	street:dominikonu		5	0	A	Autodalyse radau lemputę savo audžiui.		kept
+street	street:dominikonu		5	1	B	Brangiai?	?	kept
+street	street:dominikonu		5	2	A	Ne, dar ir parodė, kaip pakeist.		kept
+street	street:dominikonu		6	0	A	Nuo aikštės pučia kaip lauke.		new
+street	street:dominikonu		6	1	B	Atvira vieta, ką padarysi.		new
+street	street:dominikonu		6	2	A	Dar ir lietaus žada.		new
+street	street:dubysos		7	0	A	Vėl kažkas mano vietą prie laiptinės užstatė.		kept
+street	street:dubysos		7	1	B	Po šešių čia niekada vietų nėra.		kept
+street	street:dubysos		7	2	A	Reikės anksčiau iš darbo grįžti.		kept
+street	street:dubysos		7	3	B	Arba dviračiu važinėti.		kept
+street	street:dubysos		8	0	A	Einu į Lidlą, tau nieko nereikia?	?	kept
+street	street:dubysos		8	1	B	Duonos ir pieno, jei nesunku.		kept
+street	street:dubysos		8	2	A	Gerai, užnešiu pakeliui.		kept
+street	street:dubysos		9	0	A	Obuolių šiemet tiek, kad nėra kur dėti.		kept
+street	street:dubysos		9	1	B	Spausk sultis, aš jau trečią kibirą išspaudžiau.		kept
+street	street:dubysos		9	2	A	Neturiu sulčiaspaudės.		new
+street	street:dubysos		9	3	B	Atnešk pas mane, kartu išspausim.		kept
+street	street:dubysos		10	0	A	Kada tą Dubysos gatvę pagaliau užlopys?	?	new
+street	street:dubysos		10	1	B	Kur ten, jau kelinti metai žada.		new
+street	street:dubysos		10	2	A	Tai vėl per duobes šokinėsim.		new
+street	street:dubysos		11	0	A	Savaitgalį važiuojam prie Dubysos su meškerėm?	?	kept
+street	street:dubysos		11	1	B	Jei nelis, važiuojam.		kept
+street	street:dubysos		11	2	A	Kirmėlių aš prikasiu.		kept
+street	street:dubysos		12	0	A	Prie šviesoforo vėl eilė iki pat Dariaus ir Girėno.		kept
+street	street:dubysos		12	1	B	Pėsčiom greičiau nueini.		new
+street	street:dubysos		12	2	A	Tai ko tie visi važiuoja?	?	new
+street	street:dubysos		12	3	B	Tingi, ko daugiau.		new
+street	street:gintaro		13	0	A	Autobusas pro mus taip ir nevažiuoja.		new
+street	street:gintaro		13	1	B	Iki stotelės pėsčiom dešimt minučių.		kept
+street	street:gintaro		13	2	A	Su krepšiais ne dešimt, o visas pusvalandis.		kept
+street	street:gintaro		13	3	B	Tai sūnaus paprašyk, tegu atveža.		kept
+street	street:gintaro		14	0	A	Jūsų obelys šiemet lūžta nuo obuolių.		kept
+street	street:gintaro		14	1	B	Imkit kibirą, man visų nesuvalgyt.		kept
+street	street:gintaro		14	2	A	Tai aš jums pyrago atnešiu.		kept
+street	street:gintaro		15	0	A	Kas čia prie Aivaro vartų vėl stovi?	?	kept
+street	street:gintaro		15	1	B	Draugai atvažiavo, visą vakarą muzika.		kept
+street	street:gintaro		15	2	A	Kad tik iki dvyliktos.		kept
+street	street:gintaro		15	3	B	Jaunimas, ką padarysi.		kept
+street	street:gintaro		16	0	A	Kapinėse seniai buvot?	?	new
+street	street:gintaro		16	1	B	Sekmadienį buvau, kapą sutvarkiau.		new
+street	street:gintaro		16	2	A	O aš vis nespėju, gal šeštadienį.		kept
+street	street:jurbarko		17	0	A	Vėl fūra į Jurbarką lėkė kaip pašėlusi.		kept
+street	street:jurbarko		17	1	B	Pagrindinis kelias, ką padarysi.		kept
+street	street:jurbarko		17	2	A	Prie Vilniaus gatvės kamerą reikėtų.		kept
+street	street:jurbarko		17	3	B	Kol kas nors nenukentės, nepastatys.		kept
+street	street:jurbarko		18	0	A	Degalinėj prie išvažiavimo dyzelis vėl pabrango.		kept
+street	street:jurbarko		18	1	B	Mieste ne ką pigiau.		kept
+street	street:jurbarko		18	2	A	Tai pilsiu tik pusę bako.		kept
+street	street:jurbarko		19	0	A	Tujas jau apkirpai?	?	new
+street	street:jurbarko		19	1	B	Dar ne, laukiu sausesnės dienos.		kept
+street	street:jurbarko		19	2	A	Mano jau aukštesnės už tvorą.		kept
+street	street:jurbarko		19	3	B	Ir gerai, mažiau dulkių nuo kelio.		kept
+street	street:jurbarko		20	0	A	Gal dviračiu iki Jurbarko kada numinam?	?	new
+street	street:jurbarko		20	1	B	Keturiasdešimt kilometrų kelkraščiu? Ačiū.		new
+street	street:jurbarko		20	2	A	Tai bent iki ženklo.		new
+street	street:jurbarko		21	0	A	Prie Vilniaus gatvės žalia dega tik trims mašinoms.		new
+street	street:jurbarko		21	1	B	O jei fūra, tai vienai.		new
+street	street:jurbarko		21	2	A	Pėsčiam bent spėji pereit.		new
+street	street:jurbarko		21	3	B	Jei bėgte.		new
+street	street:kalno		22	0	A	Vėl Kalno gatvėj duobes lopo.		kept
+street	street:kalno		22	1	B	Kasmet tas pats.		new
+street	street:kalno		22	2	A	Kad bent kartą gerai užlopytų.		new
+street	street:kalno		22	3	B	Tai kitąmet neturėtų ką veikt.		new
+street	street:kalno		23	0	A	Į kalną pėsčiom ar autobusu?	?	kept
+street	street:kalno		23	1	B	Pėsčiom, sveikiau.		kept
+street	street:kalno		23	2	A	Tai tu ir eik, aš palauksiu.		kept
+street	street:kalno		24	0	A	Kiek čia iki Kauno?	?	kept
+street	street:kalno		24	1	B	Aštuoniasdešimt aštuoni, ženklas rodo.		kept
+street	street:kalno		24	2	A	Tai pėsčiom gal neisim.		new
+street	street:kalno		25	0	A	Gražios alyvos prie tos tvoros.		new
+street	street:kalno		25	1	B	Gegužę žydės, tai kvepės visa gatvė.		new
+street	street:kalno		25	2	A	Šakelę tada nusiskinsiu.		new
+street	street:kalno		26	0	A	Tos liepos pakelėj senesnės už mus.		new
+street	street:kalno		26	1	B	Gerai, kad jų nenupjovė.		new
+street	street:kalno		26	2	A	Dar nupjaus, pamatysi.		new
+street	street:kalno		27	0	A	Kaimynų paparčiai vėl per tvorą lenda.		new
+street	street:kalno		27	1	B	O pas mane tik dilgėlės auga.		new
+street	street:kalno		27	2	A	Tai ateik, prikasiu tau.		new
+street	street:kestucio		28	0	A	Tie sunkvežimiai per Kęstučio lekia kaip per greitkelį.		kept
+street	street:kestucio		28	1	B	Ženklas gi rodo, kad jau miestas.		kept
+street	street:kestucio		28	2	A	Kas jį ten skaito. Tik prie žiedo pristabdo.		kept
+street	street:kestucio		29	0	A	Autobusas į centrą dar nepraėjo?	?	kept
+street	street:kestucio		29	1	B	Ką tik nuvažiavo, kitas po valandos.		kept
+street	street:kestucio		29	2	A	Tai einu pėsčiom, čia ne taip toli.		kept
+street	street:kestucio		29	3	B	Eik palei griovį, šaligatvio nėra.		kept
+street	street:kestucio		30	0	A	Matei tuos drožinius prie kelio?	?	new
+street	street:kestucio		30	1	B	Kasdien pro juos važiuoju.		kept
+street	street:kestucio		30	2	A	Gražiai išdrožti.		new
+street	street:kestucio		30	3	B	Žemaitijoj drožėjų netrūksta.		new
+street	street:kestucio		31	0	A	Vėl vėjas iš laukų, net stotelėj nepasislėpsi.		kept
+street	street:kestucio		31	1	B	Tai kad ji iš šono atvira.		kept
+street	street:kestucio		31	2	A	Gal kitąmet naują pastatys.		kept
+street	street:maironio		32	0	A	Į Moki-veži užsuksi?	?	kept
+street	street:maironio		32	1	B	Reikia dažų tvorai, tai užsuksiu.		kept
+street	street:maironio		32	2	A	Paimk ir man vinių, tų mažų.		kept
+street	street:maironio		32	3	B	Gerai, tik pinigus atiduok.		kept
+street	street:maironio		33	0	A	Parke vakarais vėl jaunimas sėdi.		new
+street	street:maironio		33	1	B	Tegu sėdi, kol netriukšmauja.		new
+street	street:maironio		33	2	A	Daugiau jiems nėra kur eit.		new
+street	street:maironio		34	0	A	Maximoj kiaušiniai vėl pabrango.		kept
+street	street:maironio		34	1	B	Ir sviestas. Viskas brangsta.		kept
+street	street:maironio		34	2	A	Tai šeštadienį į turgų eisiu.		kept
+street	street:maironio		34	3	B	Ten irgi ne pigiau.		kept
+street	street:maironio		35	0	A	Ar čia autobusas į Kauną sustoja?	?	kept
+street	street:maironio		35	1	B	Ne, eikit į stotį, prie Vilniaus gatvės.		kept
+street	street:maironio		35	2	A	Toli?	?	kept
+street	street:maironio		35	3	B	Kokios dešimt minučių pėsčiom.		kept
+street	street:maironio		36	0	A	Saldumynų namuose pyragų po pietų dar būna?	?	new
+street	street:maironio		36	1	B	Retai, iš ryto išperka.		new
+street	street:maironio		36	2	A	Tai ryt anksčiau užsuksiu.		kept
+street	street:maironio		37	0	A	Prie Jozitos už stovėjimą reikia mokėt?	?	new
+street	street:maironio		37	1	B	Ne, čia ne mėlyna zona.		new
+street	street:maironio		37	2	A	Gerai, o tai jau automato ieškojau.		new
+street	street:stonu		38	0	A	Vėl Stonų gatvę perkasė.		kept
+street	street:stonu		38	1	B	Šaligatvį daro, sako, iki vasaros.		kept
+street	street:stonu		38	2	A	Iki kurios vasaros, nepasakė?	?	kept
+street	street:stonu		38	3	B	Tai va, kad nepasakė.		kept
+street	street:stonu		39	0	A	Į Lidlą eini?	?	kept
+street	street:stonu		39	1	B	Einu, šiandien kiaušiniai pigesni.		kept
+street	street:stonu		39	2	A	Paimk ir man dešimtį.		kept
+street	street:stonu		39	3	B	Kojas turi, nueisi.		new
+street	street:stonu		40	0	A	Autobusas į Stonų sodus dar važiuoja?	?	kept
+street	street:stonu		40	1	B	Važiuoja, tik retai. Lauk prie stotelės.		kept
+street	street:stonu		40	2	A	Ilgai laukt.		new
+street	street:stonu		40	3	B	Tai eik pėsčiom, netoli.		new
+street	street:stonu		41	0	A	Sunkvežimiai nuo ryto zuja pro langus.		kept
+street	street:stonu		41	1	B	Iš tų sandėlių prie Dariaus ir Girėno.		kept
+street	street:stonu		41	2	A	Stiklai dreba.		kept
+street	street:stonu		41	3	B	Užtat žmonėms darbo yra.		kept
+street	street:stonu		42	0	A	Raseika prie Molynės pavasarį vėl išsilies.		new
+street	street:stonu		42	1	B	Kasmet išsilieja.		new
+street	street:stonu		42	2	A	Rūsį pernai užpylė?	?	new
+street	street:stonu		42	3	B	Ne, bet maišų su smėliu jau prisipyliau.		new
+street	street:vaizganto		43	0	A	Prie komisariato vėl stovi su radaru.		kept
+street	street:vaizganto		43	1	B	Tai ir važiuok penkiasdešimt.		kept
+street	street:vaizganto		43	2	A	Aš visada penkiasdešimt.		kept
+street	street:vaizganto		43	3	B	Nu jo, mačiau aš tave.		kept
+street	street:vaizganto		44	0	A	Eisi šeštadienį į kultūros centrą?	?	kept
+street	street:vaizganto		44	1	B	O kas ten bus?	?	kept
+street	street:vaizganto		44	2	A	Koncertas, anūkė šoka.		kept
+street	street:vaizganto		44	3	B	Jei nelis, ateisiu.		kept
+street	street:vaizganto		45	0	A	Malkos vėl pabrango.		kept
+street	street:vaizganto		45	1	B	Kiek dabar už erdmetrį?	?	kept
+street	street:vaizganto		45	2	A	Šešiasdešimt, ir dar už atvežimą.		kept
+street	street:vaizganto		45	3	B	Tai žiemą su dviem megztiniais.		new
+street	street:vaizganto		46	0	A	Vilkupis po lietaus vėl išsiliejo.		kept
+street	street:vaizganto		46	1	B	Prie Pieninės visą pievą apsėmė.		kept
+street	street:vaizganto		46	2	A	Kasmet tas pats, griovių niekas nevalo.		kept
+street	street:vaizganto		47	0	A	Kultūros centrą kada nors dažys?	?	new
+street	street:vaizganto		47	1	B	Ką tu, ir taip baltas.		new
+street	street:vaizganto		47	2	A	Baltas tai buvo prieš dvidešimt metų.		new
+street	street:vilniaus		48	0	A	Gal užeinam į kebabinę prie IKI?	?	kept
+street	street:vilniaus		48	1	B	Vėl kebabo? Vakar valgėm.		kept
+street	street:vilniaus		48	2	A	Tai kad ten skaniausi Raseiniuose.		kept
+street	street:vilniaus		48	3	B	Gerai, bet aš be svogūnų.		kept
+street	street:vilniaus		49	0	A	Kada tavo autobusas į Kauną?	?	kept
+street	street:vilniaus		49	1	B	Iš stoties po pusvalandžio.		kept
+street	street:vilniaus		49	2	A	Tai dar spėsi į Maximą užbėgti.		kept
+street	street:vilniaus		49	3	B	Spėsiu, jei prie kasų eilės nebus.		kept
+street	street:vilniaus		50	0	A	Vėl Vilniaus gatve sunkvežimiai lekia.		kept
+street	street:vilniaus		50	1	B	Ką padarysi, pagrindinė gatvė.		kept
+street	street:vilniaus		50	2	A	Gerai, kad bent turėklus pastatė.		kept
+street	street:vilniaus		50	3	B	Tai bent vaikai į gatvę neišbėga.		kept
+street	street:vilniaus		51	0	A	Matei, kiek dyzelis dabar kainuoja?	?	new
+street	street:vilniaus		51	1	B	Mačiau. Dabar tik pėsčiom.		new
+street	street:vilniaus		51	2	A	Tu? Pėsčiom? Norėčiau pamatyt.		new
+street	street:vilniaus		52	0	A	Eini pro veterinarijos vaistinę?	?	kept
+street	street:vilniaus		52	1	B	Taip, katinui maisto reikia.		kept
+street	street:vilniaus		52	2	A	Tik pažiūrėk į abi puses, čia vilkikai važiuoja.		kept
+street	street:vilniaus		52	3	B	Žinau, ne pirmą dieną gyvenu.		new
+street	street:vytauto-didziojo		53	0	A	BENU rytoj dirba?	?	new
+street	street:vytauto-didziojo		53	1	B	Dirba, nuo aštuonių.		new
+street	street:vytauto-didziojo		53	2	A	Tai ryte užsuksiu, mamai vaistų reikia.		new
+street	street:vytauto-didziojo		54	0	A	Vėl lekia kaip per lenktynes.		kept
+street	street:vytauto-didziojo		54	1	B	Vienpusis, tai ir galvoja, kad greitkelis.		kept
+street	street:vytauto-didziojo		54	2	A	Prie parko bent greitį mažintų.		kept
+street	street:vytauto-didziojo		54	3	B	Sumažins, kai ką nors partrenks.		new
+street	street:vytauto-didziojo		55	0	A	Einam per parką iki Žemaičio?	?	kept
+street	street:vytauto-didziojo		55	1	B	Einam, paskui kebabų prie Vilniaus.		kept
+street	street:vytauto-didziojo		55	2	A	Tu vis apie tuos kebabus.		kept
+street	street:vytauto-didziojo		56	0	A	Prie cerkvės gražiai sutvarkyta.		new
+street	street:vytauto-didziojo		56	1	B	Savivaldybė gi čia pat, mato.		new
+street	street:vytauto-didziojo		56	2	A	Kad visur taip matytų.		new
+street	street:vytauto-didziojo		57	0	A	Penkiasdešimt rašo, o kas laikosi?	?	new
+street	street:vytauto-didziojo		57	1	B	Niekas, bet ženklas gražus.		kept
+street	street:zemaiciu		58	0	A	Katilinė vėl rūksta.		new
+street	street:zemaiciu		58	1	B	Tai ir sąskaitos už šildymą ateis.		new
+street	street:zemaiciu		58	2	A	Gerai, kad pas mane krosnis.		new
+street	street:zemaiciu		58	3	B	Užtat tu malkas kapoji.		new
+street	street:zemaiciu		59	0	A	Kaimynas vėl tujas sodina palei tvorą.		kept
+street	street:zemaiciu		59	1	B	Jau ir taip kaip tvirtovė, nieko nesimato.		kept
+street	street:zemaiciu		59	2	A	Tai gal todėl ir sodina.		kept
+street	street:zemaiciu		60	0	A	Iki centro pėsčiom eini?	?	kept
+street	street:zemaiciu		60	1	B	Pėsčiom, per Maironio greičiau nei laukt.		kept
+street	street:zemaiciu		60	2	A	Palauk, užvesiu mašiną, pavešiu.		kept
+street	street:zemaiciu		60	3	B	Jei tas tavo kibiras užsives.		new
+street	street:zemaiciu		61	0	A	Kaimyno katinas vėl mano lysvėj.		new
+street	street:zemaiciu		61	1	B	Tai bent pelių neturėsi.		new
+street	street:zemaiciu		62	0	A	Autoservisas šeštadieniais dirba?	?	new
+street	street:zemaiciu		62	1	B	Iki antros, ant durų parašyta.		new
+street	street:zemaiciu		62	2	A	Tai spėsiu padangas pakeist.		new
+street	street:zvyryno		63	0	A	Pagaliau šaligatvį iki pat Stoties padarė.		kept
+street	street:zvyryno		63	1	B	Ir lempos naujos, naktį kaip dieną.		kept
+street	street:zvyryno		63	2	A	Tik laukas kaip buvo, taip ir liko.		kept
+street	street:zvyryno		63	3	B	Sako, ir ten namus statys.		kept
+street	street:zvyryno		64	0	A	Į Maximą per Stoties eisi?	?	kept
+street	street:zvyryno		64	1	B	Einu. Ko tau reikia?	?	kept
+street	street:zvyryno		64	2	A	Kefyro, jei nesunku.		new
+street	street:zvyryno		65	0	A	Tavo šuo vėl visą naktį lojo.		kept
+street	street:zvyryno		65	1	B	Ne mano, čia kaimyno už tujų.		kept
+street	street:zvyryno		65	2	A	Tai tu jam ir pasakyk.		new
+street	street:zvyryno		66	0	A	Žvyryno gatvė, o asfaltas lygesnis nei Vilniaus.		kept
+street	street:zvyryno		66	1	B	Žvyras tik pavadinime ir liko.		kept
+street	street:zvyryno		66	2	A	Ir gerai, bent dulkių nėra.		kept
+TALK_BYE	strangers		0	0	A	Na, bėgu.		kept
+TALK_BYE	strangers		0	1	B	Iki!		kept
+TALK_BYE	strangers		1	0	A	Gerai, susimatysim.		kept
+TALK_BYE	strangers		1	1	B	Iki, iki!		kept
+TALK_BYE	strangers		2	0	A	Nu, laikykis.		kept
+TALK_BYE	strangers		2	1	B	Tu irgi!		kept
+TALK_BYE	strangers		3	0	A	Einu, manęs namie laukia.		new
+TALK_BYE	strangers		3	1	B	Sėkmės!		kept
+TALK_GO	companions		0	0	A	Nu ką, einam?		new
+TALK_GO	companions		0	1	B	Einam.		new
+TALK_GO	companions		1	0	A	Gerai, judam toliau.		new
+TALK_GO	companions		1	1	B	Judam.		new
+TALK_GO	companions		2	0	A	Ko čia stovim? Eime.		new
+TALK_GO	companions		2	1	B	Eime, eime.		new
+TALK_GO	companions		3	0	A	Nu, pajudam.		new
+TALK_GO	companions		3	1	B	Pajudam.		new
+TALK_HM	filler		0	0	C	Aha.		kept
+TALK_HM	filler		1	0	C	Va kaip.		new
+TALK_HM	filler		2	0	C	Nu jo.		kept
+TALK_HM	filler		3	0	C	Taip, taip.		kept

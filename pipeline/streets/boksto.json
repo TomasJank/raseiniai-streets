@@ -3,19 +3,19 @@
  "slug": "boksto",
  "flavour": [
   [
-   "Bokšto gatvė jau už miesto, kur asfaltas baigiasi lauku.",
-   "Bent jau eismo čia mažai.",
-   "Tik traktoriai ir vienas kitas furgonas."
+   "Čia jau beveik kaimas.",
+   "Bent mašinų mažai.",
+   "Tik traktoriai kartais pravažiuoja."
   ],
   [
    "Ar šitas posūkis į Saulės gatvę?",
    "Taip, už tų eglių.",
-   "Tada sukam, kol saulė nenusileido."
+   "Ačiū, jau maniau, kad pasiklydau."
   ],
   [
    "Beržai pakelėj gražūs, tik šaligatvio nėra.",
-   "Pėsčiom čia nevaikšto, visi važiuoja.",
-   "Tai ir mes važiuokim."
+   "Pėsčiom čia niekas nevaikšto, visi mašinom.",
+   "Tai ko mes čia tada einam."
   ]
  ],
  "props": [
