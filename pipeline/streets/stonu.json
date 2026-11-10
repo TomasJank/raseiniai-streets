@@ -40,11 +40,6 @@
     0.74,
     0.74
    ],
-   "roof": [
-    0.47,
-    0.49,
-    0.5
-   ],
    "sty": "industrial",
    "windows": false,
    "h": 7.2
@@ -54,11 +49,6 @@
     0.84,
     0.8,
     0.7
-   ],
-   "roof": [
-    0.36,
-    0.37,
-    0.37
    ],
    "sty": "industrial",
    "windows": true,
@@ -70,11 +60,6 @@
     0.92,
     0.89
    ],
-   "roof": [
-    0.4,
-    0.41,
-    0.42
-   ],
    "sty": "shop",
    "windows": true,
    "h": 4.2
@@ -84,11 +69,6 @@
     0.86,
     0.85,
     0.8
-   ],
-   "roof": [
-    0.5,
-    0.51,
-    0.51
    ],
    "sty": "brick",
    "windows": true,
@@ -103,11 +83,6 @@
     0.8,
     0.8
    ],
-   "roof": [
-    0.46,
-    0.47,
-    0.48
-   ],
    "sty": "sheet",
    "windows": false,
    "h": 4.8
@@ -118,14 +93,10 @@
     0.77,
     0.68
    ],
-   "roof": [
-    0.36,
-    0.36,
-    0.37
-   ],
    "sty": "silicate",
    "windows": true,
-   "h": 13.5
+   "h": 13.5,
+   "balcony": true
   },
   "c2918": {
    "wall": [
@@ -133,14 +104,10 @@
     0.77,
     0.68
    ],
-   "roof": [
-    0.36,
-    0.36,
-    0.37
-   ],
    "sty": "silicate",
    "windows": true,
-   "h": 13.5
+   "h": 13.5,
+   "balcony": true
   },
   "c5678": {
    "wall": [
@@ -148,41 +115,32 @@
     0.94,
     0.93
    ],
-   "roof": [
-    0.22,
-    0.38,
-    0.62
-   ],
    "sty": "sheet",
    "windows": false,
    "h": 4.4
   },
   "c2204": {
    "wall": [
-    0.8,
-    0.82,
-    0.84
-   ],
-   "roof": [
-    0.28,
-    0.3,
-    0.32
+    0.86,
+    0.87,
+    0.88
    ],
    "sty": "shop",
    "windows": true,
    "h": 6.4,
-   "pitched": false
+   "pitched": false,
+   "wall2": [
+    0.2,
+    0.22,
+    0.26
+   ],
+   "band": 3.8
   },
   "c2209": {
    "wall": [
     0.88,
     0.82,
     0.68
-   ],
-   "roof": [
-    0.62,
-    0.26,
-    0.17
    ],
    "sty": "plaster",
    "windows": true,
@@ -194,11 +152,6 @@
     0.87,
     0.76
    ],
-   "roof": [
-    0.25,
-    0.26,
-    0.28
-   ],
    "sty": "plaster",
    "windows": true,
    "h": 3.4
@@ -209,11 +162,6 @@
     0.33,
     0.24
    ],
-   "roof": [
-    0.5,
-    0.51,
-    0.51
-   ],
    "sty": "brick",
    "windows": true,
    "h": 3.6
@@ -223,11 +171,6 @@
     0.42,
     0.2,
     0.16
-   ],
-   "roof": [
-    0.45,
-    0.22,
-    0.17
    ],
    "sty": "plank",
    "windows": true,
@@ -242,28 +185,20 @@
     0.75,
     0.6
    ],
-   "roof": [
-    0.26,
-    0.27,
-    0.29
-   ],
    "sty": "silicate",
    "windows": true,
    "pitched": true,
    "hip": false,
    "h": 3.5,
-   "rh": 4.0
+   "rh": 4.0,
+   "ridge": "across",
+   "roofSty": "asbestos"
   },
   "c2193": {
    "wall": [
     0.91,
     0.87,
     0.76
-   ],
-   "roof": [
-    0.25,
-    0.26,
-    0.28
    ],
    "sty": "plaster",
    "windows": true,
@@ -275,28 +210,21 @@
     0.76,
     0.8
    ],
-   "roof": [
-    0.2,
-    0.21,
-    0.24
-   ],
    "sty": "plank",
    "windows": true,
    "pitched": true,
    "hip": false,
    "h": 3.4,
-   "rh": 3.8
+   "rh": 3.8,
+   "ridge": "across",
+   "chimney": true,
+   "roofSty": "tiles"
   },
   "c2197": {
    "wall": [
     0.86,
     0.85,
     0.8
-   ],
-   "roof": [
-    0.62,
-    0.26,
-    0.17
    ],
    "sty": "brick",
    "windows": true,
@@ -308,28 +236,20 @@
     0.77,
     0.74
    ],
-   "roof": [
-    0.36,
-    0.48,
-    0.44
-   ],
    "sty": "plank",
    "windows": true,
    "pitched": true,
    "hip": false,
    "h": 3.2,
-   "rh": 3.4
+   "rh": 3.4,
+   "blankGable": true,
+   "roofSty": "sheet"
   },
   "c2332": {
    "wall": [
     0.82,
     0.52,
     0.36
-   ],
-   "roof": [
-    0.28,
-    0.23,
-    0.21
    ],
    "sty": "plaster",
    "windows": true,
@@ -344,11 +264,6 @@
     0.82,
     0.68
    ],
-   "roof": [
-    0.42,
-    0.27,
-    0.19
-   ],
    "sty": "plaster",
    "windows": true,
    "pitched": true,
@@ -362,11 +277,6 @@
     0.78,
     0.72
    ],
-   "roof": [
-    0.5,
-    0.51,
-    0.51
-   ],
    "sty": "plaster",
    "windows": true,
    "h": 3.2
@@ -377,11 +287,6 @@
     0.73,
     0.3
    ],
-   "roof": [
-    0.82,
-    0.82,
-    0.8
-   ],
    "sty": "wood",
    "windows": true,
    "h": 5.4
@@ -391,11 +296,6 @@
     0.66,
     0.35,
     0.23
-   ],
-   "roof": [
-    0.56,
-    0.57,
-    0.57
    ],
    "sty": "brick",
    "windows": false,
@@ -410,11 +310,6 @@
     0.85,
     0.8
    ],
-   "roof": [
-    0.5,
-    0.51,
-    0.51
-   ],
    "sty": "brick",
    "windows": true,
    "pitched": true,
@@ -427,11 +322,6 @@
     0.91,
     0.87,
     0.76
-   ],
-   "roof": [
-    0.62,
-    0.26,
-    0.17
    ],
    "sty": "plaster",
    "windows": true,
@@ -446,11 +336,6 @@
     0.85,
     0.8
    ],
-   "roof": [
-    0.25,
-    0.26,
-    0.28
-   ],
    "sty": "brick",
    "windows": true,
    "h": 3.4
@@ -461,11 +346,6 @@
     0.7,
     0.55
    ],
-   "roof": [
-    0.42,
-    0.27,
-    0.19
-   ],
    "sty": "wood",
    "windows": true,
    "h": 3.4
@@ -475,11 +355,6 @@
     0.7,
     0.73,
     0.72
-   ],
-   "roof": [
-    0.44,
-    0.46,
-    0.47
    ],
    "sty": "industrial",
    "windows": false,
@@ -494,11 +369,6 @@
     0.77,
     0.76
    ],
-   "roof": [
-    0.45,
-    0.46,
-    0.47
-   ],
    "sty": "industrial",
    "windows": false,
    "h": 6.0
@@ -508,11 +378,6 @@
     0.93,
     0.92,
     0.89
-   ],
-   "roof": [
-    0.25,
-    0.26,
-    0.28
    ],
    "sty": "plaster",
    "windows": true,
@@ -527,11 +392,6 @@
     0.82,
     0.68
    ],
-   "roof": [
-    0.62,
-    0.26,
-    0.17
-   ],
    "sty": "plaster",
    "windows": true,
    "pitched": true,
@@ -544,11 +404,6 @@
     0.86,
     0.86,
     0.84
-   ],
-   "roof": [
-    0.25,
-    0.26,
-    0.28
    ],
    "sty": "plaster",
    "windows": true,
@@ -563,11 +418,6 @@
     0.74,
     0.58
    ],
-   "roof": [
-    0.42,
-    0.27,
-    0.19
-   ],
    "sty": "wood",
    "windows": true,
    "pitched": true,
@@ -580,11 +430,6 @@
     0.78,
     0.73,
     0.58
-   ],
-   "roof": [
-    0.25,
-    0.26,
-    0.28
    ],
    "sty": "silicate",
    "windows": true,
@@ -599,17 +444,18 @@
     0.77,
     0.62
    ],
-   "roof": [
-    0.24,
-    0.25,
-    0.28
-   ],
    "sty": "silicate",
    "windows": true,
    "pitched": true,
    "hip": false,
    "h": 3.4,
-   "rh": 4.2
+   "rh": 4.2,
+   "roofSty": "asbestos",
+   "roof": [
+    0.24,
+    0.25,
+    0.28
+   ]
   },
   "c2331": {
    "wall": [
@@ -617,28 +463,20 @@
     0.76,
     0.62
    ],
-   "roof": [
-    0.3,
-    0.31,
-    0.33
-   ],
    "sty": "silicate",
    "windows": true,
    "pitched": true,
    "hip": false,
    "h": 3.6,
-   "rh": 4.4
+   "rh": 4.4,
+   "ridge": "across",
+   "roofSty": "asbestos"
   },
   "c2324": {
    "wall": [
     0.8,
     0.76,
     0.62
-   ],
-   "roof": [
-    0.28,
-    0.29,
-    0.31
    ],
    "sty": "silicate",
    "windows": true,
@@ -1070,7 +908,7 @@
    ]
   },
   {
-   "style": "picket",
+   "style": "slat",
    "ll": [
     [
      55.3774227,
@@ -1080,7 +918,9 @@
      55.3773356,
      23.1046255
     ]
-   ]
+   ],
+   "col": "#6b5a50",
+   "h": 1.6
   },
   {
    "style": "hedge",
@@ -1106,7 +946,8 @@
      55.3780399,
      23.1059619
     ]
-   ]
+   ],
+   "col": "#26282a"
   },
   {
    "style": "hedge",
@@ -1312,7 +1153,7 @@
    "h": 2.0
   },
   {
-   "style": "wall",
+   "style": "panel",
    "ll": [
     [
      55.3777624,
@@ -1323,10 +1164,11 @@
      23.1051094
     ]
    ],
-   "h": 1.5
+   "h": 1.5,
+   "col": "#a9a395"
   },
   {
-   "style": "wall",
+   "style": "panel",
    "ll": [
     [
      55.379496,
@@ -1337,7 +1179,8 @@
      23.1081787
     ]
    ],
-   "h": 1.7
+   "h": 1.4,
+   "col": "#aab0b2"
   },
   {
    "style": "hedge",
