@@ -28,19 +28,19 @@
  "looks": {
   "c1072": {
    "wall": [
-    0.86,
-    0.85,
-    0.8
+    0.88,
+    0.88,
+    0.84
    ],
    "roof": [
-    0.56,
-    0.57,
-    0.56
+    0.3,
+    0.3,
+    0.32
    ],
-   "sty": "brick",
+   "sty": "plaster",
    "windows": true,
-   "h": 3.2,
-   "rh": 4.2,
+   "h": 3.0,
+   "rh": 3.6,
    "pitched": true,
    "hip": false
   },
@@ -62,18 +62,18 @@
   },
   "c449": {
    "wall": [
-    0.52,
-    0.37,
-    0.25
+    0.8,
+    0.69,
+    0.43
    ],
    "roof": [
-    0.56,
-    0.57,
-    0.56
+    0.22,
+    0.31,
+    0.24
    ],
-   "sty": "wood",
+   "sty": "silicate",
    "windows": true,
-   "h": 3.0,
+   "h": 5.6,
    "rh": 3.4,
    "pitched": true,
    "hip": false
@@ -535,6 +535,60 @@
    "windows": true,
    "h": 3.3,
    "rh": 4.2,
+   "pitched": true,
+   "hip": false
+  },
+  "c578": {
+   "wall": [
+    0.9,
+    0.88,
+    0.8
+   ],
+   "roof": [
+    0.52,
+    0.17,
+    0.14
+   ],
+   "sty": "plaster",
+   "windows": true,
+   "h": 3.0,
+   "rh": 3.6,
+   "pitched": true,
+   "hip": false
+  },
+  "c7452": {
+   "wall": [
+    0.85,
+    0.79,
+    0.6
+   ],
+   "roof": [
+    0.55,
+    0.55,
+    0.53
+   ],
+   "sty": "plaster",
+   "windows": true,
+   "h": 6.4,
+   "rh": 0.5,
+   "pitched": false,
+   "hip": false
+  },
+  "c5272": {
+   "wall": [
+    0.52,
+    0.5,
+    0.46
+   ],
+   "roof": [
+    0.34,
+    0.34,
+    0.36
+   ],
+   "sty": "plank",
+   "windows": false,
+   "h": 2.6,
+   "rh": 1.4,
    "pitched": true,
    "hip": false
   }
