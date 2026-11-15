@@ -60,7 +60,7 @@ function cars4Model(key,M){
 // the colour a car is drawn in: white means the model's own, which a flat-paint model keeps in F.own
 const cars4Own=(F,c)=>c===0xffffff&&F.own!=null?F.own:c;
 const CARS4=(()=>{
-  const S={models:{},extra:{},on:false,hi:false};if(PHONE||!CARS2.on)return S;S.on=true;
+  const S={models:{},extra:{},on:false,hi:false};if(!CARS2.on)return S;S.on=true;
   // traffic share per model
   const MIX=CARS4_MIX;
   for(const F of CARS2.inst)scene.remove(F.inst);
@@ -129,7 +129,8 @@ function cars4Parked(){
         const s=Math.sin(h),c=Math.cos(h),q=[[-1,-1],[1,-1],[1,1],[-1,1]].map(([u,v])=>[x+c*u*F.wid/2+s*v*F.len/2,z-s*u*F.wid/2+c*v*F.len/2]);
         for(let i=0;i<4;i++)addWall(...q[i],...q[(i+1)%4]);}}};}
 // close-up versions: unpacked off the main path, then swapped in by distance (bodies and wheels of moving cars here, parked cars in cars4Parked)
-if(CARS4.on){const lod=Object.values(CARS4.models).filter(F=>F.M.lod);
+// phones keep the distant versions only
+if(CARS4.on){const lod=Object.values(CARS4.models).filter(F=>F.M.lod&&!PHONE);
   Promise.all(lod.map(async F=>{const u=new Uint8Array(await new Response(new Blob([cars4Bytes('agz_cars4_'+F.key)]).stream().pipeThrough(new DecompressionStream('deflate'))).arrayBuffer());
     const G=cars4Geos(u,F.M);G.lot.userData.cars4hi=F.key;F.hi=G;
     F.instHi=new THREE.InstancedMesh(G.wheel||F.trim,F.mat,4*24);F.instHi.count=0;F.instHi.frustumCulled=false;F.instHi.userData.keep=true;scene.add(F.instHi);})).then(()=>{

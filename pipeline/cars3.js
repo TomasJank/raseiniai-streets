@@ -133,7 +133,7 @@ function buildCar3(M){
 // in place, so makeCarMesh, the parked2 meshes, police and every other system read these cars. The player's starting
 // Audi 80 (carGeo) stays hand-built, as before.
 const CARS3=(()=>{
-  const S={models:{}};if(PHONE)return S;
+  const S={models:{}};
   // traffic share per model, roughly the town's mix: estates and saloons first, one MPV, one SUV, one van
   const MIX={passat_b5:4,golf4:3,a6_c5:3,e39:2,e46:2,avensis:2,octavia3:2,zafira:1,rav4:1,t5:1};
   for(const F of CARS2.inst)scene.remove(F.inst);

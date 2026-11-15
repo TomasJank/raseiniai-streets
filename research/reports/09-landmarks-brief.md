@@ -58,3 +58,25 @@ The owner asked for "some sonnet agents to build some other less important house
 | `lmvil1` | c2913, c2911, c2910 | `vil1/` |
 | `lmvil2` | c2909, c2904 | `vil2/` |
 | `lmvil3` | c2185, c1525, c2467, c2504 | `vil3/` |
+
+## Addendum 2: main shops and public buildings (2026-11-14 night)
+The owner: "it would be good if you made models for all the main shops, and for the buildings you have not done yet, if possible. Do not make one if there is nothing to see in the photos", and "look where the Raseiniai post office is too, in a glass building". Everything above applies, with these changes:
+
+- **Evidence gate.** A building is modelled only from what photos show. If the photos do not show the building well enough to fix the plan (which footprint edge is the front, where the entrance is, storeys, roof, main materials), do not build it: say so in the report with "photo wanted" lines and stop on that building. A face nobody photographed is built plain and listed as a guess; a building nobody photographed is not built.
+- **Photo counts** (Mapillary images whose computed position is within 30 m of the footprint, 2026-11-14; N E S W = side of the building the camera stood on): see the table. Counts are positions, not proof the building is in frame: look at the images. Mapillary's compass angle is wrong by 50 to 100 degrees on some roads here: take the heading from the next frame's position.
+- **Names in the page.** Every top-level name your step adds to the page (`const`, `let`, `function`) starts with the prefix in the table. Two steps of the last round both used `LMC` and two used `LMS`, and the combined page did not start. Before you finish, check your names against the built page: `grep -c "const <NAME>=" out.html` must be 1.
+- **Build.** `build.sh` now ends `... props2 tex house5a maxima lmchurch lmsquare lmcivic lmstation lmvil2 lmvil3 perf2 kit hud2`. It cds into `pipeline/`, so always pass an absolute output path. For day-to-day work run `sh pipeline/build.sh /abs/out.html` and then your step on that page. For the final check build once with your step placed before `perf2` (copy the loop from `build.sh` into your scratch dir; never edit `build.sh`), because that is where the integrator will put it.
+- **Machine.** One software-rendered (swiftshader) test page uses about ten cores, and other agents share this Mac. Run one headless page at a time, never two tests in parallel, and use `--use-angle=metal` in your own scripts unless a test needs the software renderer. Page loads can take minutes when the machine is busy: use long timeouts and do not read a timeout as a failure of the build.
+- **Scratch.** Scratch directories are wiped on reboot (it happened today). Keep scripts, the `.blend` builder, reference crops and shots under your `research/assets/houses/<name>/` folder as you go, and write `research/reports/<step>.md` as you go, not at the end.
+- **Lettering.** As for the Maxima: the shop or office name in plain lettering where the real building carries it, no logo artwork, no brand marks beyond the name, no tenant names.
+- Budget per step 400 KB of page. Do not touch `index.html`, `work/build/`, `build.sh`, or any other step's files. Never commit or push.
+
+| Step | Prefix | Builds | Photos within 30 m (N E S W) | House folders |
+|---|---|---|---|---|
+| `lmshops` | `LSH`, `lsh` | Lidl (c8100) and IKI (c2181) | Lidl 177 (N, some E), IKI 398 (N, E) | `lidl/`, `iki/` |
+| `lmmaxx` | `LMX`, `lmx` | Maxima X (c3293) | 493 (N and W) | `maximax/` |
+| `lmpost` | `LPO`, `lpo` | Post office, Maironio g. 8 (c2683, the glass building) and Swedbank (c2940) | post 240 (N, W; 7 panoramas), Swedbank 154 (all sides) | `pastas/`, `swedbank/` |
+| `lmpublic` | `LPU`, `lpu` | Police station (c2158) and the primary health care centre (c170) | police 221 (E, S), health centre 206 (E, S) | `policija/`, `pspc/` |
+| `lmsport` | `LSP`, `lsp` | Sports centre (c19) | 129 (N, E) | `sportas/` |
+
+Not built, no photo within 60 m: Norfa (c2135), Dubysa (c948), the court (c2157), the hospital (c168), Kalno school (c44), the technology school (c2), the kindergarten (c1), the cemetery chapel (c5275). Photos from the owner would unlock them.
