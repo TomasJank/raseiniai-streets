@@ -89,7 +89,11 @@ function kitHouse(B,P,s,K,prev,rev,R,EG,RE,OF,XE){
     rows.forEach((r,k)=>{const ts=typeof r==='number'?Array.from({length:r},(_,j)=>(j+.5)/r):r;
       if(k<v1){const ww=1.92*sc,ya=yb+k*fh;
         ts.forEach((t,j)=>{const sm=Math.min(Math.max(t*F.L,ww/2),F.L-ww/2);if(k===0&&dr.some(([x,w])=>Math.abs(x-sm)<w/2+.75))return;
-          const oo=F.off?F.off(sm):0;kitWin(F,sm,ww,ya,ya+fh,.2,.8,k,k+.999,sty,wcol(ya),wm,j,F.off?.03+oo:undefined);
+          const oo=F.off?F.off(sm):0,wk=v1===1&&(s.kind==='house'||s.kind==='shed')?winK(sty,ww/.6,fh):null;
+          // fixture update (windows step, 2026-11-15): one-storey windows at the size the live kit now draws them (winK, facades2.js)
+          if(wk){const [kx,ky,q]=wk,a=q[0]/128,b=q[1]/128,yb0=1-q[3]/128,yt=1-q[2]/128,bw=ww/.6,y0=ya+fh*yb0;
+            kitWin(F,sm+((a+b)/2-.5)*bw,(b-a)*bw/kx,y0,y0+fh*(yt-yb0)/ky,a,b,k+yb0,k+yt,sty,wcol(ya),wm,j,F.off?.03+oo:undefined);}
+          else kitWin(F,sm,ww,ya,ya+fh,.2,.8,k,k+.999,sty,wcol(ya),wm,j,F.off?.03+oo:undefined);
           if(K.shut)for(const g of [-1,1])kitBox(KIT_S,F,sm+g*ww*.29-(g<0?ww*.17:0),sm+g*ww*.29+(g>0?ww*.17:0),.03+oo,.05+oo,ya+fh*.2,ya+fh*.8,K.shut,-1,'f');});}
       else if(k<=v1+1&&gRh!=null){
         // gable rows: the attic storey from just above the eaves, then a small loft window above it

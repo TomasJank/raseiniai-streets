@@ -1,0 +1,230 @@
+[
+{
+"bid": "c2462",
+"frame": "871877995564167",
+"x": 37.38259959312455,
+"z": 20.188421303688106,
+"head": 314.7577162798969,
+"w": 1024,
+"h": 768,
+"f": 768.0,
+"box": [
+482.4002923122515,
+172.42709882083508,
+971.7980154848461,
+550.5980667269308
+],
+"dist": 38,
+"da": 16,
+"date": 1768928033061,
+"photo": "/Users/tomasjankauskas/Desktop/Projects/raseiniai-streets/pipeline/kit/sheets/kit2/photos/871877995564167.jpg"
+},
+{
+"bid": "c2462",
+"frame": "1599087237859445",
+"x": 26.376533298932042,
+"z": 23.17353196361653,
+"head": 1.3380474856821,
+"w": 1024,
+"h": 768,
+"f": 768.0,
+"box": [
+78.30763590425997,
+165.8890963606697,
+582.8286735479842,
+555.7462618126384
+],
+"dist": 36,
+"da": -13,
+"date": 1779983212039,
+"photo": "/Users/tomasjankauskas/Desktop/Projects/raseiniai-streets/pipeline/kit/sheets/kit2/photos/1599087237859445.jpg"
+},
+{
+"bid": "c2464",
+"frame": "1546100299993493",
+"x": -33.784288594553125,
+"z": -22.05165023752026,
+"head": 84.40658868201477,
+"w": 1024,
+"h": 768,
+"f": 768.0,
+"box": [
+-198.94236019277474,
+-13.430556736203187,
+727.8536979153232,
+702.7300336200544
+],
+"dist": 21,
+"da": -18,
+"date": 1766161232000,
+"photo": "/Users/tomasjankauskas/Desktop/Projects/raseiniai-streets/pipeline/kit/sheets/kit2/photos/1546100299993493.jpg"
+},
+{
+"bid": "c2464",
+"frame": "1308929584404096",
+"x": 0.023730741900804486,
+"z": -3.3436819502282695,
+"head": 307.5101090428963,
+"w": 1024,
+"h": 768,
+"f": 768.0,
+"box": [
+547.8193220074916,
+106.00199680649669,
+1196.102271455378,
+606.9479122889543
+],
+"dist": 31,
+"da": 25,
+"date": 1771934145024,
+"photo": "/Users/tomasjankauskas/Desktop/Projects/raseiniai-streets/pipeline/kit/sheets/kit2/photos/1308929584404096.jpg"
+},
+{
+"bid": "c2465",
+"frame": "820040960863176",
+"x": -15.26986920135491,
+"z": -15.094003873135431,
+"head": 309.0841060747762,
+"w": 1024,
+"h": 768,
+"f": 768.0,
+"box": [
+491.7655184105121,
+86.7627727534566,
+1173.486623262805,
+613.5472628665921
+],
+"dist": 25,
+"da": 23,
+"date": 1764755443064,
+"photo": "/Users/tomasjankauskas/Desktop/Projects/raseiniai-streets/pipeline/kit/sheets/kit2/photos/820040960863176.jpg"
+},
+{
+"bid": "c2465",
+"frame": "1810334033297938",
+"x": -14.190054631650892,
+"z": -12.818137406492593,
+"head": 306.3381590301814,
+"w": 1024,
+"h": 768,
+"f": 768.0,
+"box": [
+571.4539671410948,
+113.98178316282394,
+1190.7475826067073,
+592.5268496589789
+],
+"dist": 27,
+"da": 26,
+"date": 1784024878024,
+"photo": "/Users/tomasjankauskas/Desktop/Projects/raseiniai-streets/pipeline/kit/sheets/kit2/photos/1810334033297938.jpg"
+},
+{
+"bid": "c2466",
+"frame": "1178399790939227",
+"x": -35.214413730391705,
+"z": -31.063864355327407,
+"head": 307.57576301069764,
+"w": 1024,
+"h": 768,
+"f": 768.0,
+"box": [
+365.96705110736787,
+-30.568330397321006,
+1343.9639256894616,
+725.1565272342968
+],
+"dist": 23,
+"da": 24,
+"date": 1764755445064,
+"photo": "/Users/tomasjankauskas/Desktop/Projects/raseiniai-streets/pipeline/kit/sheets/kit2/photos/1178399790939227.jpg"
+},
+{
+"bid": "c2466",
+"frame": "1939575420775602",
+"x": -33.62038808581199,
+"z": -27.607750363640786,
+"head": 305.8470750603502,
+"w": 1024,
+"h": 768,
+"f": 768.0,
+"box": [
+471.91690416754034,
+28.17414414979237,
+1311.3360044723872,
+676.8161762035376
+],
+"dist": 27,
+"da": 26,
+"date": 1763567795082,
+"photo": "/Users/tomasjankauskas/Desktop/Projects/raseiniai-streets/pipeline/kit/sheets/kit2/photos/1939575420775602.jpg"
+},
+{
+"bid": "c2462",
+"frame": "2429974844115834",
+"x": 36.34354752336227,
+"z": 29.261892091629424,
+"head": 314.36,
+"w": 1024,
+"h": 768,
+"f": 768.0,
+"box": [
+600,
+230,
+1024,
+500
+],
+"photo": "/Users/tomasjankauskas/Desktop/Projects/raseiniai-streets/pipeline/kit/sheets/kit2/photos/2429974844115834.jpg"
+},
+{
+"bid": "c2514",
+"frame": "697673",
+"x": -128.29,
+"z": -92.82,
+"head": 125.6,
+"w": 1024,
+"h": 768,
+"f": 768,
+"photo": "/Users/tomasjankauskas/Desktop/Projects/raseiniai-streets/refs/mapillary/vilniaus/2026-06-10_2417834318697673.jpg",
+"box": [
+0,
+0,
+1024,
+768
+]
+},
+{
+"bid": "c2914",
+"frame": "741232",
+"x": -578.14,
+"z": -377.46,
+"head": 321.6,
+"w": 1024,
+"h": 768,
+"f": 768,
+"photo": "/Users/tomasjankauskas/Desktop/Projects/raseiniai-streets/refs/mapillary/vilniaus/2026-02-19_2376815092741232.jpg",
+"box": [
+0,
+0,
+1024,
+768
+]
+},
+{
+"bid": "c7170",
+"frame": "973566",
+"x": -184.27,
+"z": -133.79,
+"head": 305.9,
+"w": 1024,
+"h": 768,
+"f": 768,
+"photo": "/Users/tomasjankauskas/Desktop/Projects/raseiniai-streets/refs/mapillary/vilniaus/2026-09-02_2880596888973566.jpg",
+"box": [
+0,
+0,
+1024,
+768
+]
+}
+]

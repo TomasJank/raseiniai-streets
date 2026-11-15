@@ -28,7 +28,7 @@ rep("const win=(x,y,w,h,glass,frame='#f4f4f2')=>{R(", "const win=(x,y,w,h,glass,
 rep("for(let s=0;s<16;s++)for(let r=0;r<2;r++){\n    ox=s*T;oy=r*T;const ground=r===1;sd=s*977+r*131+7;",
     "for(let s=0;s<16;s++)for(const r of[2,3,0,1]){\n    ox=s*T;oy=r*T;const ground=(r&1)===1;NOWIN=r>1;sd=s*977+(r&1)*131+7;")
 rep("vec2 f=fract(vMapUv),sc=vec2(.0625,.5),auv=vec2((vSty+f.x)*sc.x,((vMapUv.y<1.?0.:1.)+f.y)*sc.y);",
-    "float bl=step(15.5,vSty),ws=vSty-16.*bl;vec2 f=fract(vMapUv),sc=vec2(.0625,.25),auv=vec2((ws+f.x)*sc.x,((vMapUv.y<1.?2.:3.)-2.*bl+f.y)*sc.y);")
+    "float bl=step(15.5,vSty),ws=vSty-16.*bl;vec2 f=fract(vMapUv),sc=vec2(.0625,.25),auv=vec2((ws+f.x)*sc.x,((vMapUv.y<1.?2.:3.)-2.*bl+f.y)*sc.y);${WIN_GLSL}")
 rep("(vSty<7.5||(vSty>10.5&&vSty<13.5))", "(ws<7.5||(ws>10.5&&ws<13.5))", 2)
 
 # atlas grain: the tall atlas ran vn (closure per call) over 1M pixels, 200 MB of garbage; the grain repeats per tile so it is cached
@@ -63,6 +63,9 @@ rep("  let T=s.tops;\n  if(polyArea(p)>0){p=p.slice().reverse();if(T)T=T.slice()
     "  let T=s.tops;const rev=polyArea(p)>0;\n  if(rev){p=p.slice().reverse();if(T)T=T.slice().reverse();}")
 rep("const fw=s.sty>=0;B.cs=fw?s.sty:-1;", "const fw=s.sty>=0;B.cs=fw?s.sty:-1;\n  const tn=s.wall2?[...s.wall2,-((s.yb||0)+.3+(s.band==null?3:s.band)+500)]:NOTONE,gb=s.blankGable&&s.pitched&&!s.hip&&n===4?gableIdx(p,s):null;B.tn=tn;")
 rep("    const want=[-dz,0,dx];\n    const u1=fw?", "    const want=[-dz,0,dx];if(fw)B.cs=s.sty+(faceOff(s,i,n,rev,gb)?16:0);\n    const u1=fw?")
+# window size on one-storey houses (WIN_FIX in facades2.js): their walls' u is offset by WIN_U
+rep("    const uA=fw?[0,0]:UV0,uB=fw?[u1,0]:UV0,uC=fw?[u1,v1]:UV0,uD=fw?[0,v1]:UV0;",
+    "    const wo=fw&&v1===1&&winFix(s)?WIN_U:0,uA=fw?[wo,0]:UV0,uB=fw?[wo+u1,0]:UV0,uC=fw?[wo+u1,v1]:UV0,uD=fw?[wo,v1]:UV0;")
 rep("  B.cs=-1;\n  if(s.pitched){\n    let [a,b,c,d]=p;", "  B.cs=-1;B.tn=NOTONE;\n  if(s.pitched){\n    let [a,b,c,d]=p;")
 rep("    else if(s.ridge===1)[a,b,c,d]=[b,c,d,a];\n    else if(s.ridge==null&&Math.hypot(b[0]-a[0],b[1]-a[1])<Math.hypot(c[0]-b[0],c[1]-b[1]))[a,b,c,d]=[b,c,d,a];\n    const shortL",
     "    if(!s.front)[a,b,c,d]=pitchOrder(p,s);\n    const shortL")

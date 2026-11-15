@@ -2,6 +2,26 @@
 // ---------- facades2: per-building knobs read from street-file looks (add_facades2.py) ----------
 // two-tone walls: the vertex attribute `tone` is (r,g,b,-(bandY+500)) on upper-wall triangles; (0,0,0,1) is the GL default and means "no band"
 const NOTONE=[0,0,0,1];
+// window size on one-storey houses and sheds: the atlas window is a fixed share of the storey, and a one-storey house's storey is its whole
+// wall (median 3.6 m), so its frame came out 1.4-1.55 m wide and ~1.9 m tall. Per style: the window's box in tile pixels
+// (x0, x1, top, bottom: frame, sill and lintel/casing), its frame width and height in pixels, and the frame size wanted in metres.
+// Walls of such houses get u + WIN_U (fract unchanged); the shader shrinks the box to that size about its centre, sill kept.
+const WIN_U=1024,WIN_FIX={0:[30,98,22,99,62,66,1.2,1.35],1:[30,98,12,105,58,80,1.2,1.4],4:[30,98,22,99,62,66,1.2,1.35],
+  5:[32,94,22,99,56,68,1.15,1.35],11:[30,98,19,99,62,66,1.2,1.35],13:[26,102,16,99,56,68,1.15,1.35]};
+const winFix=s=>(s.kind==='house'||s.kind==='shed')&&!!WIN_FIX[s.sty]&&!(typeof kitSized==='function'&&kitSized(s.rid));
+// [kx, ky, box] shrink of the window on a bay bw x storey sh metres, or null when it is already small enough
+function winK(sty,bw,sh){const q=WIN_FIX[sty];if(!q)return null;const kx=Math.max(1,q[4]/128*bw/q[6]),ky=Math.max(1,q[5]/128*sh/q[7]);return kx>1||ky>1?[kx,ky,q]:null;}
+const WIN_GLSL=(()=>{const n=v=>v.toFixed(5);let s='';
+  for(const k in WIN_FIX){const [x0,x1,yt,yb,fw,fh,W,H]=WIN_FIX[k];s+=`if(abs(ws-${k}.)<.5){wb=vec4(${n(x0/128)},${n(x1/128)},${n(1-yb/128)},${n(1-yt/128)});wf=vec4(${n(fw/128)},${n(fh/128)},${n(W)},${n(H)});}`;}
+  // metres per tile along u and v from screen derivatives (the wall is a plane, so this is exact), then a piecewise-linear warp
+  // per axis: box [a,b] shows on [a2,b2], the wall outside it is stretched to fill, gradients scaled with it
+  return `if(vMapUv.x>=${WIN_U/2}.&&bl<.5){vec4 wb=vec4(0.),wf=vec4(0.);${s}
+    vec3 px=dFdx(vViewPosition),py=dFdy(vViewPosition);vec2 qx=dFdx(vMapUv),qy=dFdy(vMapUv);float dt=qx.x*qy.y-qx.y*qy.x;
+    if(wf.x>0.&&abs(dt)>1e-14){
+      vec2 k=max(vec2(1.),wf.xy*vec2(length(px*qy.y-py*qx.y),length(py*qx.x-px*qy.x))/abs(dt)/wf.zw);
+      float c=(wb.x+wb.y)*.5;vec2 a=wb.xz,b=wb.yw,a2=vec2(c-(c-a.x)/k.x,a.y),b2=vec2(c+(b.x-c)/k.x,a.y+(b.y-a.y)/k.y),i0=step(a2,f),i1=step(b2,f);
+      vec2 g=mix(mix(f*a/a2,a+(f-a2)*(b-a)/(b2-a2),i0),b+(f-b2)*(1.-b)/(1.-b2),i1);
+      auv=vec2((ws+g.x)*sc.x,((vMapUv.y<1.?2.:3.)+g.y)*sc.y);sc*=mix(mix(a/a2,(b-a)/(b2-a2),i0),(1.-b)/(1.-b2),i1);}}`;})();
 function facade2(sp,w){
   // cross-gabled wings: the eaves overhang of one wing sticks through the other's roof as dark X-shaped lines, so wings sit flush
   if(w.tags.parts&&sp.pitched)sp.noEave=true;

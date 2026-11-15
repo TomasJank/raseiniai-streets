@@ -123,7 +123,9 @@ const geo=await run(kit,({ids,K2ID,SHUT,WCOL,RCOL})=>{
     if(K.roof2)o.roof2=[].concat(K.roof2).map(q=>{const c=q.col||sp.roof,m=B.filter(t=>same(t.col,c)&&t.c[1]>h&&t.n[1]>.2&&bld.sty.array[t.v]>=0).length;return{ok:m>=(q.side==='both'?4:2),n:m};});
     if(K.shut){const s=S.filter(t=>same(t.col,SHUT)),wn=(K.win||[]).reduce((a,[e,rows])=>a+rows.slice(0,v1).reduce((b,r)=>b+(typeof r==='number'?r:r.length),0),0);o.shut={ok:s.length>=4*wn&&s.length%4===0,n:s.length/4,wn};}
     if(Array.isArray(K.winShape))o.winShape=K.winShape.map(([e,sh])=>{const W=E(e),dec=S.filter(t=>t.sty>=0&&W.mine(t)&&t.c[1]<h);
-      const w=Math.max(0,...dec.map(t=>{const xs=t.p.map(q=>W.at([q[0],0,q[2]])*W.L);return Math.max(...xs)-Math.min(...xs);}));return{e,ok:!dec.length||Math.abs(w-1.92*KIT_SHAPE[sh])<.05,w:+w.toFixed(2)};});
+      const w=Math.max(0,...dec.map(t=>{const xs=t.p.map(q=>W.at([q[0],0,q[2]])*W.L);return Math.max(...xs)-Math.min(...xs);}));// windows step: one-storey house walls draw their windows at the one-storey size (winK); the quad is the window box, kx narrower
+      const st=sp.sty>=0?sp.sty:STY.plaster,wk=v1===1&&(sp.kind==='house'||sp.kind==='shed')&&K.winSize==null?winK(st,3.2*KIT_SHAPE[sh],fh):null,want=wk?(wk[2][1]-wk[2][0])/128*3.2*KIT_SHAPE[sh]/wk[0]:1.92*KIT_SHAPE[sh];
+      return{e,ok:!dec.length||Math.abs(w-want)<.05,w:+w.toFixed(2),want:+want.toFixed(2)};});
     // kit 3
     if(Array.isArray(K.winSize))o.winSize=K.winSize.map(([e,v])=>{const W=E(e),dec=S.filter(t=>t.sty>=0&&W.mine(t)&&t.c[1]<h);
       const w=Math.max(0,...dec.map(t=>{const xs=t.p.map(q=>W.at([q[0],0,q[2]])*W.L);return Math.max(...xs)-Math.min(...xs);})),want=1.92*kitZ(v,sp.sty);return{e,ok:Math.abs(w-want)<.05,w:+w.toFixed(2),want:+want.toFixed(2)};});

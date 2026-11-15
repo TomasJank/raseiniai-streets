@@ -10,6 +10,8 @@ const kitN=(v,a,b)=>typeof v==='number'&&v>=a&&v<=b,kitC=v=>Array.isArray(v)&&v.
 const kitRowOk=r=>Number.isInteger(r)&&r>=0&&r<=12||Array.isArray(r)&&r.length>0&&r.length<=12&&r.every(x=>kitN(x,0,1));
 // window size: a name, or the width of the window's frame in metres (the atlas frame is 1.4 m on board styles, 1.45 on `old`, 1.55 on the rest)
 const KIT_SIZE={small:.75,normal:1,large:1.3},kitSizeOk=v=>typeof v==='string'&&v in KIT_SIZE||kitN(v,.4,3);
+// a house whose description sets a valid winSize keeps every window as drawn before the windows step (read by winFix, facades2.js)
+const kitSized=id=>{const v=typeof KIT!=='undefined'&&KIT[id]&&KIT[id].winSize;return v!=null&&v!==false&&(kitSizeOk(v)||Array.isArray(v)&&v.length>0&&v.every(q=>Array.isArray(q)&&Number.isInteger(q[0])&&q[0]>=0&&kitSizeOk(q[1])));};
 const kitZ=(v,st)=>typeof v==='string'?KIT_SIZE[v]:v/(st===STY.plank||st===STY.wood?1.4:st===STY.old?1.45:1.55);
 // checks that need no outline (the addBuilding wrapper reads these keys before the outline is known)
 const kitXgOk=q=>!!q&&Number.isInteger(q.e)&&q.e>=0&&(q.at==null||kitN(q.at,0,1))&&(q.w==null||kitN(q.w,1,16))&&(q.d==null||kitN(q.d,0,12))&&(q.rise==null||kitN(q.rise,.3,1.4))&&
@@ -103,9 +105,12 @@ function kitHouse(B,P,s,K,prev,rev,R,EG,RE,OF,XE,PT){
   const spanAt=(i,x)=>{if(i==null)return null;for(const [j,Q] of SPANS)if(j===i){const L=fw(i).L;if(x>=Q.at[0]*L-.05&&x<=Q.at[1]*L+.05)return Q;}return null;};
   KIT_S.tn=K.frame?[...K.frame,2]:NOTONE;
   // one storey window centred sm metres along F on the storey from ya, fh high; o (kit 3): z = size, band = fill the storey, col/sty/tx/ii
-  const stWin=(F,sm,j,k,ya,fh,ww,o)=>{const oo=F.off?F.off(sm):0,Q=spanAt(o.ii,sm),c=o.col||(Q&&Q.col)||wcol(ya),tx=o.tx??(Q&&Q.sty?TI[Q.sty]:wm),st=o.sty??sty;
-    let y0=ya+fh*.2,y1=ya+fh*.8;
-    if(o.z==null&&!o.band)kitWin(F,sm,ww,ya,ya+fh,.2,.8,k,k+.999,st,c,tx,j,F.off?.03+oo:undefined);
+  // one: the wall has one storey; on a house without winSize its windows take the one-storey size (winK, facades2.js), as the automatic ones do
+  const stWin=(F,sm,j,k,ya,fh,ww,o,one)=>{const oo=F.off?F.off(sm):0,Q=spanAt(o.ii,sm),c=o.col||(Q&&Q.col)||wcol(ya),tx=o.tx??(Q&&Q.sty?TI[Q.sty]:wm),st=o.sty??sty;
+    let y0=ya+fh*.2,y1=ya+fh*.8;const wk=one&&o.z==null&&!o.band&&(s.kind==='house'||s.kind==='shed')&&K.winSize==null?winK(st,ww/.6,fh):null;
+    if(wk){const [kx,ky,q]=wk,a=q[0]/128,b=q[1]/128,yb0=1-q[3]/128,yt=1-q[2]/128,bw=ww/.6;y0=ya+fh*yb0;y1=y0+fh*(yt-yb0)/ky;ww/=kx;
+      kitWin(F,sm+((a+b)/2-.5)*bw,(b-a)*bw/kx,y0,y1,a,b,k+yb0,k+yt,st,c,tx,j,F.off?.03+oo:undefined);}
+    else if(o.z==null&&!o.band)kitWin(F,sm,ww,ya,ya+fh,.2,.8,k,k+.999,st,c,tx,j,F.off?.03+oo:undefined);
     else{const z=o.z||1;[y0,y1]=o.band?[ya+.1,ya+fh-.1]:[ya+fh*(.55-.35*z),ya+fh*(.55+.35*z)];kitWin(F,sm,ww,y0,y1,.2,.8,k+.2,k+.9,st,c,tx,j,F.off?.03+oo:undefined);
       if(!o.band){y0=ya+fh*(.55-.3*z);y1=ya+fh*(.55+.3*z);}}
     if(K.shut)for(const g of [-1,1])kitBox(KIT_S,F,sm+g*ww*.29-(g<0?ww*.17:0),sm+g*ww*.29+(g>0?ww*.17:0),.03+oo,.05+oo,y0,y1,K.shut,-1,'f');};
@@ -114,10 +119,10 @@ function kitHouse(B,P,s,K,prev,rev,R,EG,RE,OF,XE,PT){
   const rowsOn=(F,rows,dr,hE,gRh,sc,lab,o={})=>{const yB=o.yb??yb,v1=Math.max(1,Math.round((hE-yB)/3)),fh=(hE-yB)/v1,h=hE;
     rows.forEach((r,k)=>{const ts=typeof r==='number'?Array.from({length:r},(_,j)=>(j+.5)/r):r;
       if(k<v1){const ww=1.92*sc*(o.z||1),ya=yB+k*fh;
-        ts.forEach((t,j)=>{const sm=Math.min(Math.max(t*F.L,ww/2),F.L-ww/2);if(k===0&&dr.some(([x,w])=>Math.abs(x-sm)<w/2+.75))return;stWin(F,sm,j,k,ya,fh,ww,o);});}
+        ts.forEach((t,j)=>{const sm=Math.min(Math.max(t*F.L,ww/2),F.L-ww/2);if(k===0&&dr.some(([x,w])=>Math.abs(x-sm)<w/2+.75))return;stWin(F,sm,j,k,ya,fh,ww,o,v1===1);});}
       else if(gRh==null&&o.pt){let miss=0;const ww=1.92*sc*(o.z||1);
         ts.forEach((t,j)=>{const sm=Math.min(Math.max(t*F.L,ww/2),F.L-ww/2),hT=o.pt(sm),v2=hT?Math.max(1,Math.round((hT-yB)/3)):0;
-          if(k>=v2){miss++;return;}const f2=(hT-yB)/v2;stWin(F,sm,j,k,yB+k*f2,f2,ww,o);});
+          if(k>=v2){miss++;return;}const f2=(hT-yB)/v2;stWin(F,sm,j,k,yB+k*f2,f2,ww,o,v2===1);});
         if(miss)KIT_WARN.push(s.rid+'.'+lab+': row '+k+' has no wall under '+miss+' of its windows');}
       else if(k<=v1+1&&gRh!=null){
         // gable rows: the attic storey from just above the eaves, then a small loft window above it
