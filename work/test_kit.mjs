@@ -11,9 +11,11 @@ const ST='/Users/tomasjankauskas/Desktop/Projects/raseiniai-streets/pipeline/str
 const BAD='c2337',BADK={f:0,win:[[99,[2]]],door:[{e:0,type:'tank'}],frame:[2,0,0],chim:'many',ext:[{e:0,d:50}],plinthH:9,winShape:'round',dorm:[{e:1,n:0}]};
 const FULL={f:0,win:[[0,[2,1]],[1,[3]]],frame:[.4,.28,.2],door:[{e:1,at:.3,steps:true,porch:'canopy'}],gable:[.6,.6,.6],gableSty:'boards',plinth:[.35,.35,.34],
   ext:[{e:2,w:.5,d:3}],chim:[.3,.7],dorm:[{e:1,type:'gable',n:2}],balc:[{e:0,w:.4}]};
-// rid -> [[v0,v1) of the building mesh, [k0,k1) of the kit mesh] per addBuilding call, recorded outside every step's wrapper
-const REC=`window.__k={ev(s){return eval(s)}};{const ab=addBuilding;window.__rec={};addBuilding=function(B,p,s){const v0=B.pos.length/3,k0=typeof KIT_S!=='undefined'?KIT_S.pos.length/3:0,r=ab(B,p,s);
-  if(s&&s.rid)(__rec[s.rid]||(__rec[s.rid]=[])).push([v0,B.pos.length/3,k0,typeof KIT_S!=='undefined'?KIT_S.pos.length/3:0]);return r;};}\n`;
+// rid -> [[v0,v1) of the building mesh, [k0,k1) of the kit mesh] per addBuilding call and for what facadeRec adds once the building
+// is whole (the kit parts), recorded outside every step's wrapper. Auto quality is off so both pages are measured at full quality.
+const REC=`window.__GFX={auto:false};window.__k={ev(s){return eval(s)}};{const ab=addBuilding,fr=facadeRec,kn=()=>typeof KIT_S!=='undefined'?KIT_S.pos.length/3:0;let LB=null;window.__rec={};
+  addBuilding=function(B,p,s){LB=B;const v0=B.pos.length/3,k0=kn(),r=ab(B,p,s);if(s&&s.rid)(__rec[s.rid]||(__rec[s.rid]=[])).push([v0,B.pos.length/3,k0,kn()]);return r;};
+  facadeRec=function(W,w,...a){const v0=LB?LB.pos.length/3:0,k0=kn(),r=fr.call(this,W,w,...a);if(LB&&__rec[w.id]&&(LB.pos.length/3>v0||kn()>k0))__rec[w.id].push([v0,LB.pos.length/3,k0,kn()]);return r;};}\n`;
 const prep=(f,extra)=>{let h=fs.readFileSync(f,'utf8');const b='// ---------- boot ----------';if(h.split(b).length!==2)throw new Error('boot anchor');
   h=h.replace(b,REC+b);if(extra)h=extra(h);const o=path.join(path.dirname(path.resolve(f)),'_kt_'+path.basename(f));fs.writeFileSync(o,h);return o;};
 let fillIds=[];
@@ -22,7 +24,8 @@ const kitPage=prep(kitF,h=>{const m=h.match(/const KIT=(\{.*?\});\n/);const K=JS
   fillIds=looks.filter(([id,L])=>L.pitched&&!K[id]&&id!==BAD).map(([id])=>id).slice(0,40-Object.keys(K).length);
   for(const id of fillIds)K[id]=FULL;K[BAD]=BADK;return h.replace(m[0],'const KIT='+JSON.stringify(K)+';\n');});
 const basePage=prep(baseF);
-const br=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader','--ignore-gpu-blocklist','--allow-file-access-from-files']});
+// Metal: two pages of this size in one software-rendered browser never finish loading
+const br=await chromium.launch({args:['--use-angle=metal','--ignore-gpu-blocklist','--allow-file-access-from-files']});
 async function open(f){
   const p=await br.newPage({viewport:{width:1024,height:640}}),errs=[],warns=[];
   p.on('pageerror',e=>errs.push(e.message));p.on('console',m=>{if(m.type()==='error'&&!/fonts|ERR_/.test(m.text()))errs.push(m.text().slice(0,200));if(m.type()==='warning'&&m.text().startsWith('kit'))warns.push(m.text());});

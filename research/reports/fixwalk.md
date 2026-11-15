@@ -36,7 +36,16 @@ Feet: lowest drawn vertex minus the ground at the person's spot ("body"); in bra
 Pictures (opened and checked), `research/prototypes/characters/fixwalk/`: `before_feet.png` (shoe soles cut by the pavement) / `after_feet.png` (whole shoes on it); `before_car.png` (a walker's head and shoulders sticking out of the roof of a kerb-parked car) / `after_car.png` (the walker steps round it on the road side; spawnCars places its cars with `Math.random`, so the two pages picked different cars).
 
 ## Gates
-RESULTS_PLACEHOLDER
+(run by the integrator after the agent stopped, one test at a time on a quiet machine)
+- Chain with this fix and no new steps: `test_fixwalk` all pass (through 0, touching 5 of 222,881 calm); `test_streets`, `test_react`,
+  `test_solid`, `test_jump` pass. `test_fixwalk` fails on v67, as it should.
+- v68 (adds the Blender landmarks, perf2, kit, hud2): through 0 in both runs and every feet check passes, `test_solid`, `test_streets`,
+  `test_react`, `test_jump`, `test_props2`, `test_mhchars` pass. The touching limit fails: 536 of 226,152 samples calm and 1,299 of
+  226,378 stirred (limit 0.05%). Nearly all of it is three long events: one standing person against a stopped car (399 frames), one
+  stopped person against a building wall (1,194 frames), walkers brushing stopped cars (about 100 frames). With perf2 alone the
+  limit holds (1 and 12 samples), so it comes with the landmark steps: standing spots or stopped cars next to the new walls.
+  Not located yet.
+- fps 60 on Metal on v68 (`test_perf` passes its budgets). Builds byte-identical.
 
 ## Still wrong / not done
 - On a slope, a foot's far end is up to 3.5 cm into the ground (the body is placed at the ground under its centre; no foot IK). Same for the old rig.

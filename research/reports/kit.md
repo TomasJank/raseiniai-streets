@@ -56,13 +56,24 @@ from the left end of the wall as seen from outside. `add_kit.py --sides` prints 
 - Invalid values are dropped per key or per item and listed once: `console.warn('kit: ignored c1298.door; ...')`.
 
 ## Numbers
-(see test output below)
+(filled in after the agent stopped, from `work/test_kit.mjs` on the v68 chain, 40 houses described)
+- Added triangles: 3,167 over 39 fully described houses, 81 per house (budget 150). Kit mesh 1,726 triangles, one mesh, no shadow,
+  static matrix. Draw calls not higher than without kit at the start view and from 600 m up.
+- Page: +17.4 KB code, 1,241 B of data for the 12 houses (about 100 B per house).
 
 ## The 12 houses
-(see below)
+Stonų c2331 c2332 c2334 c2337, Jurbarko c1298 c1302 c1401 c1274 c1484 c1629, Gintaro c449 c578. Sheets in `pipeline/kit/sheets/`
+(regenerated on v68; `views.json` there is the camera list for `shots.mjs`).
+Read of the sheets: the square-on views show the described parts where they were asked for (c1298 two front windows, attic window
+and the shed dormer; c2337 closed porch with a glass door; c2331 fewer windows and a dormer). From the photo viewpoints the gain is
+small: Mapillary's camera positions are a few metres off, so several game views do not frame the house the photo shows (c1484,
+c1629, c578), and where they do the difference is a window count at 40 m. The vocabulary works; these 12 are not proof that a
+described house reads as the real one from the street. A step-2 pass should check each house square-on, not from the dashcam view.
 
 ## Tests
-(see below)
+`work/test_kit.mjs kit.html base.html [kit2.html]`: all pass on the v68 chain (builds identical, no errors, 8,278 houses without
+keys unchanged, invalid values ignored with one warning, every key's part on the right wall, cost). The test runs on Metal (two
+pages of this size never finish loading in one software-rendered browser) and with automatic quality off.
 
 ## Not expressible yet
 - The roof direction itself. Two of the 12 houses (c2331 Stonų, c1274 Jurbarko) have the ridge turned 90 degrees from the photo
