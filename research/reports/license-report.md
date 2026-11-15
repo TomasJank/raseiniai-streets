@@ -69,3 +69,5 @@ Vehicles shipped by the `cars2` step (details and sha256 per file: `research/ass
 "Car" (https://poly.pizza/m/75h3mi6uHuC) and "Van" (https://poly.pizza/m/aT_24cDaW1a) by Poly by Google, CC BY 3.0 (https://creativecommons.org/licenses/by/3.0/), modified. "Generic Van" (https://poly.pizza/m/BbRojf2v3H) by PuKkBuMXDD, CC BY 3.0, modified.
 ```
 Rejected candidates downloaded only for the comparison sheet (KayKit, Poly by Google, jeremy, Quaternius police/taxi) are not embedded: `research/assets/vehicles/rejected/SOURCE.md`.
+
+- 2026-11-10: the owner reports the ORT10LT rights holder said the orthophoto is fine to use (verbal report; written reply not yet filed here). GRPK vector data added this day is CC BY 4.0, credit "GRPK (c) Lietuvos Respublikos aplinkos ministerija".

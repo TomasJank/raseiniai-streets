@@ -50,7 +50,7 @@ const played=await p.evaluate(()=>{const T=__t,g=T.g,L=T.voiceLast;if(!L)return{
     clipLen:j>=0?T.voiceData.clips[T.voiceInfo(L.text)[L.voice==='m'?1:0]][1]:0};});
 check('talk 8 m away plays a clip in the speaker\'s voice',played.played&&played.inScript&&played.voice===played.want&&played.len>.3&&Math.abs(played.len-played.clipLen)<.15,played);
 check('male voice is the female clip slowed (say backend) or its own clip, rate within the speaker spread',
-  played.played&&(played.voice==='m'?played.rate>.7&&played.rate<1.07:played.rate>.93&&played.rate<1.07),played);
+  played.played&&(played.voice==='m'?played.rate>.7&&played.rate<1.08:played.rate>.83&&played.rate<1.29),played);
 
 // whole talk: never two live clips in the group, several lines spoken in both voices
 const run=await (async()=>{let maxLive=0,starts=0,last=null,voices=new Set(),rates=new Set();

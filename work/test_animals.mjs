@@ -58,7 +58,7 @@ await ev('runOver',(voice)=>{const T=__t,P=T.player,c=P.car,a=window.__cat,calls
   for(let i=0;i<60;i++){c.speed=10;c.x+=Math.sin(c.h)*10*.033;c.z+=Math.cos(c.h)*10*.033;P.x=c.x;P.z=c.z;T.steps(1);
     if(T.heat>h0)ups++;if(T.cash<m0)downs++;h0=T.heat;m0=T.cash;}
   const r={heat:T.heat,cash:T.cash,heatRises:ups,cashDrops:downs,catMode:a.mode,hp:+((c.hp??1)-hp0).toFixed(3),sounds:calls};T.heat=0;c.speed=0;delete window.sfxAnimal;
-  if(ups!==1||downs!==1||T.cash!==480||r.heat!==1||a.mode!=='down')r.fail='hit not counted exactly once';else if(!voice&&!calls.includes('meow'))r.fail='no sound on the hit';return r;},h.includes('function sfxAnimal('));
+  if(ups!==1||downs!==1||T.cash!==490||r.heat!==1||a.mode!=='down')r.fail='hit not counted exactly once';else if(!voice&&!calls.includes('meow'))r.fail='no sound on the hit';return r;},h.includes('function sfxAnimal('));
 
 await ev('fallenPole',()=>{const T=__t,b=T.live().find(q=>q.name==='zz_day'&&q.pole);if(!b)return{fail:'no perched bird'};const q=b.pole;q.down=true;T.steps(1);const left=b.leave;T.steps(700);
   const on=T.live().filter(o=>o.pole===q&&!o.leave).length;q.down=false;const r={leftAtOnce:left,newOnFallen:on,gone:b.mode==='hide'};if(!left||on||!r.gone)r.fail='bird stayed on a fallen pole';return r;});

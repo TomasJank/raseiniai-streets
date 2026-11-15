@@ -70,6 +70,11 @@ FIX = [
 ]
 for a, b in FIX:
     rep(a, b)
+# grammar pass 2026-11-14, single lines
+for a, b in [("'Mūsų irgi. Ta matematika...'", "'Mūsiškiams irgi. Ta matematika...'"),
+             ("'Tą, keturiasdešimt pirmų metų?'", "'Tą, keturiasdešimt pirmųjų metų?'"),
+             ("'Eisiu, į dešimtą.'", "'Eisiu, į dešimtos mišias.'")]:
+    rep(a, b)
 
 # a parent and the kid walking with it (A = the adult, B = the kid); only picked when the kid is the second speaker
 KID = """['kid',['Pavargai?','Kojos skauda.','Dar truputį, jau beveik namie.','Paimk ant rankų.']],

@@ -58,7 +58,7 @@ const hitJs=`(pick,v)=>{const T=__t,W=T.world,c=T.player.car;
     return{at:[+q.x.toFixed(1),+q.z.toFixed(1)],down:!!q.down,falling:T.falling.length-n0,tilt:f?+f.th.toFixed(2):0,hp:+(c.hp??1).toFixed(3),closest:+closest.toFixed(2)};}
   return null;}`;
 const hit=(name,pick,v)=>p.evaluate(`(${hitJs})(${pick},${v})`).then(r=>{if(!r)console.log('no clear approach for',name);return r;});
-const isPole=`q=>q.minSp===7&&q.h===8.6`,isSignal=`q=>q.minSp===7&&q.h===4&&q.parts[0].obj`,isBusSign=`q=>q.minSp===5&&q.h===2.6&&q.parts[0].obj`;
+const isPole=`q=>q.minSp===7&&q.h===8.6`,isSignal=`q=>q.minSp===7&&q.h===4&&q.parts[0].obj`,isBusSign=`q=>q.minSp===5&&Math.abs(q.h-2.6)<.01&&(q.parts[0].obj||q.parts[0][0]&&q.parts[0][0].userData.props2==="stopsign")`;
 for(const [name,pick] of [['pole',isPole],['signal',isSignal],['bus-stop sign',isBusSign]]){
   const r=await hit(name,pick,12);check(name+' falls at 12 m/s',!!r&&r.down&&r.falling>0&&r.hp<1,r);}
 const slow=await hit('slow pole',isPole,3);

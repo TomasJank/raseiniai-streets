@@ -1,0 +1,45 @@
+{
+ "mix": {
+  "audi80": 2,
+  "passat_b3": 2,
+  "sedan79": 2,
+  "wagon79": 2,
+  "primera": 1,
+  "ibiza2": 1,
+  "sprinter": 1,
+  "a4_b55": 2,
+  "e46_roh": 2,
+  "e34": 1,
+  "e90": 1,
+  "zafira_a": 2,
+  "accord7": 1,
+  "v70": 2,
+  "w124": 2,
+  "w210": 2,
+  "megane2_gt": 2,
+  "p206_2000": 2,
+  "p406": 2,
+  "punto1": 1
+ },
+ "bus": "aero_bus",
+ "static": {
+  "ps1_bus": [
+   [
+    55.378101,
+    23.114881,
+    -39.3
+   ]
+  ],
+  "kamaz": [
+   [
+    55.398211,
+    23.084313,
+    34.6
+   ]
+  ]
+ },
+ "own_colour": [
+  "e34"
+ ],
+ "credit": "Cars from Sketchfab, CC BY 4.0: Audi 80 by xoliul; VW Passat B3, Mercedes Sprinter by kuwalol93; Lowpoly Sedan & Wagon by Han66st; Nissan Primera by unitygtt34; Seat Ibiza by ngon_3d; Audi A4 B5.5 Avant by Tomasoo; BMW E46 by roh3d; BMW 525i E34 by UVZZZ; BMW 320i E90 by rifdanzz; Opel Zafira, Renault Megane Grand Tour, Peugeot 206 by tonielpro520; Honda Accord by dirocris; Volvo V70 by bigslavehd; Mercedes-Benz W124 by San.Dro; Mercedes-Benz W210 by homicivan53; Peugeot 406 by supercarmodels; Fiat Punto by lionsharp; Hyundai Aero Space coach by ImperialBlue3D; PS1 styled bus by almondz2549; Kamaz by animara777; Toyota Corolla wheels by ImperialBlue3D (modified)"
+}

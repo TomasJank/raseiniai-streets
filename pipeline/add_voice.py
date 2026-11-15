@@ -6,7 +6,7 @@ usage: add_voice.py page.html   (edits in place; run voice.py page.html first to
 import base64, json, os, subprocess, sys
 from concurrent.futures import ThreadPoolExecutor
 
-from voice import EDGE, MALE_RATE, SAY, clip, lines
+from voice import EDGE, MALE_RATE, SAY, cast, clip, lines, rejected
 
 path = sys.argv[1]
 h = open(path, encoding='utf-8').read()
@@ -26,9 +26,13 @@ def seconds(f):
 
 
 clips, table, missing = {}, {}, []
+roles, bad, eleven = cast(h), rejected(), 0
 for t in lines(h):
     if all(os.path.exists(clip(v, t)) for v in EDGE):
-        f, m, rate = clip(EDGE[0], t), clip(EDGE[1], t), 1
+        # each slot takes the conversation's ElevenLabs voice where that clip exists, else stays on Edge
+        f, m = (clip(e, t) if (e, t) not in bad and os.path.exists(clip(e, t)) else clip(d, t) for e, d in zip(roles.get(t, EDGE), EDGE))
+        eleven += (f != clip(EDGE[0], t)) + (m != clip(EDGE[1], t))
+        rate = 1
     elif os.path.exists(clip(SAY[0], t)):
         f = m = clip(SAY[0], t)
         rate = MALE_RATE
@@ -50,4 +54,4 @@ rep('g.text=t;g.say=1.2+t.length*.07;', 'g.text=t;g.say=Math.max(1.2+t.length*.0
 open(path, 'w', encoding='utf-8').write(h)
 if missing:
     print('voice: %d lines without a clip stay silent (run pipeline/voice.py on the page): %s' % (len(missing), ' | '.join(missing)))
-print('voice ok: %d lines, %d clips, %.0f KB embedded' % (len(table), len(clips), len(block) / 1024))
+print('voice ok: %d lines, %d clips (%d of %d slots ElevenLabs), %.0f KB embedded' % (len(table), len(clips), eleven, 2 * len(table), len(block) / 1024))

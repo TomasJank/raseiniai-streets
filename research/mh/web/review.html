@@ -1,0 +1,80 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>MakeHuman crowd review</title>
+<style>html,body{margin:0;background:#ddd}canvas{display:block}</style>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.187.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.187.0/examples/jsm/"}}</script>
+<script type="module">
+// Shows one exported person as the game draws it (same material treatment as pipeline/mhchars.js):
+// window.show(path, view) returns a JPEG data URL, window.pal(path) the colours the eye sees. Paths are relative to research/mh.
+import * as THREE from 'three';
+import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
+import {MeshoptDecoder} from 'three/addons/libs/meshopt_decoder.module.js';
+const renderer = new THREE.WebGLRenderer({antialias: true, preserveDrawingBuffer: true, alpha: true});
+document.body.appendChild(renderer.domElement);
+const scene = new THREE.Scene(), grey = new THREE.Color(0xdddddd);
+scene.add(new THREE.HemisphereLight(0xdde8f2, 0x6d6a52, 2.6));
+const sun = new THREE.DirectionalLight(0xfff1dc, 2.6);
+scene.add(sun);
+const camera = new THREE.PerspectiveCamera(28, 1, 0.05, 50);
+const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
+let cur = null, curFile = null;
+async function load(file) {
+  if (file === curFile) return;
+  if (cur) scene.remove(cur);
+  const g = await loader.loadAsync('../' + file);
+  cur = g.scene; curFile = file; scene.add(cur);
+  cur.traverse(o => { if (!o.isMesh) return;
+    const name = o.name + ' ' + (o.material.name || ''), card = /hair|brow|lash/i.test(name), src = o.material;
+    const mat = new THREE.MeshLambertMaterial({map: src.map, color: src.color, alphaTest: card ? .5 : 0, side: card ? THREE.DoubleSide : THREE.FrontSide});
+    // the game lifts the dark tones of every texture but the eyes, whose brown irises it turned red
+    if (!/eye/i.test(name)) mat.onBeforeCompile = sh => { sh.fragmentShader = sh.fragmentShader.replace('#include <map_fragment>', '#include <map_fragment>\ndiffuseColor.rgb=pow(diffuseColor.rgb,vec3(.6))*1.5;'); };
+    mat.customProgramCacheKey = () => 'mh' + /eye/i.test(name) + card;
+    o.userData.part = (src.name || '').split('_')[0];
+    o.material = mat; o.frustumCulled = false; });
+  cur.updateMatrixWorld(true);
+}
+function aim(view, w, h) {
+  let head = null; cur.traverse(n => { if (n.isBone && n.name.toLowerCase() === 'head') head = n; });
+  const hp = head.getWorldPosition(new THREE.Vector3()), box = new THREE.Box3().setFromObject(cur), H = box.max.y - box.min.y;
+  renderer.setSize(w, h); camera.aspect = w / h; camera.updateProjectionMatrix();
+  const s = view === 'back' ? -1 : 1;
+  if (view === 'face') { camera.position.set(.25 * s, hp.y + .1, .95); camera.lookAt(0, hp.y + .08, 0); }
+  else { camera.position.set(0, box.min.y + H * .52, s * H * 2.25); camera.lookAt(0, box.min.y + H * .5, 0); }
+  sun.position.set(2 * s, 4, 3 * s);
+}
+window.show = async (file, view, scale = 1) => {
+  await load(file);
+  const [w, h] = view === 'face' ? [420, 480] : [330, 480];
+  aim(view, w * scale, h * scale);
+  renderer.setClearColor(grey, 1);
+  renderer.render(scene, camera);
+  return renderer.domElement.toDataURL('image/jpeg', .9);
+};
+// mean colour on screen of each part (front and back), as sRGB hex. A one-piece garment gives its upper half as the top
+// and its lower half as the legs, split at the hips.
+window.pal = async file => {
+  await load(file);
+  const hex = c => c ? c.map(v => Math.round(v).toString(16).padStart(2, '0')).join('') : null, sum = {};
+  let pelvis = null; cur.traverse(n => { if (n.isBone && n.name === 'pelvis') pelvis = n; });
+  const cv = document.createElement('canvas'), cx = cv.getContext('2d', {willReadFrequently: true});
+  const parts = new Set(); cur.traverse(o => { if (o.isMesh) parts.add(o.userData.part); });
+  for (const view of ['front', 'back']) {
+    aim(view, 330, 480);
+    const hip = (1 - (pelvis.getWorldPosition(new THREE.Vector3()).project(camera).y + 1) / 2) * 480;
+    for (const part of parts) {
+      cur.traverse(o => { if (o.isMesh) o.visible = o.userData.part === part; });
+      renderer.setClearColor(0, 0); renderer.render(scene, camera);
+      cv.width = 330; cv.height = 480; cx.drawImage(renderer.domElement, 0, 0, 330, 480);
+      const d = cx.getImageData(0, 0, 330, 480).data;
+      for (let y = 0; y < 480; y++) for (let x = 0; x < 330; x++) {
+        const k = (y * 330 + x) * 4; if (d[k + 3] < 255) continue;
+        const key = part === 'full' ? (y < hip ? 'top' : 'legs') : part, s = sum[key] || (sum[key] = [0, 0, 0, 0]);
+        s[0] += d[k]; s[1] += d[k + 1]; s[2] += d[k + 2]; s[3]++; }
+    }
+  }
+  cur.traverse(o => { if (o.isMesh) o.visible = true; });
+  const mean = k => sum[k] && sum[k][3] ? sum[k].slice(0, 3).map(v => v / sum[k][3]) : null;
+  return {skin: hex(mean('skin')), top: hex(mean('top')), legs: hex(mean('legs')), shoe: hex(mean('shoe')), hair: hex(mean('hair'))};
+};
+window.ready = true;
+</script>

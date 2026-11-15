@@ -1,0 +1,108 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Retarget test</title>
+<style>html,body{margin:0;background:#ddd}canvas{display:block}</style>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.187.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.187.0/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from 'three';
+import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
+import {MeshoptDecoder} from 'three/addons/libs/meshopt_decoder.module.js';
+
+const W = 1600, H = 800;
+const renderer = new THREE.WebGLRenderer({antialias: true, preserveDrawingBuffer: true});
+renderer.setSize(W, H);
+document.body.appendChild(renderer.domElement);
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xdddddd);
+scene.add(new THREE.HemisphereLight(0xffffff, 0x888888, 2.2));
+const sun = new THREE.DirectionalLight(0xffffff, 1.6);
+sun.position.set(2, 4, 3);
+scene.add(sun);
+const camera = new THREE.PerspectiveCamera(30, W / H, 0.1, 50);
+
+const load = url => new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).loadAsync(url);
+window.addEventListener('unhandledrejection', e => console.log('rejection: ' + e.reason));
+const [src, clips, dst] = await Promise.all([load('body_f.glb'), load('clips.glb'), load('mh.glb')]);
+
+const srcRoot = src.scene, dstRoot = dst.scene;
+scene.add(srcRoot, dstRoot);
+// hair, brows and lashes are alpha cards; render them cut out instead of as solid sheets
+// the exporter marks every material as blended, which lets the mouth interior show through the face; only cards need alpha
+dstRoot.traverse(o => { if (o.isMesh) for (const m of [o.material].flat()) {
+  m.transparent = false; m.depthWrite = true;
+  if (/hair|brow|lash/i.test(m.name + o.name)) { m.alphaTest = 0.5; m.side = THREE.DoubleSide; } else m.alphaTest = 0;
+} });
+srcRoot.position.x = -0.6;
+dstRoot.position.x = 0.6;
+scene.updateMatrixWorld(true);
+
+const skel = root => { let s; root.traverse(o => { if (o.isSkinnedMesh && !s) s = o.skeleton; }); return s; };
+const srcSkel = skel(srcRoot), dstSkel = skel(dstRoot);
+const srcBy = new Map(srcSkel.bones.map(b => [b.name.toLowerCase(), b]));
+// target bone -> source bone, matched by name ignoring case (Root/root, head/Head)
+const pairs = dstSkel.bones.filter(b => srcBy.has(b.name.toLowerCase())).map(b => [b, srcBy.get(b.name.toLowerCase())]);
+const pairOf = new Map(pairs);
+const unmatched = dstSkel.bones.filter(b => !pairOf.has(b)).map(b => b.name);
+
+// which child decides a bone's direction when it has several
+const AIM = {pelvis: 'spine_01', spine_03: 'neck_01', hand_l: 'middle_01_l', hand_r: 'middle_01_r', foot_l: 'ball_l', foot_r: 'ball_r', root: 'pelvis'};
+const aimChild = b => {
+  const kids = b.children.filter(c => c.isBone && pairOf.has(c));
+  const want = AIM[b.name.toLowerCase()];
+  return kids.find(c => c.name.toLowerCase() === want) || (kids.length === 1 ? kids[0] : null);
+};
+const wpos = o => o.getWorldPosition(new THREE.Vector3());
+const wquat = o => o.getWorldQuaternion(new THREE.Quaternion());
+
+// 1. pose the target into the source's rest pose: swing each bone so it points the way the source bone points
+const depth = b => { let d = 0; for (let p = b.parent; p; p = p.parent) d++; return d; };
+pairs.sort((a, b) => depth(a[0]) - depth(b[0]));
+for (const [t, s] of pairs) {
+  const c = aimChild(t);
+  if (!c) continue;
+  dstRoot.updateMatrixWorld(true);
+  const dt = wpos(c).sub(wpos(t)).normalize();
+  const ds = wpos(pairOf.get(c)).sub(wpos(s)).normalize();
+  const swing = new THREE.Quaternion().setFromUnitVectors(dt, ds);
+  const world = swing.multiply(wquat(t));
+  const parentWorld = wquat(t.parent);
+  t.quaternion.copy(parentWorld.invert().multiply(world));
+}
+dstRoot.updateMatrixWorld(true);
+
+// 2. rest world rotations on both sides
+const srcRest = new Map(pairs.map(([t, s]) => [t, wquat(s)]));
+const dstRest = new Map(pairs.map(([t]) => [t, wquat(t)]));
+const srcPelvis = srcBy.get('pelvis'), dstPelvis = dstSkel.bones.find(b => b.name === 'pelvis');
+const srcHip0 = srcPelvis.position.clone(), dstHip0 = dstPelvis.position.clone();
+const scale = wpos(dstPelvis).y / wpos(srcPelvis).y;
+
+function retarget() {
+  srcRoot.updateMatrixWorld(true);
+  for (const [t, s] of pairs) {
+    // world delta from the source's rest, applied on top of the target's aligned rest
+    const delta = wquat(s).multiply(srcRest.get(t).clone().invert());
+    const world = delta.multiply(dstRest.get(t));
+    t.quaternion.copy(wquat(t.parent).invert().multiply(world));
+    t.updateMatrixWorld(true);
+  }
+  dstPelvis.position.copy(dstHip0).add(srcPelvis.position.clone().sub(srcHip0).multiplyScalar(scale));
+}
+
+const mixer = new THREE.AnimationMixer(srcRoot);
+const byName = Object.fromEntries(clips.animations.map(a => [a.name, a]));
+let action;
+window.play = name => { mixer.stopAllAction(); action = mixer.clipAction(byName[name]); action.play(); };
+window.pose = (name, t, view) => {
+  play(name);
+  mixer.setTime(t);
+  retarget();
+  const views = {face: [0.6, 1.55, 1.1], front: [0, 1.0, 5.2], side: [5.2, 1.0, 0.01], back: [0, 1.0, -5.2]};
+  camera.position.set(...views[view]);
+  camera.lookAt(view === 'face' ? 0.6 : 0, view === 'face' ? 1.5 : 0.9, 0);
+  renderer.render(scene, camera);
+  return renderer.domElement.toDataURL('image/png');
+};
+window.info = {pairs: pairs.length, unmatched, scale, tris: dstSkel.bones.length};
+window.ready = true;
+</script>

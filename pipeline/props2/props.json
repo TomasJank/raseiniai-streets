@@ -1,0 +1,847 @@
+{
+ "bush": {
+  "kind": "bush",
+  "f": [
+   1.1,
+   1.1
+  ],
+  "tint": [
+   0.72,
+   0.78,
+   0.68
+  ],
+  "s": [
+   1.411,
+   0.9,
+   1.478
+  ],
+  "faces": 988,
+  "bytes": 26452,
+  "src": {
+   "i": 653,
+   "name": "Stylized Bush",
+   "user": "danielpetrov",
+   "lic": "CC Attribution",
+   "uid": "9d9ce79d3ae040619e96d5b22c7de1a6"
+  }
+ },
+ "bale_a": {
+  "kind": "bale",
+  "s": [
+   2.556,
+   1.3,
+   1.743
+  ],
+  "faces": 900,
+  "bytes": 39848,
+  "src": {
+   "i": 672,
+   "name": "Hay Bales",
+   "user": "FrodoUndead",
+   "lic": "CC Attribution",
+   "uid": "6b775049e57e4d9da87977905493ebfb"
+  }
+ },
+ "bale_b": {
+  "kind": "bale",
+  "s": [
+   0.9,
+   0.9,
+   2.005
+  ],
+  "faces": 492,
+  "bytes": 15056,
+  "src": {
+   "i": 677,
+   "name": "hay bale",
+   "user": "GAIA.",
+   "lic": "CC Attribution",
+   "uid": "4d3a767e8db5495ba26efa6441499cd7"
+  }
+ },
+ "logs": {
+  "kind": "logs",
+  "s": [
+   2.346,
+   1.2,
+   0.46
+  ],
+  "faces": 84,
+  "bytes": 28840,
+  "src": {
+   "i": 818,
+   "name": "Wood log pile - PS1 Low Poly",
+   "user": "wersaus33",
+   "lic": "CC Attribution",
+   "uid": "297af51362454833b93d70afb059d56a"
+  }
+ },
+ "shelter_333": {
+  "kind": "shelter",
+  "s": [
+   3.885,
+   2.6,
+   2.286
+  ],
+  "faces": 1464,
+  "bytes": 27292,
+  "src": {
+   "i": 333,
+   "name": "Soviet bus stop",
+   "user": "Lordies",
+   "lic": "CC Attribution",
+   "uid": "ffcf2f95eb1f4005a6e7555c2b6739c3"
+  }
+ },
+ "shelter_332": {
+  "kind": "shelter",
+  "s": [
+   3.488,
+   2.6,
+   1.416
+  ],
+  "faces": 4364,
+  "bytes": 52524,
+  "src": {
+   "i": 332,
+   "name": "Old Soviet Bus Stop",
+   "user": "GameDevNick",
+   "lic": "CC Attribution",
+   "uid": "fe4d132434c24e1c8447a6d1190e8c6d"
+  }
+ },
+ "shelter_336": {
+  "kind": "shelter",
+  "s": [
+   5.612,
+   2.6,
+   1.517
+  ],
+  "faces": 150,
+  "bytes": 16304,
+  "src": {
+   "i": 336,
+   "name": "Soviet Bus Stop 2",
+   "user": "BeogradStudio",
+   "lic": "CC Attribution",
+   "uid": "62a33c1527f3440796c3e1194bebd01d"
+  }
+ },
+ "shelter_237": {
+  "kind": "shelter",
+  "s": [
+   4.205,
+   2.6,
+   3.953
+  ],
+  "faces": 1652,
+  "bytes": 36340,
+  "src": {
+   "i": 237,
+   "name": "Old Russian bus stop",
+   "user": "halkiridze",
+   "lic": "CC Attribution",
+   "uid": "074e11d7adb9420a83bc862e81579a9f"
+  }
+ },
+ "shelter_247": {
+  "kind": "shelter",
+  "s": [
+   3.588,
+   2.6,
+   2.223
+  ],
+  "faces": 432,
+  "bytes": 9248,
+  "src": {
+   "i": 247,
+   "name": "Bus stop PSX",
+   "user": "Tesalo",
+   "lic": "CC Attribution",
+   "uid": "1af4be16978c4c9e8f10b872dc637a9d"
+  }
+ },
+ "bench_401": {
+  "kind": "bench",
+  "s": [
+   1.6,
+   0.85,
+   0.6
+  ],
+  "faces": 700,
+  "bytes": 15340,
+  "src": {
+   "i": 401,
+   "name": "USSR Bench",
+   "user": "se660745",
+   "lic": "CC Attribution",
+   "uid": "956f6cf08d7444379b21c57cadc7702d"
+  }
+ },
+ "bench_355": {
+  "kind": "bench",
+  "back": 0.2,
+  "s": [
+   2.211,
+   0.98,
+   1.056
+  ],
+  "faces": 800,
+  "bytes": 25336,
+  "src": {
+   "i": 355,
+   "name": "Park Bech Low-poly",
+   "user": "MaX3Dd",
+   "lic": "CC Attribution",
+   "uid": "d9014318124c4013a3bd49cfd69e8b77"
+  }
+ },
+ "bin_371": {
+  "kind": "bin",
+  "s": [
+   0.467,
+   0.7,
+   0.467
+  ],
+  "faces": 170,
+  "bytes": 20396,
+  "src": {
+   "i": 371,
+   "name": "Trash Can",
+   "user": "UnkaII",
+   "lic": "CC Attribution",
+   "uid": "3e4c8c57443c437c97e2f94cc7373a21"
+  }
+ },
+ "bin_379": {
+  "kind": "bin",
+  "s": [
+   0.503,
+   0.7,
+   0.525
+  ],
+  "faces": 356,
+  "bytes": 17824,
+  "src": {
+   "i": 379,
+   "name": "Trash Can. Low Poly",
+   "user": "katykate",
+   "lic": "CC Attribution",
+   "uid": "6dfba42794e445719010caf0a1ceca7c"
+  }
+ },
+ "dumpster_374": {
+  "kind": "dumpster",
+  "s": [
+   2.002,
+   1.3,
+   1.356
+  ],
+  "faces": 540,
+  "bytes": 22584,
+  "src": {
+   "i": 374,
+   "name": "Dumpster",
+   "user": "txnomod",
+   "lic": "CC Attribution",
+   "uid": "337b3a4424b745699cda776545070e04"
+  }
+ },
+ "dumpster_375": {
+  "kind": "dumpster",
+  "tint": [
+   0.25,
+   0.42,
+   0.3
+  ],
+  "s": [
+   1.623,
+   1.3,
+   1.065
+  ],
+  "faces": 624,
+  "bytes": 9120,
+  "src": {
+   "i": 375,
+   "name": "Old Dumpster Low Poly",
+   "user": "Michele.Passerino",
+   "lic": "CC Attribution",
+   "uid": "f77c43a407244009ba49d16540a03515"
+  }
+ },
+ "dumpster_380a": {
+  "kind": "dumpster",
+  "s": [
+   1.748,
+   1.25,
+   1.748
+  ],
+  "faces": 79,
+  "bytes": 12276,
+  "src": {
+   "i": 380,
+   "name": "PSX Style Dumpster Set",
+   "user": "wooolvie",
+   "lic": "CC Attribution",
+   "uid": "b9e60134b8504ed4bac16fdf670f996b"
+  }
+ },
+ "dumpster_380b": {
+  "kind": "dumpster",
+  "s": [
+   1.959,
+   1.25,
+   1.735
+  ],
+  "faces": 100,
+  "bytes": 9204,
+  "src": {
+   "i": 380,
+   "name": "PSX Style Dumpster Set",
+   "user": "wooolvie",
+   "lic": "CC Attribution",
+   "uid": "b9e60134b8504ed4bac16fdf670f996b"
+  }
+ },
+ "lamp_383": {
+  "kind": "lamp",
+  "f": [
+   0.2,
+   0.2
+  ],
+  "face": true,
+  "s": [
+   0.175,
+   4.7,
+   1.096
+  ],
+  "faces": 971,
+  "bytes": 22336,
+  "src": {
+   "i": 383,
+   "name": "Street lamp (low poly)",
+   "user": "pinokio21",
+   "lic": "CC Attribution",
+   "uid": "17e2bc2ec7de42d08d98e3a6c886a8b2"
+  }
+ },
+ "lamp_389": {
+  "kind": "lamp",
+  "s": [
+   0.317,
+   4.7,
+   1.517
+  ],
+  "faces": 922,
+  "bytes": 11480,
+  "src": {
+   "i": 389,
+   "name": "Street Lamp",
+   "user": "kraytongaming",
+   "lic": "CC Attribution",
+   "uid": "4438dd6844384d9ca0e1b7f12775fcc9"
+  }
+ },
+ "lamp_384": {
+  "kind": "lamp",
+  "s": [
+   0.421,
+   4.7,
+   1.261
+  ],
+  "faces": 172,
+  "bytes": 20940,
+  "src": {
+   "i": 384,
+   "name": "Low Poly Psx Street lamp",
+   "user": "SaukrDev",
+   "lic": "CC Attribution",
+   "uid": "81a8d1861bbd4cef8ab1aed2986bf873"
+  }
+ },
+ "kiosk_392": {
+  "kind": "kiosk",
+  "s": [
+   3.527,
+   2.7,
+   3.768
+  ],
+  "faces": 1668,
+  "bytes": 37380,
+  "src": {
+   "i": 392,
+   "name": "Simple 90's Kiosk",
+   "user": "Vagabondare",
+   "lic": "CC Attribution",
+   "uid": "a04e69a838054f7cb39a635943ab9b0d"
+  }
+ },
+ "play_397": {
+  "kind": "play",
+  "s": [
+   0.705,
+   2.2,
+   5.325
+  ],
+  "faces": 992,
+  "bytes": 35480,
+  "src": {
+   "i": 397,
+   "name": "Rusty Soviet Slide",
+   "user": "shtran",
+   "lic": "CC Attribution",
+   "uid": "ed352ad8725a47c79c786ddc398936ed"
+  }
+ },
+ "play_398": {
+  "kind": "play",
+  "s": [
+   2.217,
+   1.3,
+   0.826
+  ],
+  "faces": 996,
+  "bytes": 35912,
+  "src": {
+   "i": 398,
+   "name": "Seesaw \"Type-1\"",
+   "user": "targettius",
+   "lic": "CC Attribution",
+   "uid": "9855438bf7d14f9b8a83e779c03e937f"
+  }
+ },
+ "play_399": {
+  "kind": "play",
+  "s": [
+   5.056,
+   3.4,
+   1.236
+  ],
+  "faces": 4232,
+  "bytes": 29492,
+  "src": {
+   "i": 399,
+   "name": "Soviet Rocket Play Scape",
+   "user": "OccamRendered",
+   "lic": "CC Attribution",
+   "uid": "9885be3845fa4b488fae42b122fd59d0"
+  }
+ },
+ "play_400": {
+  "kind": "play",
+  "s": [
+   1.342,
+   2.2,
+   2.551
+  ],
+  "faces": 2648,
+  "bytes": 42628,
+  "src": {
+   "i": 400,
+   "name": "USSR Swings",
+   "user": "se660745",
+   "lic": "CC Attribution",
+   "uid": "57f6c19b214e440e8b9865f648102472"
+  }
+ },
+ "play_405": {
+  "kind": "play",
+  "s": [
+   1.455,
+   2.2,
+   2.772
+  ],
+  "faces": 260,
+  "bytes": 5900,
+  "src": {
+   "i": 405,
+   "name": "Swings",
+   "user": "decoratopia",
+   "lic": "CC Attribution",
+   "uid": "93431b8da7c044fd84446f9f9ebcdda3"
+  }
+ },
+ "sign_giveway": {
+  "kind": "sign_giveway",
+  "f": [
+   0.12,
+   0.12
+  ],
+  "s": [
+   0.631,
+   2.6,
+   0.109
+  ],
+  "faces": 192,
+  "bytes": 41452,
+  "src": {
+   "i": 422,
+   "name": "European Road Signs",
+   "user": "Satik64",
+   "lic": "CC Attribution",
+   "uid": "25ebbe36a9274344bd779a55d97bfca3"
+  }
+ },
+ "sign_main": {
+  "kind": "sign_main",
+  "f": [
+   0.12,
+   0.12
+  ],
+  "s": [
+   0.679,
+   2.6,
+   0.103
+  ],
+  "faces": 136,
+  "bytes": 30340,
+  "src": {
+   "i": 422,
+   "name": "European Road Signs",
+   "user": "Satik64",
+   "lic": "CC Attribution",
+   "uid": "25ebbe36a9274344bd779a55d97bfca3"
+  }
+ },
+ "mailbox": {
+  "kind": "mailbox",
+  "f": [
+   0.2,
+   0.2
+  ],
+  "s": [
+   0.284,
+   1.2,
+   0.237
+  ],
+  "faces": 300,
+  "bytes": 21424,
+  "src": {
+   "i": 429,
+   "name": "Wooden Mailboxes",
+   "user": "max_imum",
+   "lic": "CC Attribution",
+   "uid": "a3a6c064b21a425da79f72bb3f4f0ac8"
+  }
+ },
+ "fpanel_470": {
+  "kind": "fence_panel",
+  "s": [
+   1.468,
+   1.6,
+   0.294
+  ],
+  "faces": 632,
+  "bytes": 14616,
+  "src": {
+   "i": 470,
+   "name": "Soviet Fence",
+   "user": "ArtEast.",
+   "lic": "CC Attribution",
+   "uid": "a30eef5b904b4354befe12eeb7dcaa92"
+  }
+ },
+ "fpicket_477": {
+  "kind": "fence_picket",
+  "s": [
+   2.226,
+   1.15,
+   0.228
+  ],
+  "faces": 298,
+  "bytes": 23724,
+  "src": {
+   "i": 477,
+   "name": "Wood Wooden fence Protector of the farm low poly",
+   "user": "ahmagh2e",
+   "lic": "CC Attribution",
+   "uid": "ace00004692b48c6afee9f9d505e6e35"
+  }
+ },
+ "well_492": {
+  "kind": "well",
+  "s": [
+   1.511,
+   1.9,
+   1.415
+  ],
+  "faces": 1199,
+  "bytes": 27384,
+  "src": {
+   "i": 492,
+   "name": "Old village well",
+   "user": "Amagitsune",
+   "lic": "CC Attribution",
+   "uid": "f17be5e2abf447f59d800b253322e013"
+  }
+ },
+ "well_489": {
+  "kind": "well",
+  "s": [
+   2.228,
+   2.1,
+   1.225
+  ],
+  "faces": 1199,
+  "bytes": 31648,
+  "src": {
+   "i": 489,
+   "name": "well wooden Village - 13MB",
+   "user": "ahmagh2e",
+   "lic": "CC Attribution",
+   "uid": "d631c9a4fe304a2eb53a1a08854e0939"
+  }
+ },
+ "signal_3000": {
+  "kind": "signal",
+  "lens": [
+   [
+    0,
+    3.1,
+    0.09
+   ],
+   [
+    0,
+    2.7,
+    0.09
+   ],
+   [
+    0,
+    2.31,
+    0.09
+   ]
+  ],
+  "lensR": 0.1,
+  "s": [
+   0.415,
+   3.4,
+   0.547
+  ],
+  "faces": 2300,
+  "bytes": 28308,
+  "src": {
+   "i": 3000,
+   "name": "traffic light + animation",
+   "user": "daniel.brueck",
+   "lic": "CC Attribution",
+   "uid": "30f361478c8143fbb463dcf9b2a0cb61"
+  }
+ },
+ "sign_crossing": {
+  "kind": "sign_crossing",
+  "f": [
+   0.12,
+   0.12
+  ],
+  "s": [
+   0.762,
+   2.8,
+   0.077
+  ],
+  "faces": 300,
+  "bytes": 7948,
+  "src": {
+   "i": 3005,
+   "name": "Pedestrian Crossing Sign",
+   "user": "Liquell",
+   "lic": "CC Attribution",
+   "uid": "c8c7210c40624b71bd5f4644fdaa60f3"
+  }
+ },
+ "stopsign": {
+  "kind": "stopsign",
+  "s": [
+   1.033,
+   2.6,
+   0.365
+  ],
+  "faces": 280,
+  "bytes": 11172,
+  "src": {
+   "i": 3006,
+   "name": "Bus Sign",
+   "user": "decoratopia",
+   "lic": "CC Attribution",
+   "uid": "76333622b3464662adb87ccb8d3c3e28"
+  }
+ },
+ "bell_g": {
+  "kind": "bell",
+  "s": [
+   1.233,
+   1.6,
+   1.234
+  ],
+  "faces": 1084,
+  "bytes": 11356,
+  "src": {
+   "i": 3007,
+   "name": "Glass recycling bin",
+   "user": "Bee.Lucas",
+   "lic": "CC Attribution",
+   "uid": "d69838a4110946b7a315a88a32ecc3a6"
+  }
+ },
+ "bell_y": {
+  "kind": "bell",
+  "s": [
+   1.404,
+   1.6,
+   1.626
+  ],
+  "faces": 534,
+  "bytes": 12124,
+  "src": {
+   "i": 3008,
+   "name": "Plastic recycling bin",
+   "user": "Bee.Lucas",
+   "lic": "CC Attribution",
+   "uid": "e175ad45a0ca4be784f3a3d79929a6b1"
+  }
+ },
+ "bell_b": {
+  "kind": "bell",
+  "s": [
+   1.34,
+   1.6,
+   1.333
+  ],
+  "faces": 1984,
+  "bytes": 25080,
+  "src": {
+   "i": 3009,
+   "name": "Cardboard recycling bin",
+   "user": "Bee.Lucas",
+   "lic": "CC Attribution",
+   "uid": "3d436b0b30a24114b407467496091e5e"
+  }
+ },
+ "box_3010": {
+  "kind": "box",
+  "tint": [
+   0.62,
+   0.64,
+   0.62
+  ],
+  "s": [
+   0.878,
+   1.2,
+   0.323
+  ],
+  "faces": 124,
+  "bytes": 3892,
+  "src": {
+   "i": 3010,
+   "name": "Electrical cabinet",
+   "user": "pinokio21",
+   "lic": "CC Attribution",
+   "uid": "e25417f2da1e4308ba4fcd3eda740b33"
+  }
+ },
+ "bollard_3011": {
+  "kind": "bollard",
+  "f": [
+   0.2,
+   0.2
+  ],
+  "s": [
+   0.091,
+   0.9,
+   0.091
+  ],
+  "faces": 138,
+  "bytes": 6592,
+  "src": {
+   "i": 3011,
+   "name": "Parking post",
+   "user": "Art62",
+   "lic": "CC Attribution",
+   "uid": "532b02858c67410f9a1973544f25dcc4"
+  }
+ },
+ "planter_3012": {
+  "kind": "planter",
+  "s": [
+   1.3,
+   0.417,
+   1.126
+  ],
+  "faces": 44,
+  "bytes": 12684,
+  "src": {
+   "i": 3012,
+   "name": "Lowpoly Flower Pot",
+   "user": "l0wpoly",
+   "lic": "CC Attribution",
+   "uid": "2ee55eb5e6d74fadbfc6149f2db1096a"
+  }
+ },
+ "play_3013": {
+  "kind": "play",
+  "s": [
+   2.4,
+   0.797,
+   2.4
+  ],
+  "faces": 662,
+  "bytes": 18696,
+  "src": {
+   "i": 3013,
+   "name": "Merry-go-round",
+   "user": "ashley.carboon",
+   "lic": "CC Attribution",
+   "uid": "3fd337d26f5f42dea8503a3bf27efe40"
+  }
+ },
+ "play_3014": {
+  "kind": "play",
+  "s": [
+   1.238,
+   2.4,
+   1.64
+  ],
+  "faces": 2852,
+  "bytes": 45036,
+  "src": {
+   "i": 3014,
+   "name": "Children Climbing Frame T-shape",
+   "user": "mira9",
+   "lic": "CC Attribution",
+   "uid": "327ec7b4deae45eab360703133756142"
+  }
+ },
+ "doghouse": {
+  "kind": "doghouse",
+  "s": [
+   0.763,
+   0.9,
+   0.875
+  ],
+  "faces": 1184,
+  "bytes": 41016,
+  "src": {
+   "i": 3015,
+   "name": "Dog House Free",
+   "user": "donnichols",
+   "lic": "CC Attribution",
+   "uid": "fc9e3897b3564f36be62748aaf46adb5"
+  }
+ },
+ "shrub_3200": {
+  "kind": "bush",
+  "s": [
+   0.979,
+   0.9,
+   1.043
+  ],
+  "faces": 1080,
+  "bytes": 37772,
+  "src": {
+   "i": 3200,
+   "name": "Low poly Bush (Buxus)",
+   "user": "arekusandoru.kurobe",
+   "lic": "CC Attribution",
+   "uid": "d3383bb111bc49d6a9d6cfe810e3058b"
+  }
+ }
+}

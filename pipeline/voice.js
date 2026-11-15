@@ -15,11 +15,16 @@ function voiceBuffer(id){
     b=AC.decodeAudioData(a.buffer).catch(()=>null);voiceBuf.set(id,b);}
   return b;}
 function voiceStop(g){if(!g.vsrc)return;try{g.vsrc.stop();}catch(e){}voiceLive.delete(g.vsrc);g.vsrc=null;}
+// Who speaks how: children of either sex use the female clip pitched up (a boy with a grown man's voice is the worst case),
+// the old speak lower and slower, and every person keeps a pitch of their own. v = [femaleId, maleId, maleRate].
+function voiceFor(p,v){
+  const k=peds.indexOf(p),age=p.look&&p.look.age,kid=age==='kid',male=!kid&&(p.look&&p.look.male!=null?!!p.look.male:hash(k+':v')<.5),
+    base=kid?1.2:age==='old'?.9:1;
+  return{id:v[male?1:0],male,rate:(male?v[2]:1)*base*(1+(hash(k+':r')-.5)*.14)};}
 // called when tickGroups shows a new line; returns the clip length in seconds so the subtitle lasts as long as the speech
 function talkVoice(g){
   const v=voiceInfo(g.text),p=g.mem[g.spk];if(!v||!p)return 0;
-  const k=peds.indexOf(p),male=p.look&&p.look.male!=null?!!p.look.male:hash(k+':v')<.5,id=v[male?1:0],
-    rate=(male?v[2]:1)*(1+(hash(k+':r')-.5)*.12),i=g.i,text=g.text;
+  const {id,male,rate}=voiceFor(p,v),i=g.i,text=g.text;
   voiceStop(g);
   if(snd&&!muted&&Math.hypot(p.x-camera.position.x,p.z-camera.position.z)<40)
     voiceBuffer(id).then(b=>{if(!b||g.i!==i||g.say<=0||!pedGroups.includes(g)||g.mem[g.spk]!==p)return;

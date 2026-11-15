@@ -157,3 +157,69 @@ the rest is on you.
    your view point, both views resolve to your street, every solid pushes a ped out, no ped inside a street solid over
    600 frames, both view PNGs written.
 3. You looked at both PNGs and they show your street.
+
+## House kit keys (doors, windows per wall, porches, extensions, ...)
+
+Step `kit` (`pipeline/kit.js`, `pipeline/add_kit.py`, last in the chain) adds the parts that make an ordinary house look
+like the real one. Its keys do **not** go in this street file (`add_streets.py` rejects unknown look keys): they go in
+`pipeline/kit/looks/{slug}.json`, keyed by the same building ids, and every id there must already have a look here.
+`pipeline/kit/looks/_example.json` uses every key. All keys are optional; a house with none looks exactly as before.
+
+```sh
+python3 pipeline/add_kit.py --sides c1298            # the house's walls: index, length, compass, metres to the road, side name
+python3 pipeline/add_kit.py --check pipeline/kit/looks/jurbarko.json
+python3 pipeline/kit/photo_views.py jurbarko         # camera records of refs/mapillary/jurbarko/*.jpg -> pipeline/kit/views/
+node pipeline/kit/shots.mjs page.html views.json outdir   # render the game from those photos, or square-on to one wall
+```
+
+### Sides
+
+Every part sits on a wall, named by `side`:
+- `front`: the wall nearest a named street (the smallest `road` in `--sides`, walls of 2 m or more). Corner houses: check it, and
+  if the street front is another wall, set `"front": <edge index>`.
+- `left` / `right`: as you **stand in the street looking at the front**. `back`: opposite the front.
+- or an edge index (number, or a string like `"3"` as a `win` key) from `--sides`, for outlines with more than four walls.
+`--sides` prints which edge each name resolves to; run it before writing a house and compare the compass directions with the photo
+(the photo's compass angle is in `pipeline/kit/views/{slug}.json`: a camera looking SW sees walls that face NE).
+
+Positions along a wall (`at`) are fractions 0..1 from the wall's **left end as you face that wall from outside**.
+Storeys count from the ground; a 1.5-storey house with `h` 5 m still has two wall rows in the game, so give the upper row
+as `0` when the real upper floor has no windows on that wall.
+
+### Keys
+
+| key | value | how to read it off a photo |
+|---|---|---|
+| `front` | edge index | only when the auto front (`--sides`) is not the wall on the street |
+| `win` | `{side: [row0, row1, ...]}`, a row is a count (evenly spaced) or a list of `at` fractions | count the windows of each storey on each wall you can see. On a gable end (the triangle wall of a gable roof) the row after the last wall row is the attic, and one more is a small loft window near the apex: `[2, 1]` on a one-storey gable = two below, one in the gable. A wall listed here loses all its automatic windows; walls you do not list keep them. `[0]` = a blank wall |
+| `winShape` | `normal` `wide` `narrow` | wide = triple / picture windows, narrow = tall slim ones; one value for the whole house |
+| `frame` | `[r,g,b]` | window frame colour of the `win` windows (white PVC is the default; brown wood ~`[0.4,0.27,0.18]`) |
+| `door` | object or list: `side`, `at` (number or list, default 0.5), `type` `single double glass garage`, `col`, `steps` true/false, `porch` `none canopy closed` | a door you can see. `canopy` = a small roof over it, `closed` = an enclosed entrance porch (small box with a gable roof, door on its front). A ground-floor window closer than ~0.75 m to a door is dropped |
+| `gable` | `[r,g,b]` | colour of both gable triangles when it differs from the wall (boarded or painted gables) |
+| `gableSty` | `boards` (vertical) `planks` (horizontal siding) `profile` (metal) `asbestos` `plaster` `roughcast` `brick` `silicate` | material of the gable triangles |
+| `plinth` | `[r,g,b]` | foundation strip round the house, usually grey concrete `[0.45,0.45,0.43]` |
+| `plinthH` | metres 0.1..1.5, default 0.5 | its height above the ground; count it in brick courses or against a door step |
+| `ext` | object or list: `side`, `at` (centre, 0.5), `w` (share of the wall 0.1..1, 0.5), `d` (metres out 0.8..12, 3), `h` (wall height 2..8, 2.6), `roof` `lean flat gable` (lean), `wall`, `roofCol`, `glazed` true/false, `sty` `plaster brick silicate plank panel corrugated sheet none` | lean-to, boxy extension, glazed veranda, garage block built on to a wall. `glazed` = a veranda of glass |
+| `balc` | object or list: `side`, `at`, `w` (share of the wall, 0.35), `floor` (1 = first upper floor; default the attic floor on a gable end, else 1), `col` (railing) | a balcony: slab, railing as a panel |
+| `chim` | count 1..4 or list of fractions along the ridge | chimneys on the ridge, measured from the ridge end nearest the front wall's left corner (from the street end on a gable-front house, from the left on an eaves-front one). Replaces the automatic chimney |
+| `dorm` | object or list: `side` (the wall under that roof slope), `n` (count, or windows of a shed dormer), `type` `gable shed` | dormers. Only on an eaves wall (not a gable end). `shed` = one wide box dormer with `n` windows. Replaces the automatic dormers |
+
+Gable windows, `chim` and `dorm` need a four-corner pitched roof (`pitched`); the rest works on any outline. Buildings the game
+builds from several rectangles (complex outlines with wings) are skipped with a console warning: describe only single-outline houses.
+
+### Check it
+
+Invalid values are ignored and listed once in the console (`kit: ignored c1298.door; ...`) and in the `add_kit.py` output.
+Render the house before and after from the photo (`shots.mjs`, records from `pipeline/kit/views/`) and look: same door place,
+same window count per wall, porch or extension on the same side. `node work/test_kit.mjs kit.html base.html` checks that every key
+lands on the wall it names.
+
+### Common mistakes
+
+- Left and right swapped: they are as seen from the **street**, facing the front, not as seen in the photo.
+- Counting the windows of two storeys in one row; a gable attic window put in row 0.
+- Giving gable rows to an eaves wall (warning "row 2 of edge 1 has no wall"): look at which walls the ridge runs between.
+- `dorm` on a gable end (warning "has no roof slope over it").
+- Using the facades2 `faces` key and `win` on the same wall: `win` wins; you do not need both.
+- What cannot be said yet: the roof direction itself (that is the street look's `ridge`), window size per wall, shutters, a
+  door on an extension, columns, solar panels, aerials.

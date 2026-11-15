@@ -1,0 +1,85 @@
+{
+ "bump": {
+  "kid": [
+   "Ei! Mama, jis mane stumdo!",
+   "Žiūrėk, kur eini, dėde!",
+   "Ką, akių neturi?",
+   "Dėde, tu ką, aklas?"
+  ],
+  "man": [
+   "Ką nori, velnias?",
+   "Ei, ko stumdaisi?",
+   "Brolau, tu ką, nematai?",
+   "Ko čia lendi, asile?",
+   "Ar tau gyvent nusibodo?"
+  ],
+  "woman": [
+   "Ei! Atsiprašyt nemoki?",
+   "Kur tu žiūri, asile?",
+   "Nu žmogau, gatvė plati, o tu į mane.",
+   "Ar tu girtas, ar ką?"
+  ],
+  "oldm": [
+   "Ką, gatvė per siaura?",
+   "Mano laikais už tokį dalyką per ausį gaudavai.",
+   "Ir vėl koks prisigėręs.",
+   "Lekia kaip į gaisrą, velnias."
+  ],
+  "oldf": [
+   "Jėzau Marija! Kur tu lendi?",
+   "Nu jaunimas, nei atsiprašyt, nei nieko.",
+   "Akių neturi, vaikeli?",
+   "Rupūže tu, vos manęs neparvertei!"
+  ]
+ },
+ "again": {
+  "kid": [
+   "Mama! Jis vėl!",
+   "Pasakysiu tėčiui, jis tau parodys!"
+  ],
+  "man": [
+   "Tuoj prasileisi vieną.",
+   "Išsiųsiu aš tave į Nameko planetą tuoj.",
+   "Dar kartą, ir skrisi iki pat Kauno."
+  ],
+  "woman": [
+   "Dar kartą prisiliesi, ir vyrą pašauksiu.",
+   "Tu man jau nusibodai, rupūže."
+  ],
+  "oldm": [
+   "Dar kartą, ir gausi lazda per nugarą.",
+   "Aš armijoj tarnavau, matęs esu tokių kaip tu."
+  ],
+  "oldf": [
+   "Vėl tu? Tuoj gausi skėčiu per galvą!",
+   "Policiją kviesiu, chuligane!"
+  ]
+ },
+ "hit": {
+  "kid": [
+   "Ai! Mama!",
+   "Ai! Viskas, pasakysiu mamai!",
+   "Tėti! Tėti, padėk!"
+  ],
+  "man": [
+   "Ai! Nu tai dabar gausi!",
+   "Tu ką, velnias, gaut nori? Eik čia!",
+   "Tuoj teks drakoną kviest, kad tave atgaivintų."
+  ],
+  "woman": [
+   "Ai! Gyvulys tu!",
+   "Žmonės, kvieskit policiją!",
+   "Ai! Tuoj gausi rankine per galvą!"
+  ],
+  "oldm": [
+   "Ai, rupūže! Mano nugara!",
+   "Chuliganai! Kur ta policija, kai reikia?",
+   "Ui! Kad tau rankos nudžiūtų!"
+  ],
+  "oldf": [
+   "Gelbėkit! Žmonės, muša!",
+   "Ai! Kad tave perkūnas nutrenktų!",
+   "Kelti ranką prieš seną moterį? Gėda!"
+  ]
+ }
+}

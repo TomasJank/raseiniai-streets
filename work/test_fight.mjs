@@ -66,7 +66,7 @@ await check('groupMateJoins',A=>{const T=__t,q=T.put(T.peds[13],.9,A),m=T.put(T.
   T.player.hp=99;T.press('KeyX');T.steps(30);const res={ok:q.mode==='fight'&&m.mode==='fight',victim:q.mode,mate:m.mode};q.mode=m.mode='hide';T.player.hp=5;return res;},ADULT);
 await check('playerKnockedOut',A=>{const T=__t,q=T.put(T.peds[15],.9,A);T.hideAll([q]);T.steps(20);T.put(q,.9,A);T.player.hp=1;T.heat=0;T.cash=120;
   T.press('KeyX');let down=-1;for(let i=0;i<150&&down<0;i++){T.steps(1);if(T.fight.pDown>0)down=i;}const heat=T.heat;T.steps(130);
-  const res={ok:down>=0&&heat>=1&&T.fight.pDown<=0&&T.player.hp===5&&T.cash===70&&q.mode!=='fight',downAtStep:down,heat,cash:T.cash,fighterAfter:q.mode};
+  const res={ok:down>=0&&heat>=1&&T.fight.pDown<=0&&T.player.hp===5&&T.cash===100&&q.mode!=='fight',downAtStep:down,heat,cash:T.cash,fighterAfter:q.mode};
   q.mode='hide';T.heat=0;return res;},YOUNG);
 await check('bouncers',async()=>{const T=__t;T.tod=23;await new Promise(r=>setTimeout(r,1500));T.ENV.night.value=1;
   const B0=()=>T.club&&T.club.bouncers;T.hideAll([]);
