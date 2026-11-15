@@ -213,3 +213,72 @@ read line by line against the copy it started from.
 Review images (gitignored, `research/assets/vehicles/cars4/review/`): `colours_{key}.jpg` (every model in every palette
 colour), `detailed_near_far_1/2.jpg` (side, front, back of each detailed car, close-up and distant version),
 `detailed_wheels.jpg`, `zafira_w210_wheels.jpg`, `street_carpark.jpg`, `route_bus.jpg`, `paz_kamaz.jpg`.
+
+## Police car (2026-11-15): the 2005 Skoda Octavia
+
+The owner's pick: "2005 Skoda Octavia" by tonielpro520 (Sketchfab #3300, CC BY 4.0,
+https://sketchfab.com/3d-models/2005-skoda-octavia-c31169ccfd354b6c9b6f09964c113ae3). It is an Octavia II (A5) liftback,
+the generation Lithuanian police drove in the late 2000s. It replaces the code-built Octavia III of `cars3` wherever a
+police car appears: chasing cops (`spawnCop`), roadblocks (`makeCop`), and any other `skodaGeo` car.
+
+**What the download carries.** 353,866 triangles, 21 materials, all flat colours: the only two textures are 128 px badge
+images (`logo`, `logo0`). So nothing was taken from textures; the paint is the flat `car_paint` material (stored grey,
+coloured by the game, as `paintMat` cars are), and the livery is drawn by the game on top of it.
+
+**Conversion** (`models.json` key `octavia2_pol`, `police: 1`, `lod: [20000, 3600]`, `paintMat: ^car_paint$`; `convert.mjs`
+now copies `police` into the fleet entry). Nothing else was needed: four separate tyres found, nose already to +z, lamps
+found by the lamp pass (clear head lenses over light reflectors removed so the reflectors show; red tail lenses kept).
+Hidden geometry 133,360 -> 70,937 body, 54,977 -> 44,154 wheel triangles.
+
+| version | body | wheel | total (4 wheels) |
+|---|---|---|---|
+| close-up (within 40 m) | 19,999 | 899 | 23,595 |
+| distant (beyond 44 m; phones always) | 3,599 | 100 | 3,999 |
+
+Page: +433 KB (bin 115 KB, close-up 273 KB, 512 px atlas 38 KB, mask 3 KB, all base64). Draw calls: one body and one lamp
+mesh per police car plus its bar parts (as before), wheels through one InstancedMesh per version (as every model).
+
+**Wiring** (`cars4.js`, `add_cars4.py`, `mix.json`). `mix.json` names the model as `"police"` (never in `mix`; `add_cars4.py`
+asserts it is flagged `police` and not in the mix) and holds its `livery`. In `CARS4`: the model becomes `CARS2.police` and
+`CARS2.swap[skodaGeo]`, so cars2's `makeCarMesh`, `policeExtras`, `cars2Bar`, wheel instancing, the cop AI, dents, sinking,
+the minimap and the 400 m cull all run on it unchanged. The close-up version is unpacked with the fleet's (not on phones).
+The roof height under the bar is the full model's (1.417 m: the distant version's roof sits 6 cm lower, so it is not
+measured from it); the bar's z is the middle of the flat of the roof (-0.13 m). `cars2Bar` is wrapped to put the red and
+blue lamps there too. cars2's flat hood lettering plane is hidden (the bonnet lettering is in the paint now). A respray
+keeps the livery. A cop car the player gets into is driven like any other car.
+
+**Livery** (`cars4Police`, in the paint shader, both versions): white `#eef0ee`; a green band `#269b70` from 0.73 to 0.87 m
+on every side-facing panel along the whole car (the waist/handle line, as on the references); POLICIJA in dark `#22272c`
+plain bold capitals (canvas text, no emblem, no numbers) centred across both doors below the band, and across the bonnet,
+reading from the front. Projected in the car's own frame (x for the sides, y for the bonnet) and limited to the paint mask,
+so it follows the body, stays off glass, lamps and trim, and reads the right way round on both sides.
+
+References (Wikimedia Commons, used for the band's height and colour only, not in the page):
+- "Police car in Jonava.jpg" (Bearas, 2011-12-30, CC BY-SA 3.0): an Octavia II in this livery, band at the handle line,
+  POLICIJA on bonnet and boot.
+- "Volkswagen Jetta police (Lithuania).jpg" (David Holt, 2011-09-14, CC BY-SA 2.0): side view; band about 15 cm, from
+  0.73 to 0.88 m, colour measured at about rgb(40, 155, 115).
+
+**What differs from a real police Octavia II.** No coat-of-arms badge on the front doors, no unit number (K3087 / G20),
+no trust-line phone number, no POLICIJA on the boot lid; the bar is the game's existing bar (a white box with a red and a
+blue block), not the long Lithuanian bar; the door lettering is a choice (the references show the coat of arms there).
+
+**Review.** `review/police/sheet.jpg` (gitignored): references, eight angles close up, eight distant (alone, from 60 m
+through a long lens), four by night in each flash phase. `review/police/chase.jpg`, `street.jpg`: in the game.
+Tools: `police_sheet.mjs page.html out.jpg`, `police_game.mjs page.html outdir`.
+
+**cars3.** With this in place nothing draws the cars3 code-built models any more: cars4 already replaced the traffic and
+parked fleet, and the police car was the last. `CARS3` still builds all ten at load (it runs before cars4). The step is
+left in the chain for the integrator to decide.
+
+**Gates** (page 31,732,018 B with every step's current files; two builds byte-identical):
+
+| gate | result |
+|---|---|
+| `test_cars4` | **PASS**, with two new checks: `policeCar` (model `octavia2_pol`, liveried material, wheels spin 1/r and fronts steer .28, bar and box at roof 1.417 + .065 / .06 over z -0.131, close-up roof 1.409, flash phases R- and -B both seen, close-up within 40 m with 4 close-up wheel instances, distant at 70 m, 23,595 / 3,999 triangles, not in models, traffic, car parks or live traffic, `skodaGeo` maps to it) and `phoneGetsDistantOnly` (coarse pointer: no close-up version for the police car or any other) |
+| `test_cars2` | `policeBar` fails: it requires the cars2-era `MeshPhongMaterial` (the bar itself is placed as it asks: 1.482 / 1.477 on roof 1.417). `glbBacked`, `breakAndFixLamps`, `noHolesRear34` fail as before (same on the page without this change). `wheelsDrawnOnGround` and `brakeLights` fail whenever the car `stealGlbCar` happens to take is a detailed model: on the page without this change with a Zafira taken both fail the same way; on this page with a V70 taken `brakeLights` passes. Not caused by the police car |
+| `test_perf` | **ALL PASS** (start 602 calls / 5.0 M tris, budget 620 / 5.4) |
+| `test_takepark` | **PASS** |
+
+In the game: `review/police/chase.jpg` (one star, the cop 12 m behind the player, top-down camera),
+`review/police/street.jpg` (a cop car on Vilniaus g.), `review/police/sheet.jpg` (the review sheet).

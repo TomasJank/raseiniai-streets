@@ -210,6 +210,13 @@ as `0` when the real upper floor has no windows on that wall.
 | `roof2` | object or list: `at` `[from, to]` (fractions along the ridge, measured like `chim`), `side` `front back both` (slope over the front wall, the other, or both), `col`, `sty` `tiles sheet flat corrugated asbestos` | a stretch of the main roof re-covered in another material or colour (new metal over half an old asbestos roof). Four-corner gable roofs only |
 | `walls` | `{side: {col, sty}}`, `sty` as `gableSty` | one wall (and its gable triangle) in another colour or material: an old boarded gable end on a sided house |
 | `shut` | `[r,g,b]` | shutters on both sides of every storey window the house's `win` rows draw (cross gable windows too) |
+| `winSize` | `small` `normal` `large`, or the window frame's width in metres 0.4..3; one value or `{side: size}` | window size of the storey windows the kit draws. Left out, windows are drawn as before (the automatic window: frame 1.4 m wide on board walls, 1.55 m on plaster and brick, and as tall as about half the storey). A wall with a size but no `win` row keeps its automatic count (one per 3.2 m) and gets the smaller windows. Measure the frame against the wall: old wooden houses are mostly 1.0 to 1.2 m |
+| `halfHip` | `true` (0.35) or the clipped share of the gable 0.15..0.6 | a half-hipped (jerkinhead) gable roof: the top of both gable triangles becomes a small hip. Four-corner gable roofs on houses the game draws as one rectangle |
+| `walls` `at` | `{side: {col, sty, at: [from, to]}}` | only that stretch of the wall (storey walls, not the gable) in the other colour or material: a newer extension in other siding on one third of the street wall. Give that wall a `win` row as well: the stretch covers its automatic windows |
+| `door` `porch: "recess"` | | a recessed entrance: a dark opening with a brick pier on its right, no door leaf |
+| `ext` `win`, `door`, `doorCol` | `win` a row (count or list of positions), `door` a position 0..1 | windows and a door on the extension's front (a shop front, a porch with a window); the windows take the extension's wall colour and style |
+| `xg` `up`, `size` | `up` metres 0.4..4; `size` as `winSize` | `up`: a **wall dormer** that starts at the eaves (its walls `up` metres high, then its gable), so the wall below keeps its own windows and door; `rise` over 1 (up to 1.4) puts its peak above the main ridge. Its `win` row 0 fills its wall band, row 1 is its gable. `size`: window size of its windows |
+| `wings` `d` | metres 1..40 | that rectangle is drawn only `d` metres deep from the street; the rest behind it gets a flat roof at the same eaves. Use it when the game's split runs one rectangle from the street wall through a back annex, so its ridge sits further back than its neighbours' and the roof steps |
 
 Gable windows, `chim`, `dorm`, `xg` and `roof2` need a pitched roof on four corners. On outlines with 8 or more corners that the
 game draws as several rectangles, `win`, `door`, `plinth`, `chim`, `gable`, `gableSty`, `frame`, `ext`, `balc`, `walls`, `xg`, `dorm`
@@ -249,6 +256,9 @@ lands on the wall it names.
 - A cross gable seen at the very end of a wall is often just the main gable end seen at an angle: check the photo of the eaves side.
 - `wings` counted in the wrong order: use the wing numbers `--sides` prints, not the order you see them in the photo.
 - `wings` on a house of 4 corners: its roof is the street look's `ridge`, `rh` and `hip`.
-- What cannot be said yet: the roof direction of a four-corner house (that is the street look's `ridge`), a door on an extension,
+- On a split outline, `win` rows above a wall's storeys go on the rectangle wall standing at that position when it is taller
+  (the upstairs window of a two-storey wing on a one-storey street wall); elsewhere they are dropped with a warning.
+- What cannot be said yet: the roof direction of a four-corner house (that is the street look's `ridge`), per-window size or
+  shape (one per wall), a hipped lean-to, a frame colour per window,
   columns, solar panels, aerials, a glazed veranda that keeps its frame colour, a windowless clad shop box with a glazed corner,
   a close-board fence.

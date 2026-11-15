@@ -1,5 +1,6 @@
 """kit: doors, windows per wall, porches, extensions, gable colour, plinth, chimneys, dormers, balconies, cross gables, wing roofs,
-shutters, wall and roof materials and tree-free plot fronts for ordinary houses,
+shutters, wall and roof materials and tree-free plot fronts for ordinary houses, and (kit 3) window size, half-hipped roofs,
+wall dormers, wings cut short, recessed doorways, part of a wall in another material, windows and a door on an extension,
 read from pipeline/kit/looks/{slug}.json (one file per street, keyed by building id; every id must have a look in
 pipeline/streets/{slug}.json). Side names (front/back/left/right) are resolved to outline edges here; kit.js draws the parts.
 
@@ -16,9 +17,14 @@ from street_ids import Town, COMPASS, nearest, PAGE  # noqa: E402
 from add_streets import ridge_dir  # noqa: E402
 
 KEYS = {'front', 'win', 'winShape', 'frame', 'door', 'gable', 'gableSty', 'plinth', 'plinthH', 'ext', 'balc', 'chim', 'dorm',
-        'xg', 'wings', 'noTree', 'noFence', 'roof2', 'walls', 'shut'}
+        'xg', 'wings', 'noTree', 'noFence', 'roof2', 'walls', 'shut', 'winSize', 'halfHip'}
 SIDED = ('door', 'ext', 'balc', 'dorm', 'xg')
 SHAPES = ('normal', 'wide', 'narrow')
+SIZES = ('small', 'normal', 'large')
+
+
+def size_ok(v):
+    return v in SIZES if isinstance(v, str) else num_ok(v, .4, 3)
 TEX = ('brick', 'silicate', 'plaster', 'roughcast', 'planks', 'boards', 'concrete', 'corrugated', 'asbestos', 'tiles', 'profile', 'bitumen')
 SIDES = ('front', 'back', 'left', 'right')
 # Vilniaus g. buildings other agents are replacing with models
@@ -95,7 +101,7 @@ def resolve(T, segs, bid, K, err, street=None, nparts=1):
         if isinstance(v, int) and not isinstance(v, bool) and 0 <= v < n:
             return v
         err('%s.%s: side %r is not one of %s or an edge index 0..%d' % (bid, where, v, '/'.join(SIDES), n - 1))
-    out = {k: v for k, v in K.items() if k in KEYS and k not in SIDED and k not in ('front', 'win', 'winShape', 'walls', 'noTree', 'noFence', 'wings')}
+    out = {k: v for k, v in K.items() if k in KEYS and k not in SIDED and k not in ('front', 'win', 'winShape', 'winSize', 'walls', 'noTree', 'noFence', 'wings')}
     out['f'] = S['front']
     ws = K.get('winShape')
     if isinstance(ws, dict):
@@ -105,12 +111,26 @@ def resolve(T, segs, bid, K, err, street=None, nparts=1):
                 err('%s.winShape: %r is not one of %s' % (bid, v, ' '.join(SHAPES)))
     elif ws is not None:
         out['winShape'] = ws
+    ws = K.get('winSize')
+    if isinstance(ws, dict):
+        out['winSize'] = [[e, v] for e, v in ((edge('winSize', q), v) for q, v in ws.items()) if e is not None]
+        if not all(size_ok(v) for v in ws.values()):
+            err('%s.winSize: want small / normal / large or the frame width in metres 0.4..3, per side' % bid)
+    elif ws is not None:
+        out['winSize'] = ws
+        if not size_ok(ws):
+            err('%s.winSize: want small / normal / large or the frame width in metres 0.4..3' % bid)
+    hh = K.get('halfHip')
+    if hh is not None and not (hh is True or num_ok(hh, .15, .6)) or hh is not None and nparts > 1:
+        err('%s.halfHip: want true or the clipped share of the gable 0.15..0.6, on a house the game draws as one rectangle' % bid)
     if 'walls' in K:
         if isinstance(K['walls'], dict):
             out['walls'] = [[e, v] for e, v in ((edge('walls', q), v) for q, v in K['walls'].items()) if e is not None]
             for v in K['walls'].values():
-                if not (isinstance(v, dict) and set(v) <= {'col', 'sty'} and v and (v.get('col') is None or col_ok(v['col'])) and v.get('sty', 'brick') in TEX):
-                    err('%s.walls: want {"left": {"col": [r, g, b], "sty": "boards"}}, sty one of %s' % (bid, ' '.join(TEX)))
+                at = v.get('at') if isinstance(v, dict) else None
+                if not (isinstance(v, dict) and set(v) <= {'col', 'sty', 'at'} and (v.get('col') or v.get('sty')) and (v.get('col') is None or col_ok(v['col'])) and v.get('sty', 'brick') in TEX
+                        and (at is None or isinstance(at, list) and len(at) == 2 and all(num_ok(x, 0, 1) for x in at) and at[0] < at[1])):
+                    err('%s.walls: want {"left": {"col": [r, g, b], "sty": "boards", "at": [from, to]}}, sty one of %s' % (bid, ' '.join(TEX)))
         else:
             err('%s.walls: want {"left": {"col": [r, g, b], "sty": "boards"}}' % bid)
     nt = K.get('noTree')
@@ -139,15 +159,18 @@ def resolve(T, segs, bid, K, err, street=None, nparts=1):
                 if q is None:
                     lst.append(None)
                     continue
-                if not isinstance(q, dict) or set(q) - {'ridge', 'rh', 'h', 'roof'} or q.get('ridge', 'street') not in ('street', 'across') \
+                if not isinstance(q, dict) or set(q) - {'ridge', 'rh', 'h', 'roof', 'd'} or q.get('ridge', 'street') not in ('street', 'across') \
+                        or not (q.get('d') is None or num_ok(q['d'], 1, 40)) \
                         or not (q.get('rh') is None or num_ok(q['rh'], .5, 8)) or not (q.get('h') is None or num_ok(q['h'], 2.2, 30)) \
                         or q.get('roof', 'gable') not in ('gable', 'hip', 'flat'):
-                    err('%s.wings[%d]: want {"ridge": "street"|"across", "rh": 0.5..8, "h": 2.2..30, "roof": "gable"|"hip"|"flat"}' % (bid, k))
+                    err('%s.wings[%d]: want {"ridge": "street"|"across", "rh": 0.5..8, "h": 2.2..30, "roof": "gable"|"hip"|"flat", "d": 1..40 m}' % (bid, k))
                     lst.append(None)
                     continue
                 o = {k2: v for k2, v in q.items() if k2 != 'ridge'}
                 if 'ridge' in q and street:
                     o['rdir'] = ridge_dir(T, street, bid, q['ridge'])
+                if 'd' in q:
+                    o['fn'] = [round(x, 4) for x in E[S['front']][1]]
                 lst.append(o)
             out['wings'] = lst
     if 'win' in K:
@@ -166,12 +189,13 @@ def resolve(T, segs, bid, K, err, street=None, nparts=1):
                 continue
             e = edge(k, it.get('side', 'front'))
             if e is not None:
-                if k == 'xg' and not (set(it) <= {'side', 'at', 'w', 'd', 'rise', 'wall', 'gable', 'roofCol', 'win'}
+                if k == 'xg' and not (set(it) <= {'side', 'at', 'w', 'd', 'rise', 'wall', 'gable', 'roofCol', 'win', 'up', 'size'}
+                                      and (it.get('up') is None or num_ok(it['up'], .4, 4)) and (it.get('size') is None or size_ok(it['size']))
                                       and (it.get('at') is None or num_ok(it['at'], 0, 1)) and (it.get('w') is None or num_ok(it['w'], 1, 16))
-                                      and (it.get('d') is None or num_ok(it['d'], 0, 12)) and (it.get('rise') is None or num_ok(it['rise'], .3, 1))
+                                      and (it.get('d') is None or num_ok(it['d'], 0, 12)) and (it.get('rise') is None or num_ok(it['rise'], .3, 1.4))
                                       and all(it.get(c) is None or col_ok(it[c]) for c in ('wall', 'gable', 'roofCol'))
                                       and (it.get('win') is None or isinstance(it['win'], list))):
-                    err('%s.xg: want {"side", "at" 0..1, "w" 1..16 m, "d" 0..12 m, "rise" 0.3..1, "wall", "gable", "roofCol", "win": [rows]}' % bid)
+                    err('%s.xg: want {"side", "at" 0..1, "w" 1..16 m, "d" 0..12 m, "rise" 0.3..1.4, "wall", "gable", "roofCol", "win": [rows], "up" 0.4..4 m, "size"}' % bid)
                 lst.append(dict({q: v for q, v in it.items() if q != 'side'}, e=e))
         out[k] = lst
     for q in (K.get('roof2') if isinstance(K.get('roof2'), list) else [K['roof2']] if 'roof2' in K else []):

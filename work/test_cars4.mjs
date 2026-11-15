@@ -1,5 +1,5 @@
 // cars4 checks (also paint colours): node test_cars4.mjs page.html [shotdir]   (page = build.sh + add_cars4.py)
-// Real length per model, wheels on the ground, every traffic and parked car textured cars4 (police stays the cars3 Octavia),
+// Real length per model, wheels on the ground, every traffic and parked car textured cars4 (the police car is its own cars4 model, never a civilian one),
 // parked instances textured, wheels turn, lamps glow only at night or braking, a car sinks, a parked car is solid, no errors.
 // Also: the van collides along its whole length, the route bus wears the coach, standing vehicles are solid, and a detailed
 // model shows its close-up version within 40 m and its distant one beyond, both inside their triangle budgets.
@@ -11,7 +11,7 @@ const dir=new URL('.',import.meta.url).pathname,out=shotArg||dir+'shots_cars4/';
 const o='function drawMini(){';
 let h=fs.readFileSync(file,'utf8');if(h.split(o).length!==2)throw new Error('hook');
 const api=`window.__t={enterExit,get heat(){return heat},set heat(v){heat=v},set paused(v){mapOpen=v},set sinkS(v){sinkS=v},get world(){return world},get player(){return player},
-get CARS2(){return CARS2},get CARS4(){return CARS4},get CARS4_FLEET(){return CARS4_FLEET},get PARKED2(){return PARKED2},get bus(){return bus},get placeBus(){return placeBus},get CARS4_STATIC(){return CARS4_STATIC},get LL(){return LL},get collideCar(){return collideCar},get PARKED(){return PARKED},get LOT_GEOS(){return LOT_GEOS},get TRAFFIC_GEOS(){return TRAFFIC_GEOS},get cops(){return cops},get ENV(){return ENV},
+get CARS2(){return CARS2},get CARS4(){return CARS4},get CARS4_FLEET(){return CARS4_FLEET},get PARKED2(){return PARKED2},get bus(){return bus},get placeBus(){return placeBus},get CARS4_STATIC(){return CARS4_STATIC},get CARS4_POLICE(){return CARS4_POLICE},skodaGeo,flash,copRed,copBlue,copOff,get LL(){return LL},get collideCar(){return collideCar},get PARKED(){return PARKED},get LOT_GEOS(){return LOT_GEOS},get TRAFFIC_GEOS(){return TRAFFIC_GEOS},get cops(){return cops},get ENV(){return ENV},
 driveCar,syncCar,resetToRoad,get makeCarMesh(){return makeCarMesh},makeCop,spawnCop,dent,breakLamps,fixCar,lampsSet,carLamps,get carOverlap(){return carOverlap},parkedNear,inWater,worldGroup,renderer,scene,camera,get GY(){return GY},
 step(n,dt=.033){for(let i=0;i<n&&player.car;i++)driveCar(player.car,dt);},
 shot(from,to){camera.position.set(...from);camera.lookAt(...to);camera.updateMatrixWorld();const f=scene.fog;scene.fog=null;renderer.render(scene,camera);scene.fog=f;return renderer.domElement.toDataURL('image/jpeg',.9);}};`;
@@ -140,6 +140,32 @@ await check('detailedModelsSwitchByDistance',async()=>{const T=__t,L=Object.valu
   const parkedHi=T.PARKED2.filter(m=>m.geometry.userData.cars4hi).length,farLast=!T.PARKED2[T.PARKED2.length-1].geometry.userData.cars4;
   return{ok:!over.length&&near&&nearWheels>=4&&far&&farWheels>=4&&dentStays&&back&&parkedHi>0&&parkedHi<=L.length&&farLast,models:L.length,overBudget:over,nearIsCloseUp:near,nearWheels,farIsDistant:far,farWheels,dentKept:dentStays,repaired:back,parkedCloseUpMeshes:parkedHi};});
 
+// the police car: the Octavia II model with police set, liveried, four wheels that spin and steer, its bar on this roof flashing,
+// close-up and distant versions by distance, and never a civilian car (traffic, car parks, the mix)
+await check('policeCar',async()=>{const T=__t,F=T.CARS4.police,pc=T.player.car;if(!F)return{ok:false,why:'no police model'};
+  const q=T.makeCop(pc.x+25,pc.z+25,0);T.syncCar(q);const g=q.g,body=g.userData.body,ch=body.children;
+  const model=g.userData.car2===F&&F.key===T.CARS4_POLICE&&!!T.CARS4_FLEET[F.key].police&&ch[0].material===F.mat&&F.mat.customProgramCacheKey()==='cars4police';
+  const W=g.userData.wheels,x0=W.map(w=>w.rotation.x);q.z+=1;T.syncCar(q);const spin=W.map((w,i)=>+(w.rotation.x-x0[i]).toFixed(3));
+  const y0=W.map(w=>w.rotation.y);q.steer=1;T.syncCar(q);const steer=W.map((w,i)=>+(w.rotation.y-y0[i]).toFixed(3));q.steer=0;T.syncCar(q);
+  const wheels=W.length===4&&spin.every(v=>Math.abs(Math.abs(v)-1/F.r)<.05)&&steer.filter(v=>Math.abs(v-.28)<1e-3).length===2&&F.wheel.index.count/3>=40;
+  // the roof: the highest body point under the bar, on the close-up version too
+  const top=G=>{const a=G.attributes.position.array;let y=0;for(let i=0;i<a.length;i+=3)if(Math.abs(a[i])<.35&&Math.abs(a[i+2]-F.roofZ)<.15)y=Math.max(y,a[i+1]);return y;};
+  for(let i=0;i<300&&!T.CARS4.hi;i++)await new Promise(r=>setTimeout(r,100));
+  const box=ch.find(o=>o.isMesh&&o.geometry.type==='BoxGeometry'&&Array.isArray(o.material));
+  const bar=q.bar.length===2&&q.bar.every(l=>Math.abs(l.position.y-F.roof-.065)<1e-6&&Math.abs(l.position.z-F.roofZ)<1e-6)&&!!box&&Math.abs(box.position.y-F.roof-.06)<1e-6&&Math.abs(box.position.z-F.roofZ)<1e-6
+    &&top(F.paint)<=F.roof+.005&&!!F.hi&&Math.abs(top(F.hi.paint)-F.roof)<.015&&!ch[5].visible;
+  const ph=[];for(let i=0;i<4;i++){T.flash(q);ph.push(q.bar.map(l=>l.material===T.copRed?'R':l.material===T.copBlue?'B':'-').join(''));await new Promise(r=>setTimeout(r,140));}
+  const flashes=ph.includes('R-')&&ph.includes('-B');
+  // distance switch, as the fleet's detailed cars
+  const y=T.GY(q.x,q.z),look=d=>{T.camera.position.set(q.x+d,y+1.5,q.z);T.camera.lookAt(q.x,y+.7,q.z);T.camera.updateMatrixWorld();T.renderer.render(T.scene,T.camera);T.renderer.render(T.scene,T.camera);};
+  look(12);const near=ch[0].geometry===F.hi.paint,nearWheels=F.instHi.count;look(70);const far=ch[0].geometry===F.paint,farWheels=F.inst.count;
+  const tri=G=>G.index.count/3,hi=tri(F.hi.paint)+4*tri(F.hi.wheel),lo=tri(F.paint)+4*tri(F.wheel),budget=hi<=26000&&lo<=4200&&hi>lo;
+  T.worldGroup.remove(g);T.world.cars.splice(T.world.cars.indexOf(q),1);
+  // never civilian: not in the models (mix), traffic slots, car-park models, live traffic or parked cars; skodaGeo asks for it
+  const civ=!(F.key in T.CARS4.models)&&!T.TRAFFIC_GEOS.includes(F)&&!T.LOT_GEOS.some(G=>G.cars4===F.key)&&!T.world.cars.some(c=>c.ai&&c.g.userData.car2===F)&&T.CARS2.swap.get(T.skodaGeo)===F&&T.CARS2.police===F;
+  return{ok:model&&wheels&&bar&&flashes&&near&&nearWheels>=4&&far&&farWheels>=4&&budget&&civ,model:F.key,liveried:model,spin,steer,roof:+F.roof.toFixed(3),roofZ:+F.roofZ.toFixed(3),
+    roofHi:+top(F.hi.paint).toFixed(3),bar:q.bar.map(l=>+l.position.y.toFixed(3)),flashPhases:ph,nearIsCloseUp:near,nearWheels,farIsDistant:far,farWheels,tris:{near:hi,far:lo},notCivilian:civ};});
+
 const shots=await p.evaluate(()=>{const T=__t,r={};T.resetToRoad();const c=T.player.car;c.speed=0;c.ride=null;T.syncCar(c);c.g.visible=false;
   const s=Math.sin(c.h),k=Math.cos(c.h),rx=k,rz=-s,y=T.GY(c.x,c.z),P=(a,b,u)=>[c.x+s*a+rx*b,y+u,c.z+k*a+rz*b];
   for(const key in T.CARS4.models){const g=T.makeCarMesh(0x8a9099,T.CARS4.models[key]);g.position.copy(c.g.position);g.rotation.copy(c.g.rotation);T.worldGroup.add(g);
@@ -156,6 +182,12 @@ await check('sinksInWater',()=>{const T=__t,W=T.world,c=T.player.car;T.sinkS=nul
 // the same car park on a second load
 await p.reload({timeout:180000});await p.waitForFunction(()=>window.__t&&__t.world&&__t.world.cars.length&&__t.PARKED.cars.length,null,{timeout:180000});await p.waitForTimeout(1500);
 {const sig2=await parkedSig(),r={ok:sig1===sig2&&sig1.length>1000,parked:sig1.split('|').length};console.log('parkedColoursStableAcrossLoads',JSON.stringify(r));if(!r.ok)fails.push('parkedColoursStableAcrossLoads');}
+// a phone (coarse pointer) never unpacks the close-up versions, the police car's included
+{await p.close();const ctx=await b.newContext({viewport:{width:800,height:500},hasTouch:true,isMobile:true}),q=await ctx.newPage();q.on('pageerror',e=>errs.push(e.message));
+  await q.goto('file://'+dir+'_cars4.html',{timeout:300000});await q.waitForFunction(()=>window.__t&&__t.world&&__t.world.cars.length,null,{timeout:300000});await q.waitForTimeout(6000);
+  const r=await q.evaluate(()=>{const T=__t,F=T.CARS4.police,phone=matchMedia('(pointer:coarse)').matches,c=T.makeCop(T.player.car.x+8,T.player.car.z,0);T.syncCar(c);const m=c.g.userData.car2===F;
+    return{ok:phone&&!!F&&m&&!F.hi&&!T.CARS4.hi&&Object.values(T.CARS4.models).every(M=>!M.hi),phone,police:m,policeCloseUp:!!(F&&F.hi),anyCloseUp:T.CARS4.hi};});
+  console.log('phoneGetsDistantOnly',JSON.stringify(r));if(!r.ok)fails.push('phoneGetsDistantOnly');await ctx.close();}
 console.log('errors',JSON.stringify(errs.slice(0,6)));if(errs.length)fails.push('page errors');
 await b.close();
 if(fails.length){console.log('FAIL\n  '+fails.join('\n  '));process.exit(1);}

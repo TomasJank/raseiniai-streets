@@ -492,11 +492,7 @@
     0.87
    ],
    "sty": "silicate",
-   "windows": true,
-   "pitched": true,
-   "hip": false,
-   "h": 5.2,
-   "rh": 3.0
+   "windows": true
   },
   "c1635": {
    "wall": [
@@ -531,11 +527,7 @@
     0.76
    ],
    "sty": "silicate",
-   "windows": true,
-   "pitched": true,
-   "hip": false,
-   "h": 4.9,
-   "rh": 3.4
+   "windows": true
   },
   "c1639": {
    "wall": [
@@ -568,11 +560,7 @@
     0.76
    ],
    "sty": "plaster",
-   "windows": true,
-   "pitched": true,
-   "hip": false,
-   "h": 4.6,
-   "rh": 3.2
+   "windows": true
   },
   "c1653": {
    "wall": [
@@ -618,11 +606,7 @@
     0.62
    ],
    "sty": "silicate",
-   "windows": true,
-   "pitched": true,
-   "hip": false,
-   "h": 5.2,
-   "rh": 3.0
+   "windows": true
   },
   "c1672": {
    "wall": [
@@ -631,11 +615,7 @@
     0.62
    ],
    "sty": "silicate",
-   "windows": true,
-   "pitched": true,
-   "hip": true,
-   "h": 4.9,
-   "rh": 3.4
+   "windows": true
   },
   "c1765": {
    "wall": [
@@ -704,10 +684,10 @@
    ],
    "sty": "silicate",
    "windows": true,
+   "h": 3.0,
+   "rh": 3.1,
    "pitched": true,
-   "hip": false,
-   "h": 5.2,
-   "rh": 3.0
+   "hip": false
   },
   "c1850": {
    "wall": [

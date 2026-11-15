@@ -1,0 +1,7 @@
+{
+  "c2331": {"win": {"front": [2, 1], "left": [2], "right": [2]}, "chim": [0.8], "plinth": [0.45, 0.44, 0.41], "plinthH": 0.35,
+            "dorm": {"side": "right", "n": 1, "type": "gable"}},
+  "c2332": {"win": {"front": [3], "right": [1, 1]}, "plinth": [0.42, 0.4, 0.38], "plinthH": 0.4},
+  "c2334": {"win": {"front": [0, 0]}, "gableSty": "planks", "door": {"side": "left", "at": 0.25, "steps": true, "porch": "canopy"}},
+  "c2337": {"win": {"front": [3]}, "door": {"side": "right", "at": 0.5, "type": "glass", "porch": "closed"}}
+}

@@ -75,7 +75,7 @@
    "h": 3.0,
    "rh": 3.6,
    "roofSty": "asbestos",
-   "ridge": "across"
+   "ridge": "street"
   },
   "c2913": {
    "wall": [
@@ -109,10 +109,6 @@
    ],
    "sty": "plaster",
    "windows": true,
-   "pitched": true,
-   "hip": false,
-   "h": 5.6,
-   "rh": 3.2,
    "roofSty": "tiles"
   },
   "c2910": {
@@ -128,11 +124,11 @@
    ],
    "sty": "plaster",
    "windows": true,
+   "roofSty": "tiles",
+   "h": 8.6,
+   "rh": 3.3,
    "pitched": true,
-   "hip": false,
-   "h": 5.6,
-   "rh": 3.4,
-   "roofSty": "tiles"
+   "hip": true
   },
   "c2909": {
    "wall": [
@@ -274,13 +270,13 @@
    "sty": "shop",
    "windows": true,
    "pitched": false,
-   "h": 3.2,
    "wall2": [
     0.22,
     0.58,
     0.2
    ],
-   "band": 2.4
+   "h": 4.4,
+   "band": 3.4
   },
   "c7620": {
    "wall": [
@@ -350,7 +346,8 @@
    "windows": true,
    "pitched": true,
    "hip": false,
-   "roofSty": "tiles"
+   "roofSty": "tiles",
+   "ridge": "across"
   },
   "c2467": {
    "wall": [
@@ -373,37 +370,33 @@
   "c2466": {
    "wall": [
     0.86,
-    0.62,
-    0.5
+    0.63,
+    0.54
    ],
    "roof": [
-    0.3,
-    0.3,
-    0.32
+    0.47,
+    0.47,
+    0.45
    ],
-   "sty": "brick",
+   "sty": "plank",
    "windows": true,
    "pitched": true,
    "hip": false,
-   "h": 3.0,
-   "rh": 3.4,
-   "wall2": [
-    0.72,
-    0.72,
-    0.7
-   ],
-   "band": 2.8
+   "h": 3.4,
+   "rh": 3.2,
+   "roofSty": "asbestos",
+   "ridge": "street"
   },
   "c2465": {
    "wall": [
-    0.85,
-    0.78,
-    0.58
+    0.86,
+    0.79,
+    0.56
    ],
    "roof": [
-    0.42,
-    0.42,
-    0.41
+    0.45,
+    0.45,
+    0.43
    ],
    "sty": "plank",
    "windows": true,
@@ -416,33 +409,34 @@
   },
   "c2464": {
    "wall": [
-    0.5,
-    0.31,
-    0.22
+    0.42,
+    0.25,
+    0.19
    ],
    "roof": [
-    0.3,
-    0.18,
-    0.15
+    0.32,
+    0.2,
+    0.16
    ],
    "sty": "plank",
    "windows": true,
    "pitched": true,
    "hip": false,
-   "h": 3.4,
-   "rh": 3.8,
-   "roofSty": "sheet"
+   "h": 3.3,
+   "rh": 4.2,
+   "roofSty": "tiles",
+   "ridge": "street"
   },
   "c2463": {
    "wall": [
-    0.76,
-    0.75,
-    0.68
+    0.78,
+    0.79,
+    0.77
    ],
    "roof": [
-    0.2,
-    0.26,
-    0.38
+    0.3,
+    0.3,
+    0.3
    ],
    "sty": "plank",
    "windows": true,
@@ -450,7 +444,7 @@
    "hip": false,
    "h": 2.9,
    "rh": 2.8,
-   "roofSty": "sheet",
+   "roofSty": "asbestos",
    "ridge": "street"
   },
   "c2026": {
@@ -488,21 +482,22 @@
   },
   "c2022": {
    "wall": [
-    0.2,
-    0.17,
-    0.14
+    0.86,
+    0.85,
+    0.8
    ],
    "roof": [
     0.27,
     0.27,
     0.29
    ],
-   "sty": "plank",
+   "sty": "silicate",
    "windows": true,
    "pitched": true,
    "hip": false,
-   "h": 3.0,
-   "rh": 4.2,
+   "h": 3.6,
+   "rh": 4.0,
+   "roofSty": "tiles",
    "ridge": "across"
   },
   "c2019": {
@@ -581,7 +576,7 @@
     0.51,
     0.5
    ],
-   "sty": "plaster",
+   "sty": "plank",
    "windows": true,
    "pitched": true,
    "hip": false,
@@ -639,10 +634,7 @@
     0.7
    ],
    "sty": "plaster",
-   "windows": true,
-   "pitched": false,
-   "h": 7.2,
-   "balcony": true
+   "windows": true
   },
   "c2185": {
    "wall": [
@@ -657,10 +649,6 @@
    ],
    "sty": "plaster",
    "windows": true,
-   "pitched": true,
-   "hip": true,
-   "h": 7.5,
-   "rh": 3.0,
    "roofSty": "tiles"
   },
   "c2504": {
@@ -675,11 +663,7 @@
     0.29
    ],
    "sty": "plaster",
-   "windows": true,
-   "pitched": true,
-   "hip": false,
-   "h": 5.6,
-   "rh": 3.0
+   "windows": true
   },
   "c1525": {
    "wall": [
@@ -702,22 +686,22 @@
   },
   "c2462": {
    "wall": [
-    0.56,
     0.6,
-    0.68
+    0.6,
+    0.58
    ],
    "roof": [
-    0.25,
-    0.27,
-    0.32
+    0.3,
+    0.18,
+    0.14
    ],
-   "sty": "plank",
+   "sty": "plaster",
    "windows": true,
    "pitched": true,
    "hip": false,
    "h": 3.4,
    "rh": 3.4,
-   "roofSty": "sheet",
+   "roofSty": "corrugated",
    "ridge": "street"
   }
  },
@@ -1125,6 +1109,19 @@
    "y": 3.1,
    "bg": "#2f3f8f",
    "fg": "#ffffff"
+  },
+  {
+   "text": "Tėjūla",
+   "ll": [
+    55.3787471,
+    23.1170251
+   ],
+   "hd": 217,
+   "w": 4.2,
+   "h": 0.8,
+   "y": 3.9,
+   "bg": "#f4f4f2",
+   "fg": "#3a9a3a"
   }
  ],
  "parking": [

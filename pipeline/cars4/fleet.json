@@ -940,6 +940,95 @@
   "credit": "Renault Megane Grand Tour",
   "pageBytes": 261544
  },
+ "octavia2_pol": {
+  "key": "octavia2_pol",
+  "name": "Skoda Octavia II 2005",
+  "src": 3300,
+  "dims": [
+   4.572,
+   1.845,
+   1.417
+  ],
+  "axles": [
+   1.331,
+   -1.23
+  ],
+  "track": 0.703,
+  "r": 0.304,
+  "wheels": true,
+  "lamps": [
+   [
+    -0.69,
+    0.606,
+    -0.468,
+    0.69,
+    2.196,
+    1
+   ],
+   [
+    0.466,
+    0.606,
+    0.688,
+    0.69,
+    2.196,
+    1
+   ],
+   [
+    -0.658,
+    0.809,
+    -0.484,
+    0.929,
+    -2.178,
+    -1
+   ],
+   [
+    0.482,
+    0.809,
+    0.657,
+    0.929,
+    -2.178,
+    -1
+   ]
+  ],
+  "paint": [
+   0.627,
+   0.408,
+   0.153
+  ],
+  "tris": 3599,
+  "wheelTris": 100,
+  "uvOut": 0,
+  "base": [
+   0.502,
+   0.502,
+   0.502
+  ],
+  "own": 10512423,
+  "lod": {
+   "tris": 19999,
+   "wheelTris": 899
+  },
+  "seen": {
+   "body": [
+    133360,
+    70937
+   ],
+   "wheel": [
+    54977,
+    44154
+   ]
+  },
+  "images": 2,
+  "swatches": 7,
+  "parts": 56,
+  "cut": null,
+  "mask": true,
+  "author": "tonielpro520",
+  "credit": "Skoda Octavia",
+  "page": "https://sketchfab.com/3d-models/2005-skoda-octavia-c31169ccfd354b6c9b6f09964c113ae3",
+  "police": 1,
+  "pageBytes": 428688
+ },
  "p206_2000": {
   "key": "p206_2000",
   "name": "Peugeot 206 2000",

@@ -108,9 +108,7 @@
     0.3
    ],
    "sty": "plaster",
-   "windows": true,
-   "h": 5.6,
-   "rh": 2.8
+   "windows": true
   },
   "c518": {
    "wall": [
@@ -160,9 +158,7 @@
     0.56
    ],
    "sty": "plaster",
-   "windows": true,
-   "h": 3.1,
-   "rh": 3.8
+   "windows": true
   },
   "c507": {
    "wall": [
@@ -210,9 +206,7 @@
     0.56
    ],
    "sty": "brick",
-   "windows": true,
-   "h": 3.3,
-   "rh": 4.4
+   "windows": true
   },
   "c1054": {
    "wall": [
@@ -260,11 +254,7 @@
     0.3
    ],
    "sty": "brick",
-   "windows": true,
-   "h": 3.2,
-   "rh": 4.6,
-   "pitched": true,
-   "hip": true
+   "windows": true
   },
   "c493": {
    "wall": [
@@ -278,9 +268,7 @@
     0.29
    ],
    "sty": "plaster",
-   "windows": true,
-   "h": 3.1,
-   "rh": 3.8
+   "windows": true
   },
   "c1056": {
    "wall": [
@@ -378,9 +366,7 @@
     0.56
    ],
    "sty": "wood",
-   "windows": true,
-   "h": 3.0,
-   "rh": 3.6
+   "windows": true
   },
   "c537": {
    "wall": [
@@ -412,9 +398,7 @@
     0.18
    ],
    "sty": "brick",
-   "windows": true,
-   "h": 3.2,
-   "rh": 4.2
+   "windows": true
   },
   "c920": {
    "wall": [
@@ -514,11 +498,7 @@
     0.16
    ],
    "sty": "plaster",
-   "windows": true,
-   "h": 3.2,
-   "rh": 4.4,
-   "pitched": true,
-   "hip": false
+   "windows": true
   },
   "c721": {
    "wall": [
@@ -532,11 +512,7 @@
     0.18
    ],
    "sty": "brick",
-   "windows": true,
-   "h": 3.3,
-   "rh": 4.2,
-   "pitched": true,
-   "hip": false
+   "windows": true
   },
   "c578": {
    "wall": [
@@ -568,11 +544,7 @@
     0.53
    ],
    "sty": "plaster",
-   "windows": true,
-   "h": 6.4,
-   "rh": 0.5,
-   "pitched": false,
-   "hip": false
+   "windows": true
   },
   "c5272": {
    "wall": [

@@ -1,0 +1,1261 @@
+{
+ "flagged": [
+  {
+   "street": "stonu",
+   "id": "c3750",
+   "look_h": 7.2,
+   "look_mid": 7.2,
+   "lidar_mid": 15.7,
+   "lidar_eaves": 15.7,
+   "storeys": 2,
+   "lidar_storeys": 5,
+   "src": "lidar",
+   "diff": -8.5
+  },
+  {
+   "street": "dubysos",
+   "id": "c3752",
+   "look_h": 12.5,
+   "look_mid": 12.5,
+   "lidar_mid": 5.1,
+   "lidar_eaves": 5.1,
+   "storeys": 4,
+   "lidar_storeys": 2,
+   "src": "lidar",
+   "diff": 7.4
+  },
+  {
+   "street": "stonu",
+   "id": "c3746",
+   "look_h": 5.0,
+   "look_mid": 6.0,
+   "lidar_mid": 13.0,
+   "lidar_eaves": 12.1,
+   "storeys": 2,
+   "lidar_storeys": 4,
+   "src": "skeleton",
+   "diff": -7.0
+  },
+  {
+   "street": "dominikonu",
+   "id": "c2668",
+   "look_h": 14.5,
+   "look_mid": 14.5,
+   "lidar_mid": 7.6,
+   "lidar_eaves": 7.6,
+   "storeys": 5,
+   "lidar_storeys": 3,
+   "src": "lidar",
+   "diff": 6.9
+  },
+  {
+   "street": "vytauto-didziojo",
+   "id": "c3715",
+   "look_h": 9,
+   "look_mid": 10.2,
+   "lidar_mid": 3.4,
+   "lidar_eaves": 3.4,
+   "storeys": 3,
+   "lidar_storeys": 1,
+   "src": "roof fit",
+   "diff": 6.8
+  },
+  {
+   "street": "dubysos",
+   "id": "c3753",
+   "look_h": 12.5,
+   "look_mid": 12.5,
+   "lidar_mid": 6.5,
+   "lidar_eaves": 5.5,
+   "storeys": 4,
+   "lidar_storeys": 2,
+   "src": "roof fit",
+   "diff": 6.0
+  },
+  {
+   "street": "maironio",
+   "id": "c2920",
+   "look_h": 8.0,
+   "look_mid": 9.1,
+   "lidar_mid": 3.6,
+   "lidar_eaves": 3.6,
+   "storeys": 3,
+   "lidar_storeys": 1,
+   "src": "lidar",
+   "diff": 5.5
+  },
+  {
+   "street": "dominikonu",
+   "id": "c2687",
+   "look_h": 10.0,
+   "look_mid": 10.0,
+   "lidar_mid": 5.0,
+   "lidar_eaves": 5.0,
+   "storeys": 3,
+   "lidar_storeys": 2,
+   "src": "roof fit",
+   "diff": 5.0
+  },
+  {
+   "street": "zemaiciu",
+   "id": "c4468",
+   "look_h": 3.1,
+   "look_mid": 3.1,
+   "lidar_mid": 7.9,
+   "lidar_eaves": 7.9,
+   "storeys": 1,
+   "lidar_storeys": 3,
+   "src": "lidar",
+   "diff": -4.8
+  },
+  {
+   "street": "zemaiciu",
+   "id": "c3373",
+   "look_h": 5.0,
+   "look_mid": 5.0,
+   "lidar_mid": 9.6,
+   "lidar_eaves": 9.6,
+   "storeys": 2,
+   "lidar_storeys": 3,
+   "src": "lidar",
+   "diff": -4.6
+  },
+  {
+   "street": "zemaiciu",
+   "id": "c4701",
+   "look_h": 3.4,
+   "look_mid": 3.4,
+   "lidar_mid": 7.7,
+   "lidar_eaves": 7.7,
+   "storeys": 1,
+   "lidar_storeys": 3,
+   "src": "lidar",
+   "diff": -4.3
+  },
+  {
+   "street": "dubysos",
+   "id": "c2927",
+   "look_h": 3.6,
+   "look_mid": 5.5,
+   "lidar_mid": 9.7,
+   "lidar_eaves": 9.7,
+   "storeys": 1,
+   "lidar_storeys": 3,
+   "src": "roof fit",
+   "diff": -4.2
+  },
+  {
+   "street": "zemaiciu",
+   "id": "c4537",
+   "look_h": 3.3,
+   "look_mid": 3.3,
+   "lidar_mid": 7.4,
+   "lidar_eaves": 7.4,
+   "storeys": 1,
+   "lidar_storeys": 2,
+   "src": "lidar",
+   "diff": -4.1
+  },
+  {
+   "street": "zemaiciu",
+   "id": "c4786",
+   "look_h": 3.1,
+   "look_mid": 3.1,
+   "lidar_mid": 7.1,
+   "lidar_eaves": 7.1,
+   "storeys": 1,
+   "lidar_storeys": 2,
+   "src": "lidar",
+   "diff": -4.0
+  },
+  {
+   "street": "maironio",
+   "id": "c5130",
+   "look_h": 6.5,
+   "look_mid": 6.5,
+   "lidar_mid": 10.4,
+   "lidar_eaves": 10.4,
+   "storeys": 2,
+   "lidar_storeys": 3,
+   "src": "lidar",
+   "diff": -3.9
+  },
+  {
+   "street": "zemaiciu",
+   "id": "c4460",
+   "look_h": 3.3,
+   "look_mid": 3.3,
+   "lidar_mid": 7.2,
+   "lidar_eaves": 7.2,
+   "storeys": 1,
+   "lidar_storeys": 2,
+   "src": "lidar",
+   "diff": -3.9
+  },
+  {
+   "street": "zemaiciu",
+   "id": "c4789",
+   "look_h": 3.2,
+   "look_mid": 3.2,
+   "lidar_mid": 7.0,
+   "lidar_eaves": 7.0,
+   "storeys": 1,
+   "lidar_storeys": 2,
+   "src": "lidar",
+   "diff": -3.8
+  },
+  {
+   "street": "vilniaus",
+   "id": "c2504",
+   "look_h": 5.6,
+   "look_mid": 7.1,
+   "lidar_mid": 3.4,
+   "lidar_eaves": 3.4,
+   "storeys": 2,
+   "lidar_storeys": 1,
+   "src": "lidar",
+   "diff": 3.7
+  },
+  {
+   "street": "zvyryno",
+   "id": "c1835",
+   "look_h": 3.0,
+   "look_mid": 3.0,
+   "lidar_mid": 6.7,
+   "lidar_eaves": 6.7,
+   "storeys": 1,
+   "lidar_storeys": 2,
+   "src": "lidar",
+   "diff": -3.7
+  },
+  {
+   "street": "dominikonu",
+   "id": "c2943",
+   "look_h": 6.0,
+   "look_mid": 7.5,
+   "lidar_mid": 3.9,
+   "lidar_eaves": 3.9,
+   "storeys": 2,
+   "lidar_storeys": 1,
+   "src": "roof fit",
+   "diff": 3.6
+  },
+  {
+   "street": "zvyryno",
+   "id": "c1992",
+   "look_h": 3.2,
+   "look_mid": 3.2,
+   "lidar_mid": 6.8,
+   "lidar_eaves": 6.8,
+   "storeys": 1,
+   "lidar_storeys": 2,
+   "src": "lidar",
+   "diff": -3.6
+  },
+  {
+   "street": "zvyryno",
+   "id": "c1857",
+   "look_h": 5.6,
+   "look_mid": 5.6,
+   "lidar_mid": 9.2,
+   "lidar_eaves": 9.2,
+   "storeys": 2,
+   "lidar_storeys": 3,
+   "src": "lidar",
+   "diff": -3.6
+  },
+  {
+   "street": "zemaiciu",
+   "id": "c3566",
+   "look_h": 2.4,
+   "look_mid": 3.6,
+   "lidar_mid": 7.2,
+   "lidar_eaves": 5.9,
+   "storeys": 1,
+   "lidar_storeys": 2,
+   "src": "roof fit",
+   "diff": -3.5
+  },
+  {
+   "street": "zvyryno",
+   "id": "c2350",
+   "look_h": 3.0,
+   "look_mid": 4.7,
+   "lidar_mid": 8.2,
+   "lidar_eaves": 5.3,
+   "storeys": 1,
+   "lidar_storeys": 2,
+   "src": "roof fit",
+   "diff": -3.5
+  },
+  {
+   "street": "zvyryno",
+   "id": "c2111",
+   "look_h": 5.6,
+   "look_mid": 5.6,
+   "lidar_mid": 9.1,
+   "lidar_eaves": 9.1,
+   "storeys": 2,
+   "lidar_storeys": 3,
+   "src": "lidar",
+   "diff": -3.5
+  },
+  {
+   "street": "vilniaus",
+   "id": "c2185",
+   "look_h": 7.5,
+   "look_mid": 9.0,
+   "lidar_mid": 5.6,
+   "lidar_eaves": 5.6,
+   "storeys": 2,
+   "lidar_storeys": 2,
+   "src": "lidar",
+   "diff": 3.4
+  },
+  {
+   "street": "vilniaus",
+   "id": "c2181",
+   "look_h": 5.2,
+   "look_mid": 5.2,
+   "lidar_mid": 8.5,
+   "lidar_eaves": 8.5,
+   "storeys": 2,
+   "lidar_storeys": 3,
+   "src": "lidar",
+   "diff": -3.3
+  },
+  {
+   "street": "zemaiciu",
+   "id": "c4742",
+   "look_h": 3.1,
+   "look_mid": 3.1,
+   "lidar_mid": 6.4,
+   "lidar_eaves": 6.4,
+   "storeys": 1,
+   "lidar_storeys": 2,
+   "src": "lidar",
+   "diff": -3.3
+  },
+  {
+   "street": "zvyryno",
+   "id": "c2071",
+   "look_h": 3.2,
+   "look_mid": 5.2,
+   "lidar_mid": 8.5,
+   "lidar_eaves": 5.5,
+   "storeys": 1,
+   "lidar_storeys": 2,
+   "src": "roof fit",
+   "diff": -3.3
+  },
+  {
+   "street": "gintaro",
+   "id": "c7452",
+   "look_h": 6.4,
+   "look_mid": 6.4,
+   "lidar_mid": 3.2,
+   "lidar_eaves": 3.2,
+   "storeys": 2,
+   "lidar_storeys": 1,
+   "src": "lidar",
+   "diff": 3.2
+  },
+  {
+   "street": "jurbarko",
+   "id": "c1667",
+   "look_h": 5.2,
+   "look_mid": 6.7,
+   "lidar_mid": 3.6,
+   "lidar_eaves": 3.6,
+   "storeys": 2,
+   "lidar_storeys": 1,
+   "src": "lidar",
+   "diff": 3.1
+  },
+  {
+   "street": "vilniaus",
+   "id": "c2941",
+   "look_h": 7.2,
+   "look_mid": 7.2,
+   "lidar_mid": 4.1,
+   "lidar_eaves": 4.1,
+   "storeys": 2,
+   "lidar_storeys": 1,
+   "src": "lidar",
+   "diff": 3.1
+  },
+  {
+   "street": "zemaiciu",
+   "id": "c4708",
+   "look_h": 3.3,
+   "look_mid": 3.3,
+   "lidar_mid": 6.4,
+   "lidar_eaves": 6.4,
+   "storeys": 1,
+   "lidar_storeys": 2,
+   "src": "lidar",
+   "diff": -3.1
+  },
+  {
+   "street": "vilniaus",
+   "id": "c2910",
+   "look_h": 5.6,
+   "look_mid": 7.3,
+   "lidar_mid": 10.2,
+   "lidar_eaves": 8.6,
+   "storeys": 2,
+   "lidar_storeys": 3,
+   "src": "roof fit",
+   "diff": -3.0
+  },
+  {
+   "street": "kestucio",
+   "id": "c5407",
+   "look_h": 5.8,
+   "look_mid": 7.0,
+   "lidar_mid": 4.1,
+   "lidar_eaves": 4.1,
+   "storeys": 2,
+   "lidar_storeys": 1,
+   "src": "lidar",
+   "diff": 2.9
+  },
+  {
+   "street": "zvyryno",
+   "id": "c2236",
+   "look_h": 5.4,
+   "look_mid": 6.9,
+   "lidar_mid": 4.0,
+   "lidar_eaves": 2.6,
+   "storeys": 2,
+   "lidar_storeys": 1,
+   "src": "roof fit",
+   "diff": 2.9
+  },
+  {
+   "street": "dubysos",
+   "id": "c3906",
+   "look_h": 5.8,
+   "look_mid": 7.1,
+   "lidar_mid": 4.3,
+   "lidar_eaves": 4.3,
+   "storeys": 2,
+   "lidar_storeys": 1,
+   "src": "roof fit",
+   "diff": 2.8
+  },
+  {
+   "street": "maironio",
+   "id": "c3436",
+   "look_h": 5.0,
+   "look_mid": 5.0,
+   "lidar_mid": 2.2,
+   "lidar_eaves": 2.2,
+   "storeys": 2,
+   "lidar_storeys": 1,
+   "src": "roof fit",
+   "diff": 2.8
+  },
+  {
+   "street": "zemaiciu",
+   "id": "c4472",
+   "look_h": 3.2,
+   "look_mid": 3.2,
+   "lidar_mid": 6.0,
+   "lidar_eaves": 6.0,
+   "storeys": 1,
+   "lidar_storeys": 2,
+   "src": "lidar",
+   "diff": -2.8
+  },
+  {
+   "street": "zemaiciu",
+   "id": "c4702",
+   "look_h": 3.0,
+   "look_mid": 4.9,
+   "lidar_mid": 7.7,
+   "lidar_eaves": 5.4,
+   "storeys": 1,
+   "lidar_storeys": 2,
+   "src": "roof fit",
+   "diff": -2.8
+  },
+  {
+   "street": "zvyryno",
+   "id": "c2114",
+   "look_h": 3.4,
+   "look_mid": 5.4,
+   "lidar_mid": 8.2,
+   "lidar_eaves": 8.2,
+   "storeys": 1,
+   "lidar_storeys": 3,
+   "src": "roof fit",
+   "diff": -2.8
+  },
+  {
+   "street": "stonu",
+   "id": "c2250",
+   "look_h": 3.4,
+   "look_mid": 5.4,
+   "lidar_mid": 2.7,
+   "lidar_eaves": 2.7,
+   "storeys": 1,
+   "lidar_storeys": 1,
+   "src": "roof fit",
+   "diff": 2.7
+  },
+  {
+   "street": "dominikonu",
+   "id": "c2930",
+   "look_h": 7.5,
+   "look_mid": 8.8,
+   "lidar_mid": 11.4,
+   "lidar_eaves": 11.4,
+   "storeys": 2,
+   "lidar_storeys": 4,
+   "src": "lidar",
+   "diff": -2.6
+  },
+  {
+   "street": "dubysos",
+   "id": "c2946",
+   "look_h": 3.4,
+   "look_mid": 5.0,
+   "lidar_mid": 2.4,
+   "lidar_eaves": 2.4,
+   "storeys": 1,
+   "lidar_storeys": 1,
+   "src": "roof fit",
+   "diff": 2.6
+  },
+  {
+   "street": "gintaro",
+   "id": "c493",
+   "look_h": 3.1,
+   "look_mid": 5.0,
+   "lidar_mid": 7.6,
+   "lidar_eaves": 7.6,
+   "storeys": 1,
+   "lidar_storeys": 3,
+   "src": "lidar",
+   "diff": -2.6
+  },
+  {
+   "street": "gintaro",
+   "id": "c721",
+   "look_h": 3.3,
+   "look_mid": 5.4,
+   "lidar_mid": 8.0,
+   "lidar_eaves": 6.0,
+   "storeys": 1,
+   "lidar_storeys": 2,
+   "src": "roof fit",
+   "diff": -2.6
+  },
+  {
+   "street": "zemaiciu",
+   "id": "c4738",
+   "look_h": 5.7,
+   "look_mid": 5.7,
+   "lidar_mid": 8.3,
+   "lidar_eaves": 8.3,
+   "storeys": 2,
+   "lidar_storeys": 3,
+   "src": "lidar",
+   "diff": -2.6
+  },
+  {
+   "street": "gintaro",
+   "id": "c712",
+   "look_h": 3.0,
+   "look_mid": 4.8,
+   "lidar_mid": 7.3,
+   "lidar_eaves": 7.3,
+   "storeys": 1,
+   "lidar_storeys": 2,
+   "src": "lidar",
+   "diff": -2.5
+  },
+  {
+   "street": "gintaro",
+   "id": "c723",
+   "look_h": 3.2,
+   "look_mid": 5.4,
+   "lidar_mid": 8.0,
+   "lidar_eaves": 6.0,
+   "storeys": 1,
+   "lidar_storeys": 2,
+   "src": "roof fit",
+   "diff": -2.5
+  },
+  {
+   "street": "dubysos",
+   "id": "c3984",
+   "look_h": 3.3,
+   "look_mid": 5.0,
+   "lidar_mid": 7.4,
+   "lidar_eaves": 5.2,
+   "storeys": 1,
+   "lidar_storeys": 2,
+   "src": "roof fit",
+   "diff": -2.4
+  },
+  {
+   "street": "gintaro",
+   "id": "c1042",
+   "look_h": 3.3,
+   "look_mid": 5.5,
+   "lidar_mid": 7.9,
+   "lidar_eaves": 7.9,
+   "storeys": 1,
+   "lidar_storeys": 3,
+   "src": "lidar",
+   "diff": -2.4
+  },
+  {
+   "street": "gintaro",
+   "id": "c511",
+   "look_h": 3.2,
+   "look_mid": 5.3,
+   "lidar_mid": 7.7,
+   "lidar_eaves": 7.7,
+   "storeys": 1,
+   "lidar_storeys": 3,
+   "src": "lidar",
+   "diff": -2.4
+  },
+  {
+   "street": "jurbarko",
+   "id": "c1672",
+   "look_h": 4.9,
+   "look_mid": 6.6,
+   "lidar_mid": 4.2,
+   "lidar_eaves": 4.2,
+   "storeys": 2,
+   "lidar_storeys": 1,
+   "src": "lidar",
+   "diff": 2.4
+  },
+  {
+   "street": "zemaiciu",
+   "id": "c4538",
+   "look_h": 3.2,
+   "look_mid": 3.2,
+   "lidar_mid": 5.6,
+   "lidar_eaves": 5.6,
+   "storeys": 1,
+   "lidar_storeys": 2,
+   "src": "lidar",
+   "diff": -2.4
+  },
+  {
+   "street": "zvyryno",
+   "id": "c2178",
+   "look_h": 5.6,
+   "look_mid": 5.6,
+   "lidar_mid": 8.0,
+   "lidar_eaves": 8.0,
+   "storeys": 2,
+   "lidar_storeys": 3,
+   "src": "lidar",
+   "diff": -2.4
+  },
+  {
+   "street": "zvyryno",
+   "id": "c2070",
+   "look_h": 3.2,
+   "look_mid": 5.4,
+   "lidar_mid": 7.8,
+   "lidar_eaves": 4.6,
+   "storeys": 1,
+   "lidar_storeys": 2,
+   "src": "roof fit",
+   "diff": -2.4
+  },
+  {
+   "street": "dominikonu",
+   "id": "c2685",
+   "look_h": 2.6,
+   "look_mid": 2.6,
+   "lidar_mid": 4.9,
+   "lidar_eaves": 3.3,
+   "storeys": 1,
+   "lidar_storeys": 1,
+   "src": "roof fit",
+   "diff": -2.3
+  },
+  {
+   "street": "dominikonu",
+   "id": "c7210",
+   "look_h": 5.4,
+   "look_mid": 7.0,
+   "lidar_mid": 4.7,
+   "lidar_eaves": 3.4,
+   "storeys": 2,
+   "lidar_storeys": 1,
+   "src": "roof fit",
+   "diff": 2.3
+  },
+  {
+   "street": "dubysos",
+   "id": "c3727",
+   "look_h": 5.8,
+   "look_mid": 7.1,
+   "lidar_mid": 4.8,
+   "lidar_eaves": 3.1,
+   "storeys": 2,
+   "lidar_storeys": 1,
+   "src": "roof fit",
+   "diff": 2.3
+  },
+  {
+   "street": "dubysos",
+   "id": "c3923",
+   "look_h": 2.6,
+   "look_mid": 2.6,
+   "lidar_mid": 4.9,
+   "lidar_eaves": 4.0,
+   "storeys": 1,
+   "lidar_storeys": 1,
+   "src": "roof fit",
+   "diff": -2.3
+  },
+  {
+   "street": "gintaro",
+   "id": "c1045",
+   "look_h": 5.6,
+   "look_mid": 7.0,
+   "lidar_mid": 4.7,
+   "lidar_eaves": 4.7,
+   "storeys": 2,
+   "lidar_storeys": 2,
+   "src": "lidar",
+   "diff": 2.3
+  },
+  {
+   "street": "zvyryno",
+   "id": "c2205",
+   "look_h": 5.8,
+   "look_mid": 5.8,
+   "lidar_mid": 8.1,
+   "lidar_eaves": 8.1,
+   "storeys": 2,
+   "lidar_storeys": 3,
+   "src": "lidar",
+   "diff": -2.3
+  },
+  {
+   "street": "zvyryno",
+   "id": "c2112",
+   "look_h": 3.2,
+   "look_mid": 5.3,
+   "lidar_mid": 7.6,
+   "lidar_eaves": 6.1,
+   "storeys": 1,
+   "lidar_storeys": 2,
+   "src": "roof fit",
+   "diff": -2.3
+  },
+  {
+   "street": "dominikonu",
+   "id": "c2683",
+   "look_h": 13.5,
+   "look_mid": 13.5,
+   "lidar_mid": 15.7,
+   "lidar_eaves": 15.7,
+   "storeys": 4,
+   "lidar_storeys": 5,
+   "src": "roof fit",
+   "diff": -2.2
+  },
+  {
+   "street": "gintaro",
+   "id": "c717",
+   "look_h": 3.2,
+   "look_mid": 5.5,
+   "lidar_mid": 7.7,
+   "lidar_eaves": 7.7,
+   "storeys": 1,
+   "lidar_storeys": 3,
+   "src": "roof fit",
+   "diff": -2.2
+  },
+  {
+   "street": "jurbarko",
+   "id": "c1650",
+   "look_h": 4.6,
+   "look_mid": 6.2,
+   "lidar_mid": 4.0,
+   "lidar_eaves": 4.0,
+   "storeys": 2,
+   "lidar_storeys": 1,
+   "src": "roof fit",
+   "diff": 2.2
+  },
+  {
+   "street": "jurbarko",
+   "id": "c1844",
+   "look_h": 5.2,
+   "look_mid": 6.7,
+   "lidar_mid": 4.5,
+   "lidar_eaves": 3.0,
+   "storeys": 2,
+   "lidar_storeys": 1,
+   "src": "roof fit",
+   "diff": 2.2
+  },
+  {
+   "street": "stonu",
+   "id": "c320",
+   "look_h": 3.2,
+   "look_mid": 4.9,
+   "lidar_mid": 7.1,
+   "lidar_eaves": 5.6,
+   "storeys": 1,
+   "lidar_storeys": 2,
+   "src": "roof fit",
+   "diff": -2.2
+  },
+  {
+   "street": "zemaiciu",
+   "id": "c4740",
+   "look_h": 5.7,
+   "look_mid": 5.7,
+   "lidar_mid": 7.9,
+   "lidar_eaves": 7.9,
+   "storeys": 2,
+   "lidar_storeys": 3,
+   "src": "lidar",
+   "diff": -2.2
+  },
+  {
+   "street": "zemaiciu",
+   "id": "c4706",
+   "look_h": 3.3,
+   "look_mid": 3.3,
+   "lidar_mid": 5.5,
+   "lidar_eaves": 5.5,
+   "storeys": 1,
+   "lidar_storeys": 2,
+   "src": "lidar",
+   "diff": -2.2
+  },
+  {
+   "street": "gintaro",
+   "id": "c500",
+   "look_h": 3.1,
+   "look_mid": 5.0,
+   "lidar_mid": 7.1,
+   "lidar_eaves": 7.1,
+   "storeys": 1,
+   "lidar_storeys": 2,
+   "src": "lidar",
+   "diff": -2.1
+  },
+  {
+   "street": "jurbarko",
+   "id": "c1633",
+   "look_h": 5.2,
+   "look_mid": 6.7,
+   "lidar_mid": 4.6,
+   "lidar_eaves": 4.6,
+   "storeys": 2,
+   "lidar_storeys": 2,
+   "src": "lidar",
+   "diff": 2.1
+  },
+  {
+   "street": "jurbarko",
+   "id": "c1637",
+   "look_h": 4.9,
+   "look_mid": 6.6,
+   "lidar_mid": 4.5,
+   "lidar_eaves": 4.5,
+   "storeys": 2,
+   "lidar_storeys": 2,
+   "src": "lidar",
+   "diff": 2.1
+  },
+  {
+   "street": "stonu",
+   "id": "c5598",
+   "look_h": 6.0,
+   "look_mid": 6.0,
+   "lidar_mid": 3.9,
+   "lidar_eaves": 3.9,
+   "storeys": 2,
+   "lidar_storeys": 1,
+   "src": "lidar",
+   "diff": 2.1
+  },
+  {
+   "street": "vilniaus",
+   "id": "c2911",
+   "look_h": 5.6,
+   "look_mid": 7.2,
+   "lidar_mid": 5.1,
+   "lidar_eaves": 5.1,
+   "storeys": 2,
+   "lidar_storeys": 2,
+   "src": "lidar",
+   "diff": 2.1
+  },
+  {
+   "street": "vilniaus",
+   "id": "c7170",
+   "look_h": 3.2,
+   "look_mid": 3.2,
+   "lidar_mid": 5.3,
+   "lidar_eaves": 5.3,
+   "storeys": 1,
+   "lidar_storeys": 2,
+   "src": "roof fit",
+   "diff": -2.1
+  },
+  {
+   "street": "zemaiciu",
+   "id": "c5701",
+   "look_h": 3.3,
+   "look_mid": 5.3,
+   "lidar_mid": 3.2,
+   "lidar_eaves": 3.2,
+   "storeys": 1,
+   "lidar_storeys": 1,
+   "src": "roof fit",
+   "diff": 2.1
+  },
+  {
+   "street": "zvyryno",
+   "id": "c1829",
+   "look_h": 5.6,
+   "look_mid": 7.2,
+   "lidar_mid": 9.3,
+   "lidar_eaves": 6.4,
+   "storeys": 2,
+   "lidar_storeys": 2,
+   "src": "roof fit",
+   "diff": -2.1
+  },
+  {
+   "street": "dominikonu",
+   "id": "c2684",
+   "look_h": 3.4,
+   "look_mid": 3.4,
+   "lidar_mid": 5.4,
+   "lidar_eaves": 5.4,
+   "storeys": 1,
+   "lidar_storeys": 2,
+   "src": "lidar",
+   "diff": -2.0
+  },
+  {
+   "street": "zvyryno",
+   "id": "c2124",
+   "look_h": 3.3,
+   "look_mid": 5.4,
+   "lidar_mid": 3.4,
+   "lidar_eaves": 3.4,
+   "storeys": 1,
+   "lidar_storeys": 1,
+   "src": "roof fit",
+   "diff": 2.0
+  }
+ ],
+ "nolidar": [
+  [
+   "dominikonu",
+   "c2657",
+   6.8
+  ],
+  [
+   "dominikonu",
+   "c2659",
+   6.5
+  ],
+  [
+   "dominikonu",
+   "c8247",
+   2.6
+  ],
+  [
+   "dominikonu",
+   "c2678",
+   6.0
+  ],
+  [
+   "dominikonu",
+   "c2682",
+   6.4
+  ],
+  [
+   "dominikonu",
+   "c2686",
+   5.4
+  ],
+  [
+   "dominikonu",
+   "c8246",
+   2.4
+  ],
+  [
+   "dominikonu",
+   "c2673",
+   5.2
+  ],
+  [
+   "dominikonu",
+   "c2670",
+   3.4
+  ],
+  [
+   "dominikonu",
+   "c2675",
+   5.8
+  ],
+  [
+   "dominikonu",
+   "c2693",
+   2.5
+  ],
+  [
+   "dominikonu",
+   "c2688",
+   2.6
+  ],
+  [
+   "dominikonu",
+   "c2672",
+   5.6
+  ],
+  [
+   "dominikonu",
+   "c2692",
+   2.4
+  ],
+  [
+   "dominikonu",
+   "c2696",
+   3.2
+  ],
+  [
+   "dominikonu",
+   "c2691",
+   5.6
+  ],
+  [
+   "dominikonu",
+   "c2669",
+   3.4
+  ],
+  [
+   "dominikonu",
+   "c2750",
+   6.2
+  ],
+  [
+   "dominikonu",
+   "c5267",
+   4.8
+  ],
+  [
+   "dubysos",
+   "c2942",
+   2.6
+  ],
+  [
+   "gintaro",
+   "c5272",
+   2.6
+  ],
+  [
+   "jurbarko",
+   "c1269",
+   2.6
+  ],
+  [
+   "jurbarko",
+   "c1274",
+   5.1
+  ],
+  [
+   "jurbarko",
+   "c1302",
+   4.6
+  ],
+  [
+   "jurbarko",
+   "c1309",
+   2.6
+  ],
+  [
+   "jurbarko",
+   "c1332",
+   2.6
+  ],
+  [
+   "jurbarko",
+   "c1380",
+   2.6
+  ],
+  [
+   "jurbarko",
+   "c1384",
+   2.6
+  ],
+  [
+   "jurbarko",
+   "c1400",
+   5.1
+  ],
+  [
+   "jurbarko",
+   "c1401",
+   5.3
+  ],
+  [
+   "jurbarko",
+   "c1446",
+   5.9
+  ],
+  [
+   "jurbarko",
+   "c1476",
+   5.5
+  ],
+  [
+   "jurbarko",
+   "c1484",
+   4.7
+  ],
+  [
+   "jurbarko",
+   "c1491",
+   5.9
+  ],
+  [
+   "jurbarko",
+   "c1573",
+   5.8
+  ],
+  [
+   "jurbarko",
+   "c1636",
+   4.7
+  ],
+  [
+   "jurbarko",
+   "c7999",
+   2.4
+  ],
+  [
+   "jurbarko",
+   "c8016",
+   3.6
+  ],
+  [
+   "jurbarko",
+   "c8022",
+   3.6
+  ],
+  [
+   "jurbarko",
+   "c8266",
+   2.6
+  ],
+  [
+   "jurbarko",
+   "c8271",
+   5.9
+  ],
+  [
+   "maironio",
+   "c2703",
+   9.6
+  ],
+  [
+   "maironio",
+   "c2713",
+   3.6
+  ],
+  [
+   "maironio",
+   "c2709",
+   3.4
+  ],
+  [
+   "vilniaus",
+   "c7194",
+   2.8
+  ],
+  [
+   "vilniaus",
+   "c2467",
+   6.0
+  ],
+  [
+   "vilniaus",
+   "c2465",
+   2.8
+  ],
+  [
+   "vilniaus",
+   "c2463",
+   2.9
+  ],
+  [
+   "vilniaus",
+   "c2026",
+   5.4
+  ],
+  [
+   "vilniaus",
+   "c2022",
+   3.0
+  ],
+  [
+   "vilniaus",
+   "c1417",
+   3.1
+  ],
+  [
+   "vilniaus",
+   "c1418",
+   3.0
+  ],
+  [
+   "vilniaus",
+   "c1525",
+   5.6
+  ],
+  [
+   "vilniaus",
+   "c2462",
+   3.4
+  ],
+  [
+   "vytauto-didziojo",
+   "c3714",
+   6.6
+  ],
+  [
+   "vytauto-didziojo",
+   "c3710",
+   7.6
+  ],
+  [
+   "vytauto-didziojo",
+   "c3723",
+   8
+  ],
+  [
+   "zemaiciu",
+   "c5173",
+   2.4
+  ],
+  [
+   "zvyryno",
+   "c7648",
+   2.7
+  ]
+ ]
+}

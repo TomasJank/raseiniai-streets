@@ -41,5 +41,26 @@
  "own_colour": [
   "e34"
  ],
- "credit": "Cars from Sketchfab, CC BY 4.0: Audi 80 by xoliul; VW Passat B3, Mercedes Sprinter by kuwalol93; Lowpoly Sedan & Wagon by Han66st; Nissan Primera by unitygtt34; Seat Ibiza by ngon_3d; Audi A4 B5.5 Avant by Tomasoo; BMW E46 by roh3d; BMW 525i E34 by UVZZZ; BMW 320i E90 by rifdanzz; Opel Zafira, Renault Megane Grand Tour, Peugeot 206 by tonielpro520; Honda Accord by dirocris; Volvo V70 by bigslavehd; Mercedes-Benz W124 by San.Dro; Mercedes-Benz W210 by homicivan53; Peugeot 406 by supercarmodels; Fiat Punto by lionsharp; Hyundai Aero Space coach by ImperialBlue3D; PS1 styled bus by almondz2549; Kamaz by animara777; Toyota Corolla wheels by ImperialBlue3D (modified)"
+ "credit": "Cars from Sketchfab, CC BY 4.0: Audi 80 by xoliul; VW Passat B3, Mercedes Sprinter by kuwalol93; Lowpoly Sedan & Wagon by Han66st; Nissan Primera by unitygtt34; Seat Ibiza by ngon_3d; Audi A4 B5.5 Avant by Tomasoo; BMW E46 by roh3d; BMW 525i E34 by UVZZZ; BMW 320i E90 by rifdanzz; Opel Zafira, Renault Megane Grand Tour, Peugeot 206, Skoda Octavia by tonielpro520; Honda Accord by dirocris; Volvo V70 by bigslavehd; Mercedes-Benz W124 by San.Dro; Mercedes-Benz W210 by homicivan53; Peugeot 406 by supercarmodels; Fiat Punto by lionsharp; Hyundai Aero Space coach by ImperialBlue3D; PS1 styled bus by almondz2549; Kamaz by animara777; Toyota Corolla wheels by ImperialBlue3D (modified)",
+ "police": "octavia2_pol",
+ "livery": {
+  "white": 15659246,
+  "green": 2530160,
+  "ink": 2238252,
+  "band": [
+   0.73,
+   0.87
+  ],
+  "door": [
+   -0.15,
+   1.2,
+   0.55,
+   0.69
+  ],
+  "hood": [
+   1.3,
+   1.75,
+   0.5
+  ]
+ }
 }

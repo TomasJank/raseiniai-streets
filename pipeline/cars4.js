@@ -57,6 +57,29 @@ function cars4Model(key,M){
   F.lot={paint:G.lot,trim,axles:M.axles,glb:true,cars4:key};
   return F;
 }
+// Lithuanian police livery of the 2000s (Wikimedia Commons: "Police car in Jonava" 2011, "Volkswagen Jetta police (Lithuania)" 2011):
+// white, a green band along the waist, POLICIJA on the doors and the bonnet. Drawn in the paint shader, projected in the car's
+// own frame (sides along x, bonnet down y), so it follows the body on both versions and reads the right way round on each side.
+// CARS4_LIVERY: band [y0, y1] (m), door text [z centre, width, y0, y1], bonnet text [z0, z1, half width]
+function cars4Police(F){
+  const c=document.createElement('canvas');c.width=1024;c.height=128;const x=c.getContext('2d');x.fillStyle='#fff';x.font='bold 112px Arial, Helvetica, sans-serif';
+  x.textAlign='center';x.textBaseline='middle';x.fillText('POLICIJA',512,68,1000);
+  const t=new THREE.CanvasTexture(c);t.flipY=false;t.anisotropy=8;
+  const L=CARS4_LIVERY,m=cars4Paint(F.tex,F.mask,[F.base.r,F.base.g,F.base.b],false,L.white),ob=m.onBeforeCompile;
+  const u={uLiv:{value:t},uGreen:{value:new THREE.Color(L.green)},uInk:{value:new THREE.Color(L.ink)},uBand:{value:new THREE.Vector2(...L.band)},uDoor:{value:new THREE.Vector4(...L.door)},uHood:{value:new THREE.Vector3(...L.hood)}};
+  m.customProgramCacheKey=()=>'cars4police';
+  m.onBeforeCompile=sh=>{ob(sh);Object.assign(sh.uniforms,u);
+    sh.vertexShader=sh.vertexShader.replace('#include <common>','#include <common>\nvarying vec3 vLp,vLn;').replace('#include <begin_vertex>','#include <begin_vertex>\nvLp=position;vLn=normal;');
+    sh.fragmentShader=sh.fragmentShader.replace('#include <common>','#include <common>\nvarying vec3 vLp,vLn;uniform sampler2D uLiv;uniform vec3 uGreen,uInk,uHood;uniform vec2 uBand;uniform vec4 uDoor;')
+      .replace('#include <alphamap_fragment>',`{float k=step(.5,texture2D(uMask,vMapUv).r);vec3 n=normalize(vLn);
+        if(abs(n.x)>.55&&abs(n.y)<.6&&vLp.y>uBand.x&&vLp.y<uBand.y)diffuseColor.rgb=mix(diffuseColor.rgb,uGreen,k);
+        float a=0.;
+        if(abs(n.x)>.5){float s=sign(vLp.x),u=.5+s*(uDoor.x-vLp.z)/uDoor.y,v=(uDoor.w-vLp.y)/(uDoor.w-uDoor.z);if(u>0.&&u<1.&&v>0.&&v<1.)a=texture2D(uLiv,vec2(u,v)).a;}
+        if(n.y>.5&&vLp.z>uHood.x&&vLp.z<uHood.y&&abs(vLp.x)<uHood.z)a=texture2D(uLiv,vec2(.5+vLp.x/(2.*uHood.z),(vLp.z-uHood.x)/(uHood.y-uHood.x))).a;
+        diffuseColor.rgb=mix(diffuseColor.rgb,uInk,a*k);}
+#include <alphamap_fragment>`);};
+  m.userData.keep=true;return m;
+}
 // the colour a car is drawn in: white means the model's own, which a flat-paint model keeps in F.own
 const cars4Own=(F,c)=>c===0xffffff&&F.own!=null?F.own:c;
 const CARS4=(()=>{
@@ -66,13 +89,22 @@ const CARS4=(()=>{
   for(const F of CARS2.inst)scene.remove(F.inst);
   for(const k in CARS4_FLEET){const F=cars4Model(k,CARS4_FLEET[k]);if(!(k in MIX)){S.extra[k]=F;continue;}S.models[k]=F;
     F.inst=new THREE.InstancedMesh(F.wheel,F.mat,4*96);F.inst.count=0;F.inst.frustumCulled=false;F.inst.userData.keep=true;scene.add(F.inst);}
+  // the police car: never in the mix; skodaGeo (what spawnCop/makeCop ask for) becomes it, liveried by cars4Police
+  const P=S.police=CARS4_POLICE&&S.extra[CARS4_POLICE];
+  if(P){const a=P.paint.attributes.position.array;let top=0;for(let i=0;i<a.length;i+=3)if(Math.abs(a[i])<.35)top=Math.max(top,a[i+1]);
+    // the bar stands on the middle of the flat of the roof
+    let zs=0,n=0;for(let i=0;i<a.length;i+=3)if(Math.abs(a[i])<.35&&a[i+1]>top-.03){zs+=a[i+2];n++;}
+    // the roof height is the full model's (the distant version's roof sits a few cm lower)
+    Object.assign(P,{police:true,roof:Math.max(top,P.M.dims[2]),roofZ:zs/n,hood:top,mat:cars4Police(P)});
+    P.inst=new THREE.InstancedMesh(P.wheel,P.mat,4*24);P.inst.count=0;P.inst.frustumCulled=false;P.inst.userData.keep=true;
+    CARS2.swap.set(skodaGeo,P);CARS2.police=P;}
   const keys=Object.keys(MIX),weighted=keys.flatMap(k=>Array(MIX[k]).fill(S.models[k]));
   for(const[G,F]of CARS2.swap)if(!F.police)CARS2.swap.set(G,weighted[0]);
   // the player's starting car (carGeo, the hand-built Audi 80) becomes the Sketchfab Audi 80
   if(S.models.audi80)CARS2.swap.set(carGeo,S.models.audi80);
   TRAFFIC_GEOS.splice(0,TRAFFIC_GEOS.length,...weighted);
   LOT_GEOS.splice(0,LOT_GEOS.length,...keys.map(k=>S.models[k].lot));
-  // the police Octavia (cars3) keeps its wheels drawn
+  // the police car keeps its wheels drawn (the cars3 Octavia, when no police model is in the data)
   Object.assign(CARS2,{models:S.models,inst:[...keys.map(k=>S.models[k]),...(CARS2.police?[CARS2.police]:[])],
     lotPick:c=>keys.indexOf(weighted[Math.floor(hash(c[0]*.71+c[2]*1.37)*weighted.length)].key)});
   if(CARS2.police)scene.add(CARS2.police.inst);
@@ -81,11 +113,13 @@ const CARS4=(()=>{
 })();
 {const make=makeCarMesh;makeCarMesh=function(color,G){const g=make(color,G),F=g.userData.car2;if(!F||!F.cars4)return g;
   const ch=g.userData.body.children,lm=ch[4],m=lm.material,tail=ch[3],before=lm.onBeforeRender;
+  // police: the livery is in the material; cars2's hood lettering goes, its bar moves to this roof
+  if(F.police){ch[5].visible=false;ch[6].position.z=F.roofZ;}
   // the garage's respray assigns a plain colour material to the body: take its colour for the textured paint instead
   const matFor=c=>{if(!F.mask)return F.mat;c=cars4Own(F,c);if(!F.mats.has(c)){const q=cars4Paint(F.tex,F.mask,[F.base.r,F.base.g,F.base.b],false,c);q.userData.keep=true;F.mats.set(c,q);}return F.mats.get(c);};
   // the player's starting car keeps the model's own grey; traffic takes a palette colour
-  let cur=matFor(!G&&color===0x74767a?0xffffff:cars4Tone(F,cars4Colour(hash(color+':'+F.key))));
-  Object.defineProperty(ch[0],'material',{configurable:true,get:()=>cur,set:v=>{cur=v&&v.color&&!v.map?matFor(v.color.getHex()):v;}});
+  let cur=F.police?F.mat:matFor(!G&&color===0x74767a?0xffffff:cars4Tone(F,cars4Colour(hash(color+':'+F.key))));
+  Object.defineProperty(ch[0],'material',{configurable:true,get:()=>cur,set:v=>{cur=v&&v.color&&!v.map?(F.police?F.mat:matFor(v.color.getHex())):v;}});
   m.blending=THREE.AdditiveBlending;m.depthWrite=false;m.transparent=true;
   // glow by night; by day only a braking tail lamp shows
   lm.onBeforeRender=function(){before.apply(this,arguments);const k=clamp(ENV.night.value*1.25,0,1),u=m.userData;u.uHead.value*=k;u.uTail.value.multiplyScalar(tail.material.color.r>1?1:k);};
@@ -130,7 +164,7 @@ function cars4Parked(){
         for(let i=0;i<4;i++)addWall(...q[i],...q[(i+1)%4]);}}};}
 // close-up versions: unpacked off the main path, then swapped in by distance (bodies and wheels of moving cars here, parked cars in cars4Parked)
 // phones keep the distant versions only
-if(CARS4.on){const lod=Object.values(CARS4.models).filter(F=>F.M.lod&&!PHONE);
+if(CARS4.on){const lod=[...Object.values(CARS4.models),...(CARS4.police?[CARS4.police]:[])].filter(F=>F.M.lod&&!PHONE);
   Promise.all(lod.map(async F=>{const u=new Uint8Array(await new Response(new Blob([cars4Bytes('agz_cars4_'+F.key)]).stream().pipeThrough(new DecompressionStream('deflate'))).arrayBuffer());
     const G=cars4Geos(u,F.M);G.lot.userData.cars4hi=F.key;F.hi=G;
     F.instHi=new THREE.InstancedMesh(G.wheel||F.trim,F.mat,4*24);F.instHi.count=0;F.instHi.frustumCulled=false;F.instHi.userData.keep=true;scene.add(F.instHi);})).then(()=>{
@@ -144,3 +178,5 @@ if(CARS4.on){const lod=Object.values(CARS4.models).filter(F=>F.M.lod&&!PHONE);
         for(let i=0;i<I.count;i++){const o=i*16;if((a[o+12]-cx)**2+(a[o+13]-cy)**2+(a[o+14]-cz)**2<1764&&k<96){ha.set(a.subarray(o,o+16),k++*16);}else{if(n!==i)a.copyWithin(n*16,o,o+16);n++;}}
         I.count=n;I.visible=n>0;H.count=k;if(H.visible=k>0)H.instanceMatrix.needsUpdate=true;}};
     scene.onAfterRender=function(){post.apply(this,arguments);nest--;};});}
+// the flashing red and blue lamps of a cop (spawnCop/makeCop) go to the middle of this roof too
+{const bar=cars2Bar;cars2Bar=function(c){bar(c);const F=c&&c.bar&&c.g.userData.car2;if(F&&F.roofZ!=null)for(const l of c.bar)l.position.z=F.roofZ;};}

@@ -1,4 +1,4 @@
-// ---------- kit: doors, windows per wall, porches, extensions, plinth, chimneys, dormers, balconies, cross gables, wings (add_kit.py) ----------
+// ---------- kit: doors, windows per wall, porches, extensions, plinth, chimneys, dormers, balconies, cross gables, wings, half hips (add_kit.py) ----------
 // KIT[id] comes from pipeline/kit/looks/*.json with sides resolved to OSM edge indices `e`, `f` = the front edge.
 // Large parts (extensions, closed porches, porch roofs, balconies, dormers, cross gables) go into the merged building mesh and cast
 // shadows; small ones (window and door panels, steps, plinth, chimneys, shutters) into one extra mesh without shadows.
@@ -8,11 +8,22 @@ const KIT_DOOR={single:[.95,2.1,[.36,.23,.15]],double:[1.5,2.1,[.36,.23,.15]],gl
 const KIT_SHAPE={normal:1,wide:1.7,narrow:.7},KIT_EXT_STY=['plaster','brick','silicate','plank','panel','corrugated','sheet','none'];
 const kitN=(v,a,b)=>typeof v==='number'&&v>=a&&v<=b,kitC=v=>Array.isArray(v)&&v.length===3&&v.every(x=>kitN(x,0,1));
 const kitRowOk=r=>Number.isInteger(r)&&r>=0&&r<=12||Array.isArray(r)&&r.length>0&&r.length<=12&&r.every(x=>kitN(x,0,1));
+// window size: a name, or the width of the window's frame in metres (the atlas frame is 1.4 m on board styles, 1.45 on `old`, 1.55 on the rest)
+const KIT_SIZE={small:.75,normal:1,large:1.3},kitSizeOk=v=>typeof v==='string'&&v in KIT_SIZE||kitN(v,.4,3);
+const kitZ=(v,st)=>typeof v==='string'?KIT_SIZE[v]:v/(st===STY.plank||st===STY.wood?1.4:st===STY.old?1.45:1.55);
 // checks that need no outline (the addBuilding wrapper reads these keys before the outline is known)
-const kitXgOk=q=>!!q&&Number.isInteger(q.e)&&q.e>=0&&(q.at==null||kitN(q.at,0,1))&&(q.w==null||kitN(q.w,1,16))&&(q.d==null||kitN(q.d,0,12))&&(q.rise==null||kitN(q.rise,.3,1))&&
-  (q.wall==null||kitC(q.wall))&&(q.gable==null||kitC(q.gable))&&(q.roofCol==null||kitC(q.roofCol))&&(q.win==null||Array.isArray(q.win)&&q.win.length<=6&&q.win.every(kitRowOk));
+const kitXgOk=q=>!!q&&Number.isInteger(q.e)&&q.e>=0&&(q.at==null||kitN(q.at,0,1))&&(q.w==null||kitN(q.w,1,16))&&(q.d==null||kitN(q.d,0,12))&&(q.rise==null||kitN(q.rise,.3,1.4))&&
+  (q.wall==null||kitC(q.wall))&&(q.gable==null||kitC(q.gable))&&(q.roofCol==null||kitC(q.roofCol))&&(q.win==null||Array.isArray(q.win)&&q.win.length<=6&&q.win.every(kitRowOk))&&
+  (q.up==null||kitN(q.up,.4,4))&&(q.size==null||kitSizeOk(q.size));
 const kitWingOk=q=>!!q&&typeof q==='object'&&(q.rdir==null||Array.isArray(q.rdir)&&q.rdir.length===2&&q.rdir.every(x=>kitN(x,-1,1))&&Math.hypot(...q.rdir)>.5)&&
-  (q.rh==null||kitN(q.rh,.5,8))&&(q.h==null||kitN(q.h,2.2,30))&&(q.roof==null||/^(gable|hip|flat)$/.test(q.roof));
+  (q.rh==null||kitN(q.rh,.5,8))&&(q.h==null||kitN(q.h,2.2,30))&&(q.roof==null||/^(gable|hip|flat)$/.test(q.roof))&&
+  (q.d==null||kitN(q.d,1,40)&&Array.isArray(q.fn)&&q.fn.length===2&&q.fn.every(x=>kitN(x,-1,1)));
+// a wing drawn only d metres deep from its wall nearest the street (outward normal fn); the rest behind is a flat-roofed part
+function kitCut(p,q){if(!q||q.d==null||p.length!==4)return null;const cx=p.reduce((s,v)=>s+v[0],0)/4,cz=p.reduce((s,v)=>s+v[1],0)/4;
+  let j=0,bd=-2;for(let i=0;i<4;i++){const a=p[i],b=p[(i+1)%4],L=Math.hypot(b[0]-a[0],b[1]-a[1])||1;let nx=-(b[1]-a[1])/L,nz=(b[0]-a[0])/L;
+    if(((a[0]+b[0])/2-cx)*nx+((a[1]+b[1])/2-cz)*nz<0){nx=-nx;nz=-nz;}const dt=nx*q.fn[0]+nz*q.fn[1];if(dt>bd){bd=dt;j=i;}}
+  const A=p[j],B=p[(j+1)%4],C=p[(j+2)%4],D=p[(j+3)%4],dep=Math.hypot(D[0]-A[0],D[1]-A[1]);if(q.d>dep-.3)return null;
+  const f=q.d/dep,A2=[A[0]+(D[0]-A[0])*f,A[1]+(D[1]-A[1])*f],B2=[B[0]+(C[0]-B[0])*f,B[1]+(C[1]-B[1])*f];return[[A,B,B2,A2],[A2,B2,C,D]];}
 const kitNtOk=v=>!!v&&(kitN(v.d,.5,60)||kitN(v.r,.5,30));
 // what a `wings` entry changes on part k of the game's split outline
 function kitWingOv(W,k){const q=Array.isArray(W)?W[k]:null;if(!kitWingOk(q))return{};const o={};
@@ -25,17 +36,19 @@ function kitNorm(id,K,n){
   const one=(k,ok)=>{if(K[k]==null)return;if(ok(K[k]))O[k]=K[k];else w(k);};
   one('frame',col);one('gable',col);one('plinth',col);one('plinthH',v=>num(v,.1,1.5));
   one('winShape',v=>typeof v==='string'&&v in KIT_SHAPE||Array.isArray(v)&&v.every(q=>Array.isArray(q)&&E(q[0])&&q[1] in KIT_SHAPE));
+  one('winSize',v=>kitSizeOk(v)||Array.isArray(v)&&v.every(q=>Array.isArray(q)&&E(q[0])&&kitSizeOk(q[1])));one('halfHip',v=>v===true||num(v,.15,.6));
   one('gableSty',v=>typeof TEXI!=='undefined'&&v in TEXI);
   one('chim',v=>Number.isInteger(v)&&v>=1&&v<=4||fr(v)&&v.length<=4);
   one('shut',col);one('nt',kitNtOk);one('nf',v=>!!v&&kitN(v.d,.5,60));
   const row=kitRowOk;
   if(K.win!=null)O.win=(Array.isArray(K.win)?K.win:[]).filter(q=>{const ok=Array.isArray(q)&&E(q[0])&&Array.isArray(q[1])&&q[1].every(row);if(!ok)w('win');return ok;});
-  if(K.walls!=null)O.walls=(Array.isArray(K.walls)?K.walls:[]).filter(q=>{const ok=Array.isArray(q)&&E(q[0])&&q[1]&&(q[1].col==null||col(q[1].col))&&(q[1].sty==null||typeof TEXI!=='undefined'&&q[1].sty in TEXI)&&(q[1].col||q[1].sty);if(!ok)w('walls');return ok;});
+  if(K.walls!=null)O.walls=(Array.isArray(K.walls)?K.walls:[]).filter(q=>{const ok=Array.isArray(q)&&E(q[0])&&q[1]&&(q[1].col==null||col(q[1].col))&&(q[1].sty==null||typeof TEXI!=='undefined'&&q[1].sty in TEXI)&&(q[1].col||q[1].sty)&&(q[1].at==null||Array.isArray(q[1].at)&&q[1].at.length===2&&num(q[1].at[0],0,1)&&num(q[1].at[1],0,1)&&q[1].at[0]<q[1].at[1]);if(!ok)w('walls');return ok;});
   if(K.wings!=null){O.wings=Array.isArray(K.wings)?K.wings.map(q=>{if(q==null)return null;if(kitWingOk(q))return q;w('wings');return null;}):(w('wings'),null);}
   const list=(k,ok)=>{if(K[k]==null)return;O[k]=(Array.isArray(K[k])?K[k]:[K[k]]).filter(q=>{const g=q&&E(q.e)&&ok(q);if(!g)w(k);return g;});};
   const opt=(q,k,ok)=>q[k]==null||ok(q[k]);
-  list('door',q=>(q.at==null||num(q.at,0,1)||fr(q.at))&&opt(q,'type',v=>v in KIT_DOOR)&&opt(q,'col',col)&&opt(q,'steps',v=>typeof v==='boolean')&&opt(q,'porch',v=>/^(none|canopy|closed)$/.test(v)));
-  list('ext',q=>opt(q,'at',v=>num(v,0,1))&&opt(q,'w',v=>num(v,.1,1))&&opt(q,'d',v=>num(v,.8,12))&&opt(q,'h',v=>num(v,2,8))&&opt(q,'roof',v=>/^(flat|lean|gable)$/.test(v))&&opt(q,'wall',col)&&opt(q,'roofCol',col)&&opt(q,'glazed',v=>typeof v==='boolean')&&opt(q,'sty',v=>KIT_EXT_STY.includes(v)));
+  list('door',q=>(q.at==null||num(q.at,0,1)||fr(q.at))&&opt(q,'type',v=>v in KIT_DOOR)&&opt(q,'col',col)&&opt(q,'steps',v=>typeof v==='boolean')&&opt(q,'porch',v=>/^(none|canopy|closed|recess)$/.test(v)));
+  list('ext',q=>opt(q,'at',v=>num(v,0,1))&&opt(q,'w',v=>num(v,.1,1))&&opt(q,'d',v=>num(v,.8,12))&&opt(q,'h',v=>num(v,2,8))&&opt(q,'roof',v=>/^(flat|lean|gable)$/.test(v))&&opt(q,'wall',col)&&opt(q,'roofCol',col)&&opt(q,'glazed',v=>typeof v==='boolean')&&opt(q,'sty',v=>KIT_EXT_STY.includes(v))&&
+    opt(q,'win',row)&&opt(q,'door',v=>num(v,0,1))&&opt(q,'doorCol',col));
   list('balc',q=>opt(q,'at',v=>num(v,0,1))&&opt(q,'w',v=>num(v,.1,1))&&opt(q,'floor',v=>Number.isInteger(v)&&v>=1&&v<=20)&&opt(q,'col',col));
   list('dorm',q=>opt(q,'n',v=>Number.isInteger(v)&&v>=1&&v<=6)&&opt(q,'type',v=>/^(gable|shed)$/.test(v)));
   list('xg',kitXgOk);
@@ -75,7 +88,7 @@ function kitMask(B,v0,v1,segs,overlap){
       if(on&&Math.abs(((cx-a[0])*(b[1]-a[1])-(cz-a[1])*(b[0]-a[0]))/L)<.05){B.sty[v]=B.sty[v+1]=B.sty[v+2]=st+16;break;}}}
 }
 // EG(i): the drawn wall of walked edge i ([a, b]); RE(i): the pitched roof part that wall belongs to (its gable or eaves)
-function kitHouse(B,P,s,K,prev,rev,R,EG,RE,OF,XE){
+function kitHouse(B,P,s,K,prev,rev,R,EG,RE,OF,XE,PT){
   const n=P.length,W=e=>rev?(n-2-e+n)%n:e,yb=s.yb||0,y0=s.y0||0,h=y0+s.h,v1=Math.max(1,Math.round((h-yb)/3)),fh=(h-yb)/v1;
   EG=EG||(i=>[P[i],P[(i+1)%n]]);RE=RE||(()=>R);
   const sty=s.sty>=0?s.sty:STY.plaster,wm=typeof texWall==='function'?texWall(s):-1,TI=typeof TEXI!=='undefined'?TEXI:{},concrete=TI.concrete??-1;
@@ -83,14 +96,29 @@ function kitHouse(B,P,s,K,prev,rev,R,EG,RE,OF,XE){
   const fw=i=>{const F=kitFrame(...EG(i)),o=OF&&OF(i);if(o)F.off=o;return F;},scale=KIT_SHAPE[typeof K.winShape==='string'?K.winShape:'normal'],rTx=typeof TEX_ROOF!=='undefined'?TEX_ROOF[roofSty(s)]??-1:-1;
   const scaleOf=i=>{const q=Array.isArray(K.winShape)&&K.winShape.find(q=>W(q[0])===i);return q?KIT_SHAPE[q[1]]:scale;};
   const topOf=Ri=>Ri&&Ri.top!=null?Ri.top:h;
+  // window size per wall (null: as drawn before winSize existed)
+  const sizeOf=i=>{const q=Array.isArray(K.winSize)&&K.winSize.find(q=>W(q[0])===i),v=q?q[1]:typeof K.winSize==='string'||typeof K.winSize==='number'?K.winSize:null;return v==null?null:kitZ(v,sty);};
+  // `walls` with `at`: a stretch of one wall in another colour or material (drawn as a panel over the wall)
+  const SPANS=(K.walls||[]).filter(([,Q])=>Q.at).map(([e,Q])=>[W(e),Q]);
+  const spanAt=(i,x)=>{if(i==null)return null;for(const [j,Q] of SPANS)if(j===i){const L=fw(i).L;if(x>=Q.at[0]*L-.05&&x<=Q.at[1]*L+.05)return Q;}return null;};
   KIT_S.tn=K.frame?[...K.frame,2]:NOTONE;
+  // one storey window centred sm metres along F on the storey from ya, fh high; o (kit 3): z = size, band = fill the storey, col/sty/tx/ii
+  const stWin=(F,sm,j,k,ya,fh,ww,o)=>{const oo=F.off?F.off(sm):0,Q=spanAt(o.ii,sm),c=o.col||(Q&&Q.col)||wcol(ya),tx=o.tx??(Q&&Q.sty?TI[Q.sty]:wm),st=o.sty??sty;
+    let y0=ya+fh*.2,y1=ya+fh*.8;
+    if(o.z==null&&!o.band)kitWin(F,sm,ww,ya,ya+fh,.2,.8,k,k+.999,st,c,tx,j,F.off?.03+oo:undefined);
+    else{const z=o.z||1;[y0,y1]=o.band?[ya+.1,ya+fh-.1]:[ya+fh*(.55-.35*z),ya+fh*(.55+.35*z)];kitWin(F,sm,ww,y0,y1,.2,.8,k+.2,k+.9,st,c,tx,j,F.off?.03+oo:undefined);
+      if(!o.band){y0=ya+fh*(.55-.3*z);y1=ya+fh*(.55+.3*z);}}
+    if(K.shut)for(const g of [-1,1])kitBox(KIT_S,F,sm+g*ww*.29-(g<0?ww*.17:0),sm+g*ww*.29+(g>0?ww*.17:0),.03+oo,.05+oo,y0,y1,K.shut,-1,'f');};
   // window rows on wall frame F whose eaves are at hE; gRh = roof rise over it when it is a gable end, else null
-  const rowsOn=(F,rows,dr,hE,gRh,sc,lab)=>{const v1=Math.max(1,Math.round((hE-yb)/3)),fh=(hE-yb)/v1,h=hE;
+  // o.pt(s): on outlines split into rectangles, the eaves height of the rectangle wall at s (rows above this wall's storeys go there)
+  const rowsOn=(F,rows,dr,hE,gRh,sc,lab,o={})=>{const yB=o.yb??yb,v1=Math.max(1,Math.round((hE-yB)/3)),fh=(hE-yB)/v1,h=hE;
     rows.forEach((r,k)=>{const ts=typeof r==='number'?Array.from({length:r},(_,j)=>(j+.5)/r):r;
-      if(k<v1){const ww=1.92*sc,ya=yb+k*fh;
-        ts.forEach((t,j)=>{const sm=Math.min(Math.max(t*F.L,ww/2),F.L-ww/2);if(k===0&&dr.some(([x,w])=>Math.abs(x-sm)<w/2+.75))return;
-          const oo=F.off?F.off(sm):0;kitWin(F,sm,ww,ya,ya+fh,.2,.8,k,k+.999,sty,wcol(ya),wm,j,F.off?.03+oo:undefined);
-          if(K.shut)for(const g of [-1,1])kitBox(KIT_S,F,sm+g*ww*.29-(g<0?ww*.17:0),sm+g*ww*.29+(g>0?ww*.17:0),.03+oo,.05+oo,ya+fh*.2,ya+fh*.8,K.shut,-1,'f');});}
+      if(k<v1){const ww=1.92*sc*(o.z||1),ya=yB+k*fh;
+        ts.forEach((t,j)=>{const sm=Math.min(Math.max(t*F.L,ww/2),F.L-ww/2);if(k===0&&dr.some(([x,w])=>Math.abs(x-sm)<w/2+.75))return;stWin(F,sm,j,k,ya,fh,ww,o);});}
+      else if(gRh==null&&o.pt){let miss=0;const ww=1.92*sc*(o.z||1);
+        ts.forEach((t,j)=>{const sm=Math.min(Math.max(t*F.L,ww/2),F.L-ww/2),hT=o.pt(sm),v2=hT?Math.max(1,Math.round((hT-yB)/3)):0;
+          if(k>=v2){miss++;return;}const f2=(hT-yB)/v2;stWin(F,sm,j,k,yB+k*f2,f2,ww,o);});
+        if(miss)KIT_WARN.push(s.rid+'.'+lab+': row '+k+' has no wall under '+miss+' of its windows');}
       else if(k<=v1+1&&gRh!=null){
         // gable rows: the attic storey from just above the eaves, then a small loft window above it
         const h0=Math.min(fh*.8,gRh*(rows.length>v1+1?.42:.62)),hd=k===v1?h0:h0*.55,yg=k===v1?h+.12:h+.32+h0,wd=1.66*hd/(fh*.8)*sc;
@@ -99,27 +127,39 @@ function kitHouse(B,P,s,K,prev,rev,R,EG,RE,OF,XE){
           kitWin(F,t*F.L,wd*f,yg,yg+hd*f,.24,.76,v1+.1,v1+.9,sty,gcol,wm,j,F.off?.03+F.off(t*F.L):undefined);});}
       else KIT_WARN.push(s.rid+'.'+lab+': row '+k+' has no wall (house has '+v1+' storeys'+(gRh!=null?'':', and this wall is no gable end')+')');});};
   const doorAt={};
-  for(const D of K.door||[]){const i=W(D.e),F=fw(i),[dw,dh,dc]=KIT_DOOR[D.type||'single'],gar=D.type==='garage';
-    for(const t of D.at==null?[.5]:[].concat(D.at)){
+  // one door t along wall frame F; returns [centre, width] for the window rows
+  const door=(F,D,t)=>{const [dw,dh,dc]=KIT_DOOR[D.type||'single'],gar=D.type==='garage';
       const sm=Math.min(Math.max(t*F.L,dw/2+.1),F.L-dw/2-.1),g=GY(...[0,2].map(k=>F.P(sm,0,0)[k])),steps=D.steps&&!gar,yd=Math.max(yb+.05,g+(steps?.45:.04));
-      (doorAt[i]||(doorAt[i]=[])).push([sm,dw]);
       let Fd=F,od=F.off?F.off(sm):0;
       if(D.porch==='closed'&&!gar){const pw=Math.max(2.2,dw+1.4),pd=1.8,ph=yd+2.5-y0;
         prev(B,[F.P(sm-pw/2,-.05,0),F.P(sm+pw/2,-.05,0),F.P(sm+pw/2,pd,0),F.P(sm-pw/2,pd,0)].map(q=>[q[0],q[2]]),
           {h:ph,y0,yb,wall:s.wall,roof:s.roof,roofSty:s.roofSty,sty:-1,pitched:true,rh:.9,rdir:F.n,kind:'house',rid:s.rid});od=pd;}
-      if(!gar)kitBox(KIT_S,Fd,sm-dw/2-.08,sm+dw/2+.08,od,od+.03,yd,yd+dh+.08,K.frame||[.9,.9,.88],-1,'f');
-      kitBox(KIT_S,Fd,sm-dw/2,sm+dw/2,od,od+.045,yd,yd+dh,D.col||dc,-1,'f');
+      // a recessed entrance: a dark opening with a brick pier on its right
+      if(D.porch==='recess'){const ow=dw+.3,oh=dh+.1;kitBox(KIT_S,Fd,sm-ow/2,sm+ow/2,od,od+.03,yd,yd+oh,D.col||[.09,.08,.07],-1,'f');
+        kitBox(KIT_S,Fd,sm+ow/2,sm+ow/2+.45,od,od+.3,g-.05,yd+oh+.1,[.52,.3,.24],TI.brick??-1,'flrt');}
+      else{if(!gar)kitBox(KIT_S,Fd,sm-dw/2-.08,sm+dw/2+.08,od,od+.03,yd,yd+dh+.08,K.frame||[.9,.9,.88],-1,'f');
+        kitBox(KIT_S,Fd,sm-dw/2,sm+dw/2,od,od+.045,yd,yd+dh,D.col||dc,-1,'f');}
       if(steps)kitBox(KIT_S,Fd,sm-dw/2-.3,sm+dw/2+.3,od,od+.9,g-.1,yd,[.6,.6,.58],concrete,'flrt');
       if(D.porch==='canopy')kitBox(B,Fd,sm-dw/2-.5,sm+dw/2+.5,od,od+1.1,yd+dh+.3,yd+dh+.42,s.roof,-1,'flrtb');
-    }}
-  for(const [e,rows] of K.win||[]){const i=W(e),Ri=RE(i);rowsOn(fw(i),rows,doorAt[i]||[],topOf(Ri),Ri&&Ri.gab.includes(i)?Ri.rh:null,scaleOf(i),'win: edge '+e);}
+      return[sm,dw];};
+  for(const D of K.door||[]){const i=W(D.e),F=fw(i);for(const t of D.at==null?[.5]:[].concat(D.at))(doorAt[i]||(doorAt[i]=[])).push(door(F,D,t));}
+  for(const [e,rows] of K.win||[]){const i=W(e),Ri=RE(i),z=sizeOf(i);
+    rowsOn(fw(i),rows,doorAt[i]||[],topOf(Ri),Ri&&Ri.gab.includes(i)?Ri.rh:null,scaleOf(i),'win: edge '+e,z!=null||SPANS.length||PT?{z,ii:i,pt:PT&&PT(i)}:undefined);}
+  for(const [i,Q] of SPANS){const F=fw(i),hT=topOf(RE(i)),s0=Q.at[0]*F.L,s1=Q.at[1]*F.L,u1=Math.max(1,Math.round(F.L/3.2)),vw=Math.max(1,Math.round((hT-yb)/3)),o=.015+(F.off?F.off((s0+s1)/2):0);
+    const tn=KIT_S.tn,uv=(x,y)=>[x/F.L*u1,(y-yb)/(hT-yb)*vw];KIT_S.tn=NOTONE;KIT_S.cs=sty>=0?sty+16:-1;
+    kitQuad(KIT_S,[F.P(s0,o,yb),F.P(s1,o,yb),F.P(s1,o,hT),F.P(s0,o,hT)],Q.col||s.wall,F.out,Q.sty?TI[Q.sty]:wm,[uv(s0,yb),uv(s1,yb),uv(s1,hT),uv(s0,hT)]);KIT_S.cs=-1;KIT_S.tn=tn;}
   // the plinth follows the OSM outline (not the game's rectangles), as it always has
   if(K.plinth){const ph=K.plinthH||.5;for(let i=0;i<n;i++){const F=kitFrame(P[i],P[(i+1)%n]);if(F.L<.3)continue;const ga=GY(...F.a)+ph,gb=GY(...F.b)+ph;
     kitQuad(KIT_S,[F.P(0,.02,yb),F.P(F.L,.02,yb),F.P(F.L,.02,Math.max(gb,yb+.1)),F.P(0,.02,Math.max(ga,yb+.1))],K.plinth,F.out,concrete);}}
   for(const X of K.ext||[]){const F=fw(W(X.e)),ew=(X.w||.5)*F.L,sm=Math.min(Math.max((X.at??.5)*F.L,ew/2),F.L-ew/2),d=X.d||3,eh=X.h||2.6,roof=X.roof||'lean';
     const fp=[F.P(sm-ew/2,-.05,0),F.P(sm+ew/2,-.05,0),F.P(sm+ew/2,d,0),F.P(sm-ew/2,d,0)].map(q=>[q[0],q[2]]),lean=Math.min(1.2,d*.3);
-    prev(B,fp,{h:eh,y0,yb,wall:X.wall||(X.glazed?[.86,.88,.88]:s.wall),roof:X.roofCol||s.roof,roofSty:s.roofSty,sty:X.glazed?STY.glass:X.sty?(X.sty==='none'?-1:STY[X.sty]):sty,kind:'house',rid:s.rid,
-      pitched:roof==='gable',rh:roof==='gable'?Math.min(2.2,ew*.35):null,rdir:F.n,tops:roof==='lean'?[eh+lean,eh+lean,eh,eh]:null});}
+    const eo={h:eh,y0,yb,wall:X.wall||(X.glazed?[.86,.88,.88]:s.wall),roof:X.roofCol||s.roof,roofSty:s.roofSty,sty:X.glazed?STY.glass:X.sty?(X.sty==='none'?-1:STY[X.sty]):sty,kind:'house',rid:s.rid,
+      pitched:roof==='gable',rh:roof==='gable'?Math.min(2.2,ew*.35):null,rdir:F.n,tops:roof==='lean'?[eh+lean,eh+lean,eh,eh]:null},n0=B.pos.length/3;
+    prev(B,fp,eo);
+    // windows and a door on the extension's front
+    if(X.win!=null||X.door!=null){const a=F.P(sm-ew/2,d,0),b=F.P(sm+ew/2,d,0),seg=[[a[0],a[2]],[b[0],b[2]]],Fx=kitFrame(...seg),dr=[];kitMask(B,n0,B.pos.length/3,[seg]);
+      if(X.door!=null)dr.push(door(Fx,{col:X.doorCol},X.door));
+      if(X.win!=null)rowsOn(Fx,[X.win],dr,y0+eh,null,1,'ext: edge '+X.e,{z:sizeOf(W(X.e)),col:eo.wall,sty:eo.sty>=0?eo.sty:sty,tx:typeof texWall==='function'?texWall(eo):-1});}}
   for(const Q of K.balc||[]){const i=W(Q.e),F=fw(i),bw=Math.max(1.5,(Q.w||.35)*F.L),sm=Math.min(Math.max((Q.at??.5)*F.L,bw/2),F.L-bw/2);
     const k=Math.min(Q.floor??(R&&R.gab.includes(i)?v1:1),v1),y=yb+k*fh,c=Q.col||[.9,.9,.88];
     kitBox(B,F,sm-bw/2,sm+bw/2,0,.9,y-.15,y,[.75,.75,.73],concrete,'flrtb');
@@ -154,14 +194,20 @@ function kitHouse(B,P,s,K,prev,rev,R,EG,RE,OF,XE){
   for(const X of K.xg||[]){const i=W(X.e),Ri=XE&&XE(i)||RE(i);
     if(!Ri||!Ri.eave.includes(i)){KIT_WARN.push(s.rid+'.xg: edge '+X.e+(Ri&&Ri.gab.includes(i)?' is a gable end; a cross gable needs an eaves wall (one the roof slopes down to)':' has no roof slope over it'));continue;}
     const F=fw(i),top=topOf(Ri),hs=Ri.shortL/2,cw=Math.min(X.w||Math.min(4,F.L*.4),F.L),sm=Math.min(Math.max((X.at??.5)*F.L,cw/2),F.L-cw/2);
-    const rise=X.rise||1,xin=Math.min(hs,rise*hs+.05),dd=Math.max(X.d||0,.12),rx=Math.min(rise*Ri.rh,cw*.7),gc=X.gable||K.gable,n0=B.pos.length/3;
+    // up (kit 3): a wall dormer, its walls standing `up` metres from the eaves, its peak at `rise` x the main rise (over 1: above the ridge)
+    const up=X.up,rise=X.rise||1,xin=Math.min(hs,rise*hs+.05),dd=Math.max(X.d||0,.12),rx=Math.min(up?Math.max(.5,rise*Ri.rh-up):rise*Ri.rh,cw*.7),gc=X.gable||K.gable,n0=B.pos.length/3;
     const fp=[F.P(sm-cw/2,-xin,0),F.P(sm+cw/2,-xin,0),F.P(sm+cw/2,dd,0),F.P(sm-cw/2,dd,0)].map(q=>[q[0],q[2]]);
     const o={h:top-y0,y0,yb,wall:X.wall||s.wall,roof:X.roofCol||s.roof,roofSty:s.roofSty,sty,pitched:true,rh:rx,rdir:F.n,kind:'house',rid:s.rid,noEave:true};
+    if(up){o.y0=o.yb=top;o.h=up;}
     if(!X.wall&&s.wall2){o.wall2=s.wall2;o.band=s.band;}if(gc)o.gable=gc;
     prev(B,fp,o);const n1=B.pos.length/3;
-    if(K.gableSty&&B.tx)for(let v=n0;v<n1;v+=3)if(Math.abs(B.nor[v*3+1])<.05&&B.sty[v]<0&&Math.max(B.pos[v*3+1],B.pos[v*3+4],B.pos[v*3+7])>top+.01)B.tx[v]=B.tx[v+1]=B.tx[v+2]=TEXI[K.gableSty];
+    if(K.gableSty&&B.tx)for(let v=n0;v<n1;v+=3)if(Math.abs(B.nor[v*3+1])<.05&&B.sty[v]<0&&Math.max(B.pos[v*3+1],B.pos[v*3+4],B.pos[v*3+7])>(up?top+up:top)+.01)B.tx[v]=B.tx[v+1]=B.tx[v+2]=TEXI[K.gableSty];
+    // a wall dormer's walls are too low for the atlas storey: all of them take the blank tiles, its windows come from `win`
+    if(up)for(let v=n0;v<n1;v++)if(B.sty[v]>=0&&B.sty[v]<16)B.sty[v]+=16;
     if(X.win){const a=F.P(sm-cw/2,dd,0),b=F.P(sm+cw/2,dd,0),seg=[[a[0],a[2]],[b[0],b[2]]];kitMask(B,n0,n1,[seg]);
-      rowsOn(kitFrame(...seg),X.win,[],top,rx,scaleOf(i),'xg: edge '+X.e);}}
+      const z=X.size!=null?kitZ(X.size,sty):sizeOf(i);
+      if(up)rowsOn(kitFrame(...seg),X.win,[],top+up,rx,scaleOf(i),'xg: edge '+X.e,{yb:top,band:true,z});
+      else rowsOn(kitFrame(...seg),X.win,[],top,rx,scaleOf(i),'xg: edge '+X.e,z!=null?{z}:undefined);}}
   // a stretch of the main roof in another material or colour: a panel 4 cm above the slope
   for(const Q of K.roof2||[]){
     if(!R||s.hip){KIT_WARN.push(s.rid+'.roof2: needs a gable roof on a four-corner outline');continue;}
@@ -186,6 +232,29 @@ function kitOn(P,i,u,v){return kitOn2(P[i],P[(i+1)%P.length],u,v);}
 // pitched roof of one 4-corner part: corners [a,b,c,d] (ridge a->b), its gable-end and eaves edges among the walked edges `on` finds
 function kitRoof(pp,sp,on){const wp=polyArea(pp)>0?pp.slice().reverse():pp,[a,b,c,d]=pitchOrder(wp,sp),shortL=Math.hypot(c[0]-b[0],c[1]-b[1]),run=Math.hypot(b[0]-a[0],b[1]-a[1]);
   return{a,b,c,d,shortL,run,rh:sp.rh!=null?Math.min(sp.rh,shortL*.7):Math.min(shortL*.42,4),gab:sp.hip?[]:[...on(b,c),...on(d,a)],eave:[...on(a,b),...on(c,d)],top:(sp.y0||0)+sp.h};}
+// kit 3: a half-hipped gable roof. addBuilding drew a gable roof on four corners from vertex v0; the top f of each gable triangle goes,
+// the ridge ends move in by f x half the span, and each end gets a small hip facet (with its slope fill and eaves underside)
+function kitHalfHip(B,v0,p,s,f){
+  const v1=B.pos.length/3,P=polyArea(p)>0?p.slice().reverse():p,[a,b,c,d]=pitchOrder(P,s),h=(s.y0||0)+s.h;
+  const shortL=Math.hypot(c[0]-b[0],c[1]-b[1]),run=Math.hypot(b[0]-a[0],b[1]-a[1]),rh=s.rh!=null?Math.min(s.rh,shortL*.7):Math.min(shortL*.42,s.kind==='church'?8:4);
+  const ux=(b[0]-a[0])/run,uz=(b[1]-a[1])/run,e=s.noEave?0:s.kind==='shed'?.25:.5,ye=h-e*rh/(shortL/2),cx=(a[0]+b[0]+c[0]+d[0])/4,cz=(a[1]+b[1]+c[1]+d[1])/4;
+  const grow=q=>{const rx=q[0]-cx,rz=q[1]-cz,su=Math.sign(rx*ux+rz*uz),sv=Math.sign(rz*ux-rx*uz);return[q[0]+e*(su*ux-sv*uz),ye,q[1]+e*(su*uz+sv*ux)];};
+  const yc=h+rh*(1-f),sb=f*shortL/2,kq=Math.sqrt(1+(shortL/2/Math.max(rh,.1))**2)/3,rs=roofSty(s),rtx=typeof TEX_ROOF!=='undefined'?TEX_ROOF[rs]??-1:-1;
+  const at=(v,q)=>Math.abs(B.pos[v*3]-q[0])<1e-3&&Math.abs(B.pos[v*3+1]-q[1])<1e-3&&Math.abs(B.pos[v*3+2]-q[2])<1e-3,set=(v,q)=>{B.pos[v*3]=q[0];B.pos[v*3+1]=q[1];B.pos[v*3+2]=q[2];};
+  const roofTri=(t,w,along)=>{const uv=q=>[(along?q[0]*ux+q[2]*uz:q[2]*ux-q[0]*uz)/3.2,(q[1]-ye)*kq];B.cs=rs;kitTri(B,t[0],t[1],t[2],s.roof,w,rtx,t.map(uv));B.cs=-1;kitTri(B,t[0],t[1],t[2],EAVES,w.map(x=>-x),-1);};
+  for(const [m,q1,q2,sg] of [[[(d[0]+a[0])/2,(d[1]+a[1])/2],d,a,1],[[(b[0]+c[0])/2,(b[1]+c[1])/2],b,c,-1]]){
+    const rX=[m[0]-sg*ux*e,h+rh,m[1]-sg*uz*e],g=[m[0],h+rh,m[1]],R2=[m[0]+sg*ux*sb,h+rh,m[1]+sg*uz*sb],pr=q=>[q[0]+(m[0]-q[0])*(1-f),yc,q[2]+(m[1]-q[2])*(1-f)];
+    // the gable triangle (apex, x, y) becomes (x', x, y) + (y, y', x'): its top is cut off at yc
+    for(let v=v0;v<v1;v+=3){if(Math.abs(B.nor[v*3+1])>.05)continue;const k=[0,1,2].find(j=>at(v+j,g));if(k==null)continue;
+      const X=[0,1,2].map(j=>[B.pos[(v+j)*3],B.pos[(v+j)*3+1],B.pos[(v+j)*3+2]]),x=X[(k+1)%3],y=X[(k+2)%3];set(v+k,pr(x));
+      const n=B.pos.length/3;B.pos.push(...y,...pr(y),...pr(x));for(const A of ['col','nor'])B[A].push(...B[A].slice(v*3,v*3+9));B.uv.push(...B.uv.slice(v*2,v*2+6));
+      if(B.sty)B.sty.push(B.sty[v],B.sty[v],B.sty[v]);if(B.tx&&B.tx[v]!=null)B.tx[n]=B.tx[n+1]=B.tx[n+2]=B.tx[v];
+      for(let r=0,L=B.tr.length;r<L;r+=5)if(B.tr[r]===v)B.tr.push(n,...B.tr.slice(r+1,r+5));break;}
+    const t=(yc-ye)/(h+rh-ye),sq=[q1,q2].map(q=>{const Q=grow(q);return[Q,[Q[0]+(rX[0]-Q[0])*t,yc,Q[2]+(rX[2]-Q[2])*t]];});
+    for(let v=v0;v<v1;v++)if(at(v,rX))set(v,R2);
+    for(const [Q,S] of sq)roofTri([Q,S,R2],[Q[0]-cx,2,Q[2]-cz],1);
+    roofTri([sq[0][1],sq[1][1],R2],[-sg*ux,2,-sg*uz],0);}
+}
 // While a described house's walls are drawn: gable colour, no automatic chimney/dormers, wing roofs, and where its triangles start.
 // Its parts are added once the whole building is drawn (facadeRec), on the OSM outline, so outlines split into rectangles work too.
 const KIT_AT=new Map();let KIT_B=null;
@@ -200,30 +269,38 @@ const KIT_AT=new Map();let KIT_B=null;
   // a cross gable sits flush on the roof: the main eaves overhang would cut through its gable, so it goes (as facades2 does for wings)
   if(Array.isArray(K.xg)&&K.xg.some(kitXgOk))o.noEave=true;
   Object.assign(o,kitWingOv(K.wings,k));
-  return prev(B,p,Object.keys(o).length?Object.assign({},s,o):s);};
+  const s2=Object.keys(o).length?Object.assign({},s,o):s,cut=Array.isArray(K.wings)&&kitWingOk(K.wings[k])?kitCut(p,K.wings[k]):null;
+  // kit 3: a wing cut short (`d`): its front part keeps the roof, the part behind gets a flat roof at the same eaves
+  if(cut){const r=prev(B,cut[0],s2);prev(B,cut[1],Object.assign({},s2,{pitched:false,hip:false,rh:null,rdir:null,ridge:null,chim:null,tops:null,skel:null}));return r;}
+  const v0=B.pos.length/3,r=prev(B,p,s2);
+  if(K.halfHip&&(K.halfHip===true||kitN(K.halfHip,.15,.6))&&p.length===4&&s2.pitched&&!s2.hip&&!s2.tops&&!s2.skel&&!s2.front)kitHalfHip(B,v0,p,s2,K.halfHip===true?.35:K.halfHip);
+  return r;};
   const fr=facadeRec;facadeRec=function(W,w,t,pts,specs,top){
     fr(W,w,t,pts,specs,top);const B=KIT_B;
     if(!KIT_AT.has(w.id)||KIT_DONE.has(w.id))return;KIT_DONE.add(w.id);
     const n=pts.length,K=kitNorm(w.id,KIT[w.id],n),rev=polyArea(pts)>0,P=rev?pts.slice().reverse():pts,Wk=e=>rev?(n-2-e+n)%n:e,v0=KIT_AT.get(w.id),v1=B.pos.length/3;
-    const SP=specs.map(([pp,sp],k)=>[pp,Object.assign({},sp,kitWingOv(K.wings,k))]);
+    // a wing cut short (kit 3 `d`) has its roof on the front part only
+    const SP=specs.map(([pp,sp],k)=>{const c=Array.isArray(K.wings)&&kitWingOk(K.wings[k])?kitCut(pp,K.wings[k]):null;return[c?c[0]:pp,Object.assign({},sp,kitWingOv(K.wings,k))];});
     if(K.wings&&K.wings.length>specs.length)KIT_WARN.push(w.id+'.wings: the game splits this outline into '+specs.length+' part(s)');
     // heights and roof from the largest part
     let [pp,sp]=SP[0];for(const q of SP)if(Math.abs(polyArea(q[0]))>Math.abs(polyArea(pp)))[pp,sp]=q;
     // outlines of 8+ corners that the game draws as several rectangles: a wall's parts go on the rectangle wall drawn over it
     // (up to 0.6 m off the OSM line), and gable rows, dormers and cross gables use the roof of the rectangle the wall belongs to
     const big=n>=8&&specs.length>1;
-    const OFa=[],SGa=[],EGa=P.map((a,i)=>{const b=P[(i+1)%n];if(!big)return[a,b];const L=Math.hypot(b[0]-a[0],b[1]-a[1]),nx=-(b[1]-a[1])/L,nz=(b[0]-a[0])/L;let best=null;const all=[];
-      for(const [q] of specs)for(let j=0;j<q.length;j++){const u=q[j],v=q[(j+1)%q.length],M=Math.hypot(v[0]-u[0],v[1]-u[1]);
+    const OFa=[],SGa=[],PTa=[],EGa=P.map((a,i)=>{const b=P[(i+1)%n];if(!big)return[a,b];const L=Math.hypot(b[0]-a[0],b[1]-a[1]),nx=-(b[1]-a[1])/L,nz=(b[0]-a[0])/L;let best=null;const all=[];
+      for(const [k,[q]] of specs.entries())for(let j=0;j<q.length;j++){const u=q[j],v=q[(j+1)%q.length],M=Math.hypot(v[0]-u[0],v[1]-u[1]);
         if(Math.abs(((b[0]-a[0])*(v[1]-u[1])-(b[1]-a[1])*(v[0]-u[0]))/(L*M))>.1)continue;
         // offset of that wall's line out of the house, at both ends of the OSM edge
         const off=x=>((x[0]-u[0])*(v[1]-u[1])-(x[1]-u[1])*(v[0]-u[0]))/M,g=(nx*(v[1]-u[1])-nz*(v[0]-u[0]))/M,oa=-off(a)/g,ob=-off(b)/g;
         const t0=((u[0]-a[0])*(b[0]-a[0])+(u[1]-a[1])*(b[1]-a[1]))/L,t1=((v[0]-a[0])*(b[0]-a[0])+(v[1]-a[1])*(b[1]-a[1]))/L;
         if(Math.min(t0,t1)>L-.3||Math.max(t0,t1)<.3||Math.max(Math.abs(oa),Math.abs(ob))>.6)continue;
-        all.push([oa,ob,Math.min(t0,t1),Math.max(t0,t1)]);
+        all.push([oa,ob,Math.min(t0,t1),Math.max(t0,t1),k]);
         if(!best||Math.abs(oa)+Math.abs(ob)<Math.abs(best[0])+Math.abs(best[1]))best=[oa,ob];}
       // several rectangles can stand on one OSM edge, each a little in or out: OF[i](s) is the wall's offset from the frame line at s
       const g=best&&Math.max(Math.abs(best[0]),Math.abs(best[1]))>.03?best:[0,0],ln=(q,s)=>q[0]+(q[1]-q[0])*s/L;
       OFa[i]=all.length>1?(s=>{const q=all.find(q=>s>=q[2]-.05&&s<=q[3]+.05)||best;return ln(q,s)-ln(g,s);}):null;
+      // PT[i](s): eaves height of the tallest rectangle wall standing at s on this edge
+      PTa[i]=s=>{let m=0;for(const q of all)if(s>=q[2]-.05&&s<=q[3]+.05){const r=SP[q[4]][1];m=Math.max(m,(r.y0||0)+r.h);}return m||null;};
       SGa[i]=all.map(q=>[[a[0]+nx*q[0],a[1]+nz*q[0]],[b[0]+nx*q[1],b[1]+nz*q[1]]]);
       return g===best?[[a[0]+nx*best[0],a[1]+nz*best[0]],[b[0]+nx*best[1],b[1]+nz*best[1]]]:[a,b];});
     const EG=i=>EGa[i],on=(u,v)=>P.map((_,i)=>i).filter(i=>kitOn2(...EG(i),u,v));
@@ -232,16 +309,23 @@ const KIT_AT=new Map();let KIT_B=null;
     const RS=big?SP.filter(([q,s])=>s.pitched&&q.length===4).sort((x,y)=>Math.abs(polyArea(y[0]))-Math.abs(polyArea(x[0]))).map(([q,s])=>q===pp?R:kitRoof(q,s,on)):[];
     const RE=big?(i=>RS.find(r=>r.gab.includes(i)||r.eave.includes(i))||R):null;
     const RX=K.xg&&specs.length>1?(big?RS:SP.filter(([q,s])=>s.pitched&&q.length===4).map(([q,s])=>q===pp?R:kitRoof(q,s,on))):null,XE=RX&&(i=>RX.find(r=>r.eave.includes(i)));
+    // kit 3: a wall with a window size but no `win` row keeps its automatic count (one window per 3.2 m bay on every storey)
+    if(K.winSize!=null){const has=new Set((K.win||[]).map(([e])=>e)),add=[];
+      for(let e=0;e<n;e++){if(has.has(e)||Array.isArray(K.winSize)&&!K.winSize.some(q=>q[0]===e))continue;const i=Wk(e),[a,b]=EG(i),L=Math.hypot(b[0]-a[0],b[1]-a[1]);
+        let st=false;for(let v=v0;v<v1&&!st;v+=3){if(!(B.sty[v]>=0&&B.sty[v]<16)||Math.abs(B.nor[v*3+1])>.05)continue;const cx=(B.pos[v*3]+B.pos[v*3+3]+B.pos[v*3+6])/3,cz=(B.pos[v*3+2]+B.pos[v*3+5]+B.pos[v*3+8])/3,t=((cx-a[0])*(b[0]-a[0])+(cz-a[1])*(b[1]-a[1]))/L;
+          st=t>-.05&&t<L+.05&&Math.abs(((cx-a[0])*(b[1]-a[1])-(cz-a[1])*(b[0]-a[0]))/L)<.3;}
+        if(!st)continue;const Ri=big?RE(i):R,top=Ri?Ri.top:(sp.y0||0)+sp.h;add.push([e,Array(Math.max(1,Math.round((top-(sp.yb||0))/3))).fill(Math.max(1,Math.round(L/3.2)))]);}
+      if(add.length)K.win=[...(K.win||[]),...add];}
     // walls with explicit windows lose the automatic ones: their styled wall triangles take the blank tiles (facades2 mask, sty+16)
     kitMask(B,v0,v1,(K.win||[]).flatMap(([e])=>big&&SGa[Wk(e)].length?SGa[Wk(e)]:[EG(Wk(e))]),big);
     if(K.gableSty&&B.tx){const hh=sp.y0+sp.h+.01,gc=K.gable||sp.wall2||sp.wall;
       for(let v=v0;v<v1;v+=3)if(Math.abs(B.nor[v*3+1])<.05&&B.sty[v]<0&&B.col[v*3]===gc[0]&&B.col[v*3+1]===gc[1]&&Math.max(B.pos[v*3+1],B.pos[v*3+4],B.pos[v*3+7])>hh)B.tx[v]=B.tx[v+1]=B.tx[v+2]=TEXI[K.gableSty];}
     // another wall material or colour on one wall (and the gable triangle over it)
-    for(const [e,Q] of K.walls||[]){const [a,b]=EG(Wk(e)),L=Math.hypot(b[0]-a[0],b[1]-a[1]);
+    for(const [e,Q] of K.walls||[]){if(Q.at)continue;const [a,b]=EG(Wk(e)),L=Math.hypot(b[0]-a[0],b[1]-a[1]);
       for(let v=v0;v<v1;v+=3){if(Math.abs(B.nor[v*3+1])>.05)continue;const cx=(B.pos[v*3]+B.pos[v*3+3]+B.pos[v*3+6])/3,cz=(B.pos[v*3+2]+B.pos[v*3+5]+B.pos[v*3+8])/3,tt=((cx-a[0])*(b[0]-a[0])+(cz-a[1])*(b[1]-a[1]))/L;
         if(tt<-.05||tt>L+.05||Math.abs(((cx-a[0])*(b[1]-a[1])-(cz-a[1])*(b[0]-a[0]))/L)>.05)continue;
         for(let j=v;j<v+3;j++){if(Q.col)B.col.splice(j*3,3,...Q.col);if(Q.sty&&B.tx)B.tx[j]=TEXI[Q.sty];}}}
-    kitHouse(B,P,Object.assign({},sp,{gable:K.gable||sp.gable}),K,prev,rev,R,big?EG:null,RE,big?(i=>OFa[i]):null,XE);};}
+    kitHouse(B,P,Object.assign({},sp,{gable:K.gable||sp.gable}),K,prev,rev,R,big?EG:null,RE,big?(i=>OFa[i]):null,XE,big?(i=>PTa[i]):null);};}
 {const bw=buildWorld;buildWorld=function(ways,meta){
   for(const k of ['pos','col','nor','uv','sty','tr','tx'])KIT_S[k]=[];KIT_DONE.clear();KIT_AT.clear();KIT_PI.clear();KIT_WARN.length=0;KIT_TREES=0;
   const W=bw(ways,meta);

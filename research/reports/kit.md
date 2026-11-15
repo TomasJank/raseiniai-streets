@@ -192,3 +192,43 @@ and `square_<id>.jpg` (square-on and 45-degree views of the changed walls, befor
   blank; from the agent's script e13): the same-angle render now shows the ribbon windows of frames 950989774021969 / 1692676051896343.
   Not restored: c3451's `xg` (its wings now make the street wall an eaves wall, but the agent's final reading is a lower wing, not a bay),
   c3519's wings (no evidence in the frames either way).
+
+# kit 3: what the owner's Vilniaus g. houses needed (2026-11-15)
+
+Status: in `pipeline/kit.js` / `pipeline/add_kit.py` (developed as `kit_next`, replaced in one go after the checks below). The kit
+before kit 3 and a frozen fixture of every description that existed when kit 3 started (40 houses, six streets) are in
+`pipeline/kit/sheets/kit3/old/` (`fixture.sh base.html old.html new.html`). Scripts and proof: `pipeline/kit/sheets/owner/`.
+
+## Keys added
+| key | what it draws | cost |
+|---|---|---|
+| `winSize` (house or `{side: size}`; `small` .75, `normal`, `large` 1.3, or frame width in m) | storey windows of `win` rows at that size, centred where the atlas window sits; a wall with a size and no `win` row keeps its automatic count (one per 3.2 m bay) drawn by the kit | 2 tris per window (the automatic ones were part of the wall) |
+| `halfHip` (true = .35, or .15..0.6) | four-corner gable roof: the top of each gable triangle cut off, ridge ends pulled in, a hip facet with its slope fill and eaves underside | 14 building tris per house |
+| `walls` `at: [from, to]` | a panel over part of one wall (blank atlas tile, its own colour and `tex` material); windows inside it take its colour | 2 kit tris |
+| `door` `porch: "recess"` | dark opening plus a brick pier, no leaf | 12 kit tris |
+| `ext` `win`, `door`, `doorCol` | windows (masked front, extension's colour, style and material) and a door on the extension's front | 2 per window, 6-12 per door |
+| `xg` `up`, `size`, `rise` up to 1.4 | wall dormer: box from the eaves, `up` m of wall then its gable, peak may stand above the main ridge; all its walls blank tiles, its `win` row 0 fills the band | as `xg` (18 tris) |
+| `wings` `d` | rectangle drawn `d` m deep from the street, the rest behind with a flat roof at the same eaves (one more box); its roof is used for gable rows / cross gables | ~10 building tris |
+| (no key) | on split outlines, `win` rows above a wall's storeys go on a taller rectangle standing at that position | 2 per window |
+
+Every description valid before kit 3 draws the same triangles (fixture hash, 40 of 40 identical); no new draw call (kit still adds one
+mesh, no shadow, static); small parts (windows, panels, recess, pier) are in the kit mesh; invalid values of the new keys warn and are
+ignored. Test average 30 added triangles per described house (budget 150).
+
+## Window size: what the automatic windows are
+The atlas tile is one 3.2 m bay by one storey; the kit's windows used the same tile, so both are: frame 1.40 m wide on board walls
+(`plank`/`wood`; casing 1.70 m), 1.45 m on `old`, 1.55 m on plaster, brick and silicate; glass 1.15 / 1.30 m. Height scales with the
+storey: the frame is 68/128 of it. On one-storey houses the storey is the whole wall up to the eaves, so in today's town
+(one-storey houses with a facade style: 1,795 plaster, 802 plank, 473 silicate, 223 brick, 19 wood) the median wall is 3.6-3.7 m
+(p10 2.8, p90 4.3) and the automatic frame is 1.4-1.55 m wide and 1.9 m tall at the median (1.5 to 2.3 m). The owner's straight-on
+views give 1.1-1.2 m wide windows on the old wooden houses, typically about 1.3-1.4 m tall. So the automatic windows of small
+one-storey houses are oversized town-wide in the same way: about 20-30 % too wide and 35-40 % too tall at the median wall. Not changed
+(the town default is not mine); `winSize` 1.1-1.2 per house fixes the described ones.
+
+## Not done
+- One window shape/size per wall: no per-window size, so c2462's "wide low" window and its bay window share a wall setting.
+- Lean-to roof hipped at both ends (c2022's shop front is a plain lean-to); multi-pane glazing; per-window frame colour (c2465's
+  dark-framed window in the brown part).
+- `halfHip` only on houses the game draws as one rectangle; `chim` on split outlines still uses the largest rectangle's ridge.
+- On four-corner houses whose LiDAR rectangle stands a few cm off the OSM line, kit windows can sit 1.3 cm (not 3 cm) in front
+  of the wall; the test now allows 2 cm (pre-existing behaviour of the kit's offset rule, not changed to keep old houses identical).

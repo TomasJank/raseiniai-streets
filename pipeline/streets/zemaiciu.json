@@ -57,8 +57,7 @@
     0.18
    ],
    "sty": "plaster",
-   "windows": true,
-   "h": 3.1
+   "windows": true
   },
   "c4470": {
    "wall": [
@@ -90,8 +89,7 @@
     0.48
    ],
    "sty": "wood",
-   "windows": true,
-   "h": 3.2
+   "windows": true
   },
   "c4455": {
    "wall": [
@@ -156,8 +154,7 @@
     0.17
    ],
    "sty": "brick",
-   "windows": true,
-   "h": 3.3
+   "windows": true
   },
   "c4529": {
    "wall": [
@@ -234,8 +231,7 @@
     0.17
    ],
    "sty": "brick",
-   "windows": true,
-   "h": 3.3
+   "windows": true
   },
   "c4465": {
    "wall": [
@@ -302,21 +298,17 @@
   },
   "c5701": {
    "wall": [
-    0.88,
-    0.8,
-    0.62
+    0.66,
+    0.68,
+    0.7
    ],
    "roof": [
     0.58,
-    0.25,
-    0.18
+    0.64,
+    0.72
    ],
-   "sty": "plaster",
-   "windows": true,
-   "h": 3.3,
-   "pitched": true,
-   "hip": true,
-   "rh": 4.1
+   "sty": "industrial",
+   "windows": false
   },
   "c4538": {
    "wall": [
@@ -330,8 +322,7 @@
     0.36
    ],
    "sty": "brick",
-   "windows": true,
-   "h": 3.2
+   "windows": true
   },
   "c5675": {
    "wall": [
@@ -414,8 +405,7 @@
     0.27
    ],
    "sty": "plaster",
-   "windows": true,
-   "h": 5.7
+   "windows": true
   },
   "c4701": {
    "wall": [
@@ -429,8 +419,7 @@
     0.17
    ],
    "sty": "brick",
-   "windows": true,
-   "h": 3.4
+   "windows": true
   },
   "c4748": {
    "wall": [
@@ -477,11 +466,7 @@
     0.18
    ],
    "sty": "plaster",
-   "windows": true,
-   "h": 3.0,
-   "pitched": true,
-   "hip": false,
-   "rh": 3.8
+   "windows": true
   },
   "c4740": {
    "wall": [
@@ -490,13 +475,12 @@
     0.8
    ],
    "roof": [
-    0.36,
-    0.37,
-    0.36
+    0.75,
+    0.27,
+    0.2
    ],
    "sty": "plaster",
-   "windows": true,
-   "h": 5.7
+   "windows": true
   },
   "c4703": {
    "wall": [
@@ -525,8 +509,7 @@
     0.48
    ],
    "sty": "wood",
-   "windows": true,
-   "h": 3.3
+   "windows": true
   },
   "c4742": {
    "wall": [
@@ -540,8 +523,7 @@
     0.27
    ],
    "sty": "plaster",
-   "windows": true,
-   "h": 3.1
+   "windows": true
   },
   "c4707": {
    "wall": [
@@ -573,8 +555,7 @@
     0.48
    ],
    "sty": "wood",
-   "windows": true,
-   "h": 3.1
+   "windows": true
   },
   "c4708": {
    "wall": [
@@ -588,8 +569,7 @@
     0.36
    ],
    "sty": "plaster",
-   "windows": true,
-   "h": 3.3
+   "windows": true
   },
   "c4787": {
    "wall": [
@@ -651,8 +631,7 @@
     0.17
    ],
    "sty": "brick",
-   "windows": true,
-   "h": 3.2
+   "windows": true
   },
   "c4463": {
    "wall": [
@@ -877,13 +856,12 @@
     0.75
    ],
    "roof": [
-    0.4,
-    0.41,
-    0.4
+    0.8,
+    0.42,
+    0.33
    ],
    "sty": "industrial",
-   "windows": true,
-   "h": 5.0
+   "windows": true
   },
   "c3361": {
    "wall": [
@@ -1064,18 +1042,17 @@
   },
   "c3566": {
    "wall": [
-    0.62,
-    0.63,
-    0.62
+    0.82,
+    0.82,
+    0.8
    ],
    "roof": [
     0.42,
     0.43,
     0.42
    ],
-   "sty": "sheet",
-   "windows": false,
-   "h": 2.4
+   "sty": "plaster",
+   "windows": true
   }
  },
  "props": [

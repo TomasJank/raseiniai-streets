@@ -138,11 +138,7 @@
     0.12
    ],
    "sty": "plaster",
-   "windows": true,
-   "h": 5.8,
-   "pitched": true,
-   "hip": false,
-   "rh": 2.4
+   "windows": true
   },
   "c5408": {
    "wall": [

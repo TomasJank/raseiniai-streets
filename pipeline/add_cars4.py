@@ -1,7 +1,8 @@
 """Textured Sketchfab cars behind the car seam (cars4.js; data in pipeline/cars4/, made by
 research/assets/vehicles/cars4/convert.mjs). Runs after cars3 and fixgear.
 mix.json: mix = traffic share per model (parked cars use the same shares), bus = the model the route bus wears,
-static = vehicles that only stand ({key: [[lat, lon, heading in degrees], ...]}), credit = the credit line.
+static = vehicles that only stand ({key: [[lat, lon, heading in degrees], ...]}), credit = the credit line,
+police = the police car's model (never in the mix), livery = its band, door and bonnet lettering (see cars4Police).
 usage: add_cars4.py page.html   (edits in place)
 """
 import base64, json, os, sys
@@ -23,8 +24,9 @@ def rep(old, new):
 
 
 assert 'const CARS3=(()=>{' in h, 'run add_cars3.py first'
-bus, static = cfg.get('bus'), cfg.get('static', {})
-keys = list(cfg['mix']) + ([bus] if bus else []) + list(static)
+bus, static, police = cfg.get('bus'), cfg.get('static', {}), cfg.get('police')
+keys = list(cfg['mix']) + ([bus] if bus else []) + list(static) + ([police] if police else [])
+assert not police or (fleet[police].get('police') and police not in cfg['mix']), 'the police car is never a civilian car'
 assert all(k in fleet for k in keys), [k for k in keys if k not in fleet]
 # every model in the page is credited
 for k in keys:
@@ -39,8 +41,8 @@ for k in keys:
             blocks += '<script type="application/octet-stream" id="%s">%s</script>\n' % (tag, b)
 dump = lambda o: json.dumps(o, separators=(',', ':'))
 drop = ('name', 'src', 'images', 'swatches', 'parts', 'cut', 'seen', 'uvOut', 'author', 'credit', 'page', 'pageBytes', 'tris', 'wheelTris')
-js = ('const CARS4_FLEET=%s;\nconst CARS4_MIX=%s,CARS4_BUS=%s,CARS4_STATIC=%s;\n' % (
-    dump({k: {a: v for a, v in fleet[k].items() if a not in drop} for k in keys}), dump(cfg['mix']), dump(bus), dump(static))
+js = ('const CARS4_FLEET=%s;\nconst CARS4_MIX=%s,CARS4_BUS=%s,CARS4_STATIC=%s,CARS4_POLICE=%s,CARS4_LIVERY=%s;\n' % (
+    dump({k: {a: v for a, v in fleet[k].items() if a not in drop} for k in keys}), dump(cfg['mix']), dump(bus), dump(static), dump(police), dump(cfg.get('livery')))
       + open(os.path.join(d, 'cars4.js'), encoding='utf-8').read())
 rep('// ---------- boot ----------', js + '\n// ---------- boot ----------')
 rep('</body>', blocks + '</body>')

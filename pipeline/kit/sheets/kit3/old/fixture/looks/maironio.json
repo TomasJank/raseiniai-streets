@@ -1,0 +1,151 @@
+{
+ "c2713": {
+  "win": {
+   "front": [
+    2,
+    1
+   ]
+  },
+  "chim": [
+   0.5
+  ]
+ },
+ "c2962": {
+  "win": {
+   "front": [
+    2,
+    1
+   ]
+  },
+  "chim": [
+   0.5
+  ],
+  "wings": [
+   {
+    "ridge": "across"
+   },
+   {
+    "ridge": "street",
+    "rh": 2.4,
+    "h": 2.8
+   }
+  ]
+ },
+ "c3062": {
+  "win": {
+   "front": [
+    2,
+    1
+   ]
+  },
+  "chim": [
+   0.5
+  ]
+ },
+ "c3060": {
+  "chim": [
+   0.8
+  ]
+ },
+ "c3059": {
+  "chim": [
+   0.5
+  ],
+  "noFence": "front"
+ },
+ "c2714": {
+  "wings": [
+   {
+    "ridge": "across"
+   },
+   {
+    "ridge": "across",
+    "rh": 2.2,
+    "h": 3.0
+   }
+  ],
+  "chim": [
+   0.5
+  ],
+  "noFence": "front",
+  "win": {
+   "front": [
+    4
+   ]
+  }
+ },
+ "c2707": {
+  "wings": [
+   {
+    "ridge": "street",
+    "h": 2.6,
+    "rh": 1.0
+   },
+   {
+    "ridge": "street"
+   },
+   {
+    "ridge": "street",
+    "h": 2.6,
+    "rh": 1.0
+   }
+  ]
+ },
+ "c2982": {
+  "wings": [
+   {
+    "ridge": "street",
+    "rh": 1.6,
+    "h": 2.6
+   },
+   {
+    "ridge": "street"
+   },
+   {
+    "ridge": "street",
+    "rh": 1.5,
+    "h": 2.6
+   },
+   null
+  ],
+  "xg": {
+   "side": "right",
+   "at": 0.7,
+   "w": 4,
+   "rise": 0.85,
+   "win": [
+    1,
+    1
+   ]
+  },
+  "door": {
+   "side": "right",
+   "at": 0.2,
+   "type": "single",
+   "col": [
+    0.6,
+    0.12,
+    0.1
+   ],
+   "steps": true,
+   "porch": "canopy"
+  },
+  "chim": [
+   0.3,
+   0.7
+  ]
+ },
+ "c2984": {
+  "wings": [
+   {
+    "ridge": "street"
+   },
+   {
+    "ridge": "street",
+    "rh": 1.8,
+    "h": 2.6
+   }
+  ],
+  "noFence": true
+ }
+}
