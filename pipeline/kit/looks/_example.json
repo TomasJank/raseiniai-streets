@@ -2,7 +2,7 @@
   "c3142": {
     "front": 1,
     "win": {"front": [2, 1], "left": [[0.2, 0.55, 0.8]], "right": [0]},
-    "winShape": "normal",
+    "winShape": {"front": "normal", "left": "wide"},
     "frame": [0.42, 0.28, 0.18],
     "door": {"side": "left", "at": 0.8, "type": "single", "col": [0.35, 0.22, 0.14], "steps": true, "porch": "canopy"},
     "gable": [0.62, 0.64, 0.64],
@@ -12,6 +12,12 @@
     "ext": {"side": "back", "at": 0.5, "w": 0.6, "d": 3, "h": 2.6, "roof": "lean", "glazed": true},
     "balc": {"side": "front", "at": 0.5, "w": 0.4, "col": [0.9, 0.9, 0.88]},
     "chim": [0.3, 0.75],
-    "dorm": {"side": "right", "n": 2, "type": "shed"}
+    "dorm": {"side": "right", "n": 2, "type": "shed"},
+    "xg": {"side": "front", "at": 0.3, "w": 3.5, "d": 0.6, "rise": 0.85, "win": [1, 1]},
+    "roof2": {"at": [0, 0.5], "side": "back", "col": [0.22, 0.25, 0.32], "sty": "sheet"},
+    "walls": {"right": {"col": [0.35, 0.3, 0.25], "sty": "boards"}},
+    "shut": [0.25, 0.32, 0.22],
+    "noTree": true,
+    "noFence": "left"
   }
 }

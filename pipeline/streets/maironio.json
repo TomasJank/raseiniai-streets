@@ -79,9 +79,9 @@
   },
   "c2705": {
    "wall": [
-    0.85,
-    0.78,
-    0.64
+    0.86,
+    0.86,
+    0.84
    ],
    "sty": "plaster",
    "windows": true,
@@ -89,26 +89,43 @@
   },
   "c2713": {
    "wall": [
-    0.91,
+    0.93,
     0.89,
-    0.82
+    0.76
    ],
-   "sty": "wood",
+   "sty": "plank",
    "windows": true,
    "pitched": true,
    "hip": false,
-   "h": 3.4,
-   "rh": 4.6
+   "h": 3.6,
+   "rh": 3.9,
+   "roof": [
+    0.36,
+    0.22,
+    0.2
+   ],
+   "roofSty": "asbestos",
+   "ridge": "across"
   },
   "c2714": {
    "wall": [
-    0.88,
-    0.85,
-    0.78
+    0.77,
+    0.83,
+    0.74
    ],
-   "sty": "plaster",
+   "sty": "plank",
    "windows": true,
-   "h": 3.6
+   "h": 3.8,
+   "roof": [
+    0.22,
+    0.23,
+    0.27
+   ],
+   "roofSty": "asbestos",
+   "pitched": true,
+   "hip": false,
+   "ridge": "across",
+   "rh": 3.8
   },
   "c2722": {
    "wall": [
@@ -144,76 +161,121 @@
   },
   "c2962": {
    "wall": [
-    0.22,
-    0.23,
-    0.24
+    0.88,
+    0.78,
+    0.5
+   ],
+   "sty": "plank",
+   "windows": true,
+   "h": 3.2,
+   "rh": 3.6,
+   "roof": [
+    0.38,
+    0.38,
+    0.4
+   ],
+   "roofSty": "tiles",
+   "pitched": true,
+   "hip": false,
+   "ridge": "across"
+  },
+  "c2982": {
+   "wall": [
+    0.86,
+    0.89,
+    0.84
+   ],
+   "sty": "plank",
+   "windows": true,
+   "pitched": true,
+   "hip": false,
+   "h": 3.4,
+   "rh": 3.6,
+   "roof": [
+    0.16,
+    0.32,
+    0.22
+   ],
+   "roofSty": "sheet"
+  },
+  "c2984": {
+   "wall": [
+    0.2,
+    0.21,
+    0.22
    ],
    "sty": "plank",
    "windows": true,
    "pitched": true,
    "hip": false,
    "h": 3.2,
-   "rh": 3.6
-  },
-  "c2982": {
-   "wall": [
-    0.8,
-    0.75,
-    0.63
+   "rh": 3.8,
+   "roof": [
+    0.17,
+    0.19,
+    0.23
    ],
-   "sty": "silicate",
-   "windows": true,
-   "pitched": false,
-   "h": 13.5,
-   "balcony": true
-  },
-  "c2984": {
-   "wall": [
-    0.8,
-    0.75,
-    0.63
-   ],
-   "sty": "silicate",
-   "windows": true,
-   "pitched": false,
-   "h": 13.5,
-   "balcony": true
+   "roofSty": "tiles",
+   "ridge": "street"
   },
   "c3059": {
    "wall": [
-    0.8,
-    0.75,
-    0.63
+    0.5,
+    0.55,
+    0.6
    ],
-   "sty": "silicate",
+   "sty": "plank",
    "windows": true,
-   "pitched": false,
-   "h": 13.5,
-   "balcony": true
+   "pitched": true,
+   "hip": true,
+   "h": 3.0,
+   "rh": 2.6,
+   "roof": [
+    0.2,
+    0.22,
+    0.26
+   ],
+   "roofSty": "tiles"
   },
   "c3060": {
    "wall": [
-    0.8,
-    0.75,
-    0.63
+    0.3,
+    0.62,
+    0.52
    ],
-   "sty": "silicate",
+   "sty": "plank",
    "windows": true,
-   "pitched": false,
-   "h": 13.5,
-   "balcony": true
+   "pitched": true,
+   "hip": false,
+   "h": 3.1,
+   "rh": 3.2,
+   "roof": [
+    0.34,
+    0.2,
+    0.17
+   ],
+   "roofSty": "tiles",
+   "ridge": "street"
   },
   "c3062": {
    "wall": [
-    0.8,
-    0.75,
-    0.63
+    0.92,
+    0.86,
+    0.68
    ],
    "sty": "silicate",
    "windows": true,
-   "pitched": false,
-   "h": 13.5,
-   "balcony": true
+   "pitched": true,
+   "hip": false,
+   "h": 4.2,
+   "rh": 3.6,
+   "roof": [
+    0.52,
+    0.52,
+    0.5
+   ],
+   "roofSty": "asbestos",
+   "ridge": "across"
   },
   "c3380": {
    "wall": [
@@ -342,39 +404,59 @@
   },
   "c7745": {
    "wall": [
-    0.8,
-    0.75,
-    0.63
+    0.6,
+    0.58,
+    0.54
    ],
-   "sty": "silicate",
-   "windows": true,
-   "pitched": false,
-   "h": 13.5,
-   "balcony": true
+   "sty": "plaster",
+   "windows": false,
+   "pitched": true,
+   "hip": false,
+   "h": 2.6,
+   "rh": 1.6,
+   "roof": [
+    0.45,
+    0.45,
+    0.45
+   ]
   },
   "c5176": {
    "wall": [
-    0.8,
-    0.75,
-    0.63
+    0.6,
+    0.62,
+    0.62
    ],
-   "sty": "silicate",
-   "windows": true,
-   "pitched": false,
-   "h": 13.5,
-   "balcony": true
+   "sty": "sheet",
+   "windows": false,
+   "pitched": true,
+   "hip": false,
+   "h": 3.5,
+   "rh": 2.0,
+   "roof": [
+    0.5,
+    0.58,
+    0.65
+   ],
+   "roofSty": "sheet"
   },
   "c5181": {
    "wall": [
-    0.8,
-    0.75,
-    0.63
+    0.6,
+    0.62,
+    0.62
    ],
-   "sty": "silicate",
-   "windows": true,
-   "pitched": false,
-   "h": 13.5,
-   "balcony": true
+   "sty": "sheet",
+   "windows": false,
+   "pitched": true,
+   "hip": false,
+   "h": 3.5,
+   "rh": 2.0,
+   "roof": [
+    0.5,
+    0.58,
+    0.65
+   ],
+   "roofSty": "sheet"
   },
   "c3120": {
    "wall": [
@@ -382,11 +464,17 @@
     0.75,
     0.63
    ],
-   "sty": "silicate",
+   "sty": "plaster",
    "windows": true,
-   "pitched": false,
-   "h": 13.5,
-   "balcony": true
+   "pitched": true,
+   "hip": false,
+   "h": 3.2,
+   "rh": 3.0,
+   "roof": [
+    0.45,
+    0.22,
+    0.18
+   ]
   },
   "c3436": {
    "wall": [
@@ -409,6 +497,78 @@
    "windows": false,
    "pitched": false,
    "h": 5.5
+  },
+  "c2709": {
+   "wall": [
+    0.9,
+    0.88,
+    0.82
+   ],
+   "sty": "plaster",
+   "windows": true,
+   "pitched": true,
+   "hip": true,
+   "h": 3.4,
+   "rh": 1.9,
+   "roof": [
+    0.2,
+    0.21,
+    0.23
+   ],
+   "roofSty": "tiles",
+   "dormer": false,
+   "wall2": [
+    0.25,
+    0.27,
+    0.3
+   ],
+   "band": 2.6
+  },
+  "c2707": {
+   "wall": [
+    0.9,
+    0.89,
+    0.86
+   ],
+   "sty": "plank",
+   "windows": true,
+   "h": 5.0,
+   "roof": [
+    0.18,
+    0.19,
+    0.21
+   ],
+   "roofSty": "tiles",
+   "wall2": [
+    0.29,
+    0.31,
+    0.33
+   ],
+   "band": 2.7,
+   "pitched": true,
+   "hip": false,
+   "ridge": "street",
+   "rh": 3.4
+  },
+  "c2711": {
+   "wall": [
+    0.9,
+    0.76,
+    0.56
+   ],
+   "sty": "plaster",
+   "windows": true
+  },
+  "c2959": {
+   "wall": [
+    0.88,
+    0.82,
+    0.68
+   ],
+   "sty": "plaster",
+   "windows": true,
+   "pitched": false,
+   "h": 9.0
   }
  },
  "props": [
@@ -808,19 +968,6 @@
    "fg": "#151515"
   },
   {
-   "text": "POLICIJA",
-   "ll": [
-    55.3818636,
-    23.1184639
-   ],
-   "hd": 134,
-   "w": 2.6,
-   "h": 0.55,
-   "y": 5.6,
-   "bg": "#0d3c8c",
-   "fg": "#ffffff"
-  },
-  {
    "text": "JOSEDA",
    "ll": [
     55.380399,
@@ -901,10 +1048,12 @@
      23.1207957
     ]
    ],
-   "h": 1.5
+   "h": 1.5,
+   "dense": true,
+   "col": "#4a4a30"
   },
   {
-   "style": "picket",
+   "style": "hedge",
    "ll": [
     [
      55.3826885,
@@ -938,55 +1087,12 @@
      55.3828347,
      23.1212787
     ]
-   ]
+   ],
+   "h": 1.4,
+   "col": "#34432e"
   },
   {
-   "style": "mesh",
-   "ll": [
-    [
-     55.3829275,
-     23.1214771
-    ],
-    [
-     55.3829508,
-     23.1215255
-    ],
-    [
-     55.3829742,
-     23.1215738
-    ],
-    [
-     55.3829975,
-     23.1216221
-    ],
-    [
-     55.3830208,
-     23.1216705
-    ],
-    [
-     55.3830442,
-     23.1217188
-    ],
-    [
-     55.3830675,
-     23.1217672
-    ],
-    [
-     55.3830908,
-     23.1218155
-    ],
-    [
-     55.3831142,
-     23.1218638
-    ],
-    [
-     55.3831258,
-     23.121888
-    ]
-   ]
-  },
-  {
-   "style": "picket",
+   "style": "hedge",
    "ll": [
     [
      55.3831958,
@@ -1020,7 +1126,9 @@
      55.3833591,
      23.1223714
     ]
-   ]
+   ],
+   "h": 1.2,
+   "col": "#6a5c48"
   },
   {
    "style": "hedge",
@@ -1086,7 +1194,8 @@
      23.123089
     ]
    ],
-   "h": 1.4
+   "h": 1.4,
+   "col": "#6a5c48"
   },
   {
    "style": "hedge",
@@ -1096,42 +1205,43 @@
      23.1237758
     ],
     [
-     55.3841905,
-     23.1238116
+     55.3842143,
+     23.1238401
     ],
     [
-     55.3842203,
-     23.1238473
+     55.3842681,
+     23.1239045
+    ]
+   ],
+   "h": 1.8,
+   "dense": true,
+   "col": "#2c4a32"
+  },
+  {
+   "style": "wall",
+   "ll": [
+    [
+     55.3842681,
+     23.1239045
     ],
     [
-     55.3842502,
-     23.1238831
-    ],
-    [
-     55.38428,
-     23.1239188
-    ],
-    [
-     55.3843099,
-     23.1239546
-    ],
-    [
-     55.3843397,
-     23.1239903
-    ],
-    [
-     55.3843696,
-     23.1240261
+     55.3843337,
+     23.1239831
     ],
     [
      55.3843994,
      23.1240618
+    ],
+    [
+     55.384498,
+     23.1241666
     ]
    ],
-   "h": 1.7
+   "h": 1.5,
+   "col": "#44484e"
   },
   {
-   "style": "mesh",
+   "style": "panel",
    "ll": [
     [
      55.384498,
@@ -1162,10 +1272,11 @@
      23.1243306
     ]
    ],
-   "col": "#dfe3e1"
+   "h": 1.5,
+   "col": "#9a978f"
   },
   {
-   "style": "picket",
+   "style": "panel",
    "ll": [
     [
      55.3847054,
@@ -1191,10 +1302,12 @@
      55.384849,
      23.1244947
     ]
-   ]
+   ],
+   "h": 1.6,
+   "col": "#9a978f"
   },
   {
-   "style": "hedge",
+   "style": "mesh",
    "ll": [
     [
      55.3848809,
@@ -1217,7 +1330,40 @@
      23.1246438
     ]
    ],
-   "h": 1.5
+   "h": 1.6,
+   "col": "#2b2b2d"
+  },
+  {
+   "style": "hedge",
+   "ll": [
+    [
+     55.3827806,
+     23.121435
+    ],
+    [
+     55.382758,
+     23.1214713
+    ]
+   ],
+   "h": 1.6,
+   "dense": true,
+   "col": "#33442c"
+  },
+  {
+   "style": "hedge",
+   "ll": [
+    [
+     55.3828374,
+     23.1213482
+    ],
+    [
+     55.3828076,
+     23.1213939
+    ]
+   ],
+   "h": 1.6,
+   "dense": true,
+   "col": "#33442c"
   }
  ],
  "parking": [

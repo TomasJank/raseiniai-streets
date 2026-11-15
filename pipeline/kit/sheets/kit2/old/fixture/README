@@ -1,0 +1,3 @@
+Fixture for work/test_kit.mjs `oldDescriptionsUnchanged`: the 25 kit descriptions that existed when kit 2 started (2026-11-15,
+before any kit-2 key), frozen, and the street looks they need (only that each id has one). fixture.sh builds the same base page
+with the old kit (../kit.js, ../add_kit.py) and with the live kit from these files; the test compares the two triangle by triangle.

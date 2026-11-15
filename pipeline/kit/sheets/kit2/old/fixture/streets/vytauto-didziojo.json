@@ -1,0 +1,24 @@
+{
+ "street": "Vytauto Did\u017eiojo g.",
+ "looks": {
+  "c3451": {
+   "wall": [
+    0.88,
+    0.87,
+    0.83
+   ],
+   "roof": [
+    0.28,
+    0.29,
+    0.3
+   ],
+   "sty": "wood",
+   "windows": true,
+   "pitched": true,
+   "hip": false,
+   "h": 3.4,
+   "rh": 3,
+   "ridge": "across"
+  }
+ }
+}

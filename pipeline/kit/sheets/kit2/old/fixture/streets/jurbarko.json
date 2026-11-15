@@ -1,0 +1,101 @@
+{
+ "street": "Jurbarko g.",
+ "looks": {
+  "c1298": {
+   "wall": [
+    0.89,
+    0.82,
+    0.5
+   ],
+   "roof": [
+    0.27,
+    0.28,
+    0.3
+   ],
+   "sty": "plaster",
+   "windows": true,
+   "pitched": true,
+   "hip": false,
+   "h": 5.4,
+   "rh": 3.9,
+   "roofSty": "asbestos",
+   "ridge": "street",
+   "chimney": false,
+   "dormer": false
+  },
+  "c1302": {
+   "wall": [
+    0.86,
+    0.78,
+    0.6
+   ],
+   "roof": [
+    0.6,
+    0.17,
+    0.14
+   ],
+   "sty": "silicate",
+   "windows": true,
+   "pitched": true,
+   "h": 4.6,
+   "hip": false,
+   "rh": 3.4,
+   "roofSty": "sheet",
+   "ridge": "street",
+   "chimney": true,
+   "dormer": false
+  },
+  "c1401": {
+   "wall": [
+    0.93,
+    0.87,
+    0.64
+   ],
+   "sty": "plaster",
+   "windows": true,
+   "pitched": true,
+   "hip": false,
+   "h": 5.3,
+   "rh": 3.2
+  },
+  "c1274": {
+   "wall": [
+    0.84,
+    0.74,
+    0.5
+   ],
+   "sty": "brick",
+   "windows": true,
+   "pitched": true,
+   "hip": false,
+   "h": 5.1,
+   "rh": 3.5
+  },
+  "c1484": {
+   "wall": [
+    0.89,
+    0.83,
+    0.69
+   ],
+   "sty": "plaster",
+   "windows": true,
+   "pitched": true,
+   "hip": false,
+   "h": 4.7,
+   "rh": 3.3
+  },
+  "c1629": {
+   "wall": [
+    0.93,
+    0.86,
+    0.62
+   ],
+   "sty": "silicate",
+   "windows": true,
+   "pitched": true,
+   "hip": false,
+   "h": 4.6,
+   "rh": 3.2
+  }
+ }
+}

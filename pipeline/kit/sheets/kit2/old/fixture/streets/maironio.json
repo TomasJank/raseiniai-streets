@@ -1,0 +1,104 @@
+{
+ "street": "Maironio g.",
+ "looks": {
+  "c2713": {
+   "wall": [
+    0.93,
+    0.89,
+    0.76
+   ],
+   "sty": "plank",
+   "windows": true,
+   "pitched": true,
+   "hip": false,
+   "h": 3.6,
+   "rh": 3.9,
+   "roof": [
+    0.36,
+    0.22,
+    0.2
+   ],
+   "roofSty": "asbestos",
+   "ridge": "across"
+  },
+  "c2962": {
+   "wall": [
+    0.88,
+    0.78,
+    0.5
+   ],
+   "sty": "plank",
+   "windows": true,
+   "h": 3.2,
+   "rh": 3.6,
+   "roof": [
+    0.38,
+    0.38,
+    0.4
+   ],
+   "roofSty": "tiles",
+   "pitched": true,
+   "hip": false,
+   "ridge": "across"
+  },
+  "c3062": {
+   "wall": [
+    0.92,
+    0.86,
+    0.68
+   ],
+   "sty": "silicate",
+   "windows": true,
+   "pitched": true,
+   "hip": false,
+   "h": 4.2,
+   "rh": 3.6,
+   "roof": [
+    0.52,
+    0.52,
+    0.5
+   ],
+   "roofSty": "asbestos",
+   "ridge": "across"
+  },
+  "c3060": {
+   "wall": [
+    0.3,
+    0.62,
+    0.52
+   ],
+   "sty": "plank",
+   "windows": true,
+   "pitched": true,
+   "hip": false,
+   "h": 3.1,
+   "rh": 3.2,
+   "roof": [
+    0.34,
+    0.2,
+    0.17
+   ],
+   "roofSty": "tiles",
+   "ridge": "street"
+  },
+  "c3059": {
+   "wall": [
+    0.5,
+    0.55,
+    0.6
+   ],
+   "sty": "plank",
+   "windows": true,
+   "pitched": true,
+   "hip": true,
+   "h": 3.0,
+   "rh": 2.6,
+   "roof": [
+    0.2,
+    0.22,
+    0.26
+   ],
+   "roofSty": "tiles"
+  }
+ }
+}

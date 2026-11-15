@@ -64,7 +64,7 @@ Unknown keys anywhere are errors. `street`, `slug` and `views` are required, eve
 | `looks` | building restyles keyed by id. Only ids `street_ids.py` prints for your street, never one marked `*`, never one another street file has. Keys: `wall`, `roof` `[r,g,b]` 0..1; `sty` one of `plaster old shop block brick wood industrial glass tiles sheet flat none` (facade texture, `none` = plain); `windows` true/false; `pitched`, `hip` true/false (pitched roof only works on 4-corner outlines); `h` wall height m 2.2..80; `rh` roof rise m 0..12. Anything left out keeps the game's own guess. More per-building keys (two-tone walls, per-face windows, balcony/chimney/dormer, roof material, ridge direction) are in "Facade keys" below. |
 | `props` | street furniture, see the catalogue. `k` and `ll` required; `hd` default 0; `s` default the kind's size; `col` `"#rrggbb"`, default the kind's colour; `solid` default true; `knock` default false. |
 | `signs` | flat panels with text, at most 10 per street. `text` 1-40 chars, `ll`, `hd` required; `w` 2.4, `h` 0.6, `y` (height of the centre above ground) 3.2, `bg` `#1f5fae`, `fg` `#fff` by default. Front face only, so put wall signs ~0.1 m in front of the wall, facing out. A free-standing sign needs a `post` prop under it. |
-| `fences` | a polyline `ll` of 2+ points. `style`: `picket` (pickets and rails, 1.1 m), `mesh` (see-through panel with posts every 2.5 m, 1.5 m), `hedge` (0.7 m thick, 1.3 m), `wall` (0.25 m, 1.6 m); `h` overrides the height, 0.2..4. Solid for cars and people. Also `panel` (concrete panel, 1.8 m, grey plinth and posts), `slat` (dark wooden slats, 1.7 m); `col` `"#rrggbb"` recolours the fence; `dense: true` (hedge only) makes it a thick two-layer hedge. |
+| `fences` | a polyline `ll` of 2+ points. It replaces the generated garden fence or hedge on its stretch (see "House kit keys", "Fences"). `style`: `picket` (pickets and rails, 1.1 m), `mesh` (see-through panel with posts every 2.5 m, 1.5 m), `hedge` (0.7 m thick, 1.3 m), `wall` (0.25 m, 1.6 m); `h` overrides the height, 0.2..4. Solid for cars and people. Also `panel` (concrete panel, 1.8 m, grey plinth and posts), `slat` (dark wooden slats, 1.7 m); `col` `"#rrggbb"` recolours the fence; `dense: true` (hedge only) makes it a thick two-layer hedge. |
 | `parking` | a row of parked cars from `ll[0]` to `ll[1]` (the row's centre line). `side` 0 = parallel, cars along the line; 1 / -1 = bays, noses to the right / left of the `ll[0]`→`ll[1]` direction. `every` metres per car (default 6 parallel, 2.6 bays), `fill` share of slots taken (default 0.6). Cars come from the game's own parked-car fleet and are solid. |
 | `places` | named points that join the game's place labels (floating name, minimap, taxi/errand targets, ped destinations). `kind`: `shop cafe bank pharmacy school church monument bus_stop`. Skipped when a label of the same name is already within 60 m. Real places only. |
 | `views` | exactly the two reference shots for the test: camera 2.2 m above `ll`, looking 30 m ahead towards `hd`. Put them on your street (pavement or verge); the test checks the game resolves both to your street name. |
@@ -192,7 +192,7 @@ as `0` when the real upper floor has no windows on that wall.
 |---|---|---|
 | `front` | edge index | only when the auto front (`--sides`) is not the wall on the street |
 | `win` | `{side: [row0, row1, ...]}`, a row is a count (evenly spaced) or a list of `at` fractions | count the windows of each storey on each wall you can see. On a gable end (the triangle wall of a gable roof) the row after the last wall row is the attic, and one more is a small loft window near the apex: `[2, 1]` on a one-storey gable = two below, one in the gable. A wall listed here loses all its automatic windows; walls you do not list keep them. `[0]` = a blank wall |
-| `winShape` | `normal` `wide` `narrow` | wide = triple / picture windows, narrow = tall slim ones; one value for the whole house |
+| `winShape` | `normal` `wide` `narrow`, or `{side: shape}` | wide = triple / picture windows, narrow = tall slim ones; one value for the whole house, or one per wall (walls not named stay `normal`) |
 | `frame` | `[r,g,b]` | window frame colour of the `win` windows (white PVC is the default; brown wood ~`[0.4,0.27,0.18]`) |
 | `door` | object or list: `side`, `at` (number or list, default 0.5), `type` `single double glass garage`, `col`, `steps` true/false, `porch` `none canopy closed` | a door you can see. `canopy` = a small roof over it, `closed` = an enclosed entrance porch (small box with a gable roof, door on its front). A ground-floor window closer than ~0.75 m to a door is dropped |
 | `gable` | `[r,g,b]` | colour of both gable triangles when it differs from the wall (boarded or painted gables) |
@@ -203,9 +203,29 @@ as `0` when the real upper floor has no windows on that wall.
 | `balc` | object or list: `side`, `at`, `w` (share of the wall, 0.35), `floor` (1 = first upper floor; default the attic floor on a gable end, else 1), `col` (railing) | a balcony: slab, railing as a panel |
 | `chim` | count 1..4 or list of fractions along the ridge | chimneys on the ridge, measured from the ridge end nearest the front wall's left corner (from the street end on a gable-front house, from the left on an eaves-front one). Replaces the automatic chimney |
 | `dorm` | object or list: `side` (the wall under that roof slope), `n` (count, or windows of a shed dormer), `type` `gable shed` | dormers. Only on an eaves wall (not a gable end). `shed` = one wide box dormer with `n` windows. Replaces the automatic dormers |
+| `xg` | object or list: `side` (an eaves wall), `at` (centre, 0.5), `w` (metres wide 1..16, default 40 % of the wall up to 4), `d` (metres its wall stands proud of the main wall 0..12, 0), `rise` (its ridge height over the eaves as a share of the main roof's 0.3..1, 1), `wall`, `gable`, `roofCol`, `win` (rows on its front, like `win`: storeys, then attic, then loft) | a **cross gable**: a gabled bay, wall dormer or wing whose ridge runs at right angles to the main ridge. Read it from a photo of the eaves side: where along the wall its gable sits (`at`), how wide its gable is at the eaves (`w`), whether its wall is flush (`d` 0: a wall dormer or flush gable) or comes forward (`d` = metres; a long `d` is the arm of an L or T plan), and whether its ridge reaches the main ridge (`rise` 1) or stops below it (0.8 = a little below). It takes the main roof's material and colour (`roofCol` overrides), `gable`/`gableSty`, and the wall colour (`wall` overrides). A house with an `xg` loses its main eaves overhang, as the game's own wings do |
+| `wings` | list, one entry per rectangle the game draws the outline as (`--sides` prints them as "wing 0, wing 1, ..."), `null` = leave that one: `ridge` `street`/`across`, `rh` (rise 0.5..8), `h` (wall height 2.2..30), `roof` `gable hip flat` | **L, T and stepped houses** with 8 or more corners: the game splits such an outline into rectangles, each with its own roof, which often gives a row of gables to the street where the real house has one long roof, or the wrong part tall. Set each wing's ridge along or across the street, and its height. Example: a 1.5-storey house whose street front is three wings: `[{"ridge":"street"},{"ridge":"street","rh":2.6},{"ridge":"street"}]` |
+| `noTree` | `true` (the plot between the front wall and the road), a side (the plot in front of that wall), or metres 0.5..30 (that far round the house) | a generated tree stands where the photo shows none: its crown and its collision go. Only generated trees (LiDAR list and trees2), not street-file props |
+| `noFence` | `true` or a side | the photo shows no fence or hedge in front of that wall: the generated garden boundary there goes (drawing and collision). A fence the street file describes needs no key: see "Fences" below |
+| `roof2` | object or list: `at` `[from, to]` (fractions along the ridge, measured like `chim`), `side` `front back both` (slope over the front wall, the other, or both), `col`, `sty` `tiles sheet flat corrugated asbestos` | a stretch of the main roof re-covered in another material or colour (new metal over half an old asbestos roof). Four-corner gable roofs only |
+| `walls` | `{side: {col, sty}}`, `sty` as `gableSty` | one wall (and its gable triangle) in another colour or material: an old boarded gable end on a sided house |
+| `shut` | `[r,g,b]` | shutters on both sides of every storey window the house's `win` rows draw (cross gable windows too) |
 
-Gable windows, `chim` and `dorm` need a four-corner pitched roof (`pitched`); the rest works on any outline. Buildings the game
-builds from several rectangles (complex outlines with wings) are skipped with a console warning: describe only single-outline houses.
+Gable windows, `chim`, `dorm`, `xg` and `roof2` need a pitched roof on four corners. On outlines with 8 or more corners that the
+game draws as several rectangles, `win`, `door`, `plinth`, `chim`, `gable`, `gableSty`, `frame`, `ext`, `balc`, `walls`, `xg`, `dorm`
+and gable rows work on the walls you name: windows and doors go on the rectangle wall drawn over each part of the OSM edge, and gable
+rows, dormers and cross gables use the roof of the rectangle that wall belongs to. `chim` and `roof2` use the largest rectangle's
+ridge. The plinth follows the OSM outline, so where a rectangle's wall stands a few centimetres outside it, the plinth is hidden on
+that stretch. Hip roofs have no gable rows. On outlines of 5 to 7 corners the kit behaves as before kit 2 (largest rectangle only).
+
+### Fences
+
+Where a street file's `fences` entry runs along a generated garden boundary (the town's picket, mesh or hedge in front of nearly every
+house), the generated one goes on that stretch: every generated segment with both ends within 1.5 m of the described line and running
+the same way is removed from the drawing, from props2's hedge rows and from collision. No key is needed; put the described fence where
+the photo has it. For a plot whose photo shows **no** fence, give the house `"noFence": true` (or a side) in its kit file. A described
+`hedge` with `col` now takes that colour (props2's hedge models are bright green by themselves). There is no close-board fence style:
+a new style name would have to be added to `add_streets.py`'s `FENCES`, which the kit does not own.
 
 ### Check it
 
@@ -221,5 +241,14 @@ lands on the wall it names.
 - Giving gable rows to an eaves wall (warning "row 2 of edge 1 has no wall"): look at which walls the ridge runs between.
 - `dorm` on a gable end (warning "has no roof slope over it").
 - Using the facades2 `faces` key and `win` on the same wall: `win` wins; you do not need both.
-- What cannot be said yet: the roof direction itself (that is the street look's `ridge`), window size per wall, shutters, a
-  door on an extension, columns, solar panels, aerials.
+- `xg` on a gable end (warning "xg: edge 0 is a gable end; a cross gable needs an eaves wall"): a cross gable sits on an **eaves**
+  wall, the one the roof slopes down to. With `wings`, it is the wing's own ridge that decides (`ridge` across makes the street wall a
+  gable end). On outlines the game splits into rectangles, any rectangle with an eaves wall there will do.
+- A wing that is narrow cannot rise as high as you ask: the game caps a roof's rise at 0.7 x its span, so `rh` 1.8 on a 1.8 m wing
+  gives 1.26 m. A low wing behind or beside the main block may not be seen from the street at all; check it square-on first. `--sides` names walls by the nearest street; on a corner house the eaves side may be `left` or `right`.
+- A cross gable seen at the very end of a wall is often just the main gable end seen at an angle: check the photo of the eaves side.
+- `wings` counted in the wrong order: use the wing numbers `--sides` prints, not the order you see them in the photo.
+- `wings` on a house of 4 corners: its roof is the street look's `ridge`, `rh` and `hip`.
+- What cannot be said yet: the roof direction of a four-corner house (that is the street look's `ridge`), a door on an extension,
+  columns, solar panels, aerials, a glazed veranda that keeps its frame colour, a windowless clad shop box with a glazed corner,
+  a close-board fence.

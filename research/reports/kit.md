@@ -82,3 +82,113 @@ pages of this size never finish loading in one software-rendered browser) and wi
   aerials, satellite dishes, house numbers.
 - Doors and steps are panels on the wall, not openings; extensions and porches are not solid for cars and people.
 - Gable rows need a four-corner gable roof on the largest part; on hip roofs and skeleton roofs only wall rows work.
+
+# kit 2: shape (2026-11-15)
+
+Status: in `pipeline/kit.js` / `pipeline/add_kit.py` (replaced in one go after the checks below; the pre-kit-2 copies are kept in
+`pipeline/kit/sheets/kit2/old/` for "before" builds). Scripts and sheets: `pipeline/kit/sheets/kit2/`
+(`build_with.sh` = build.sh's chain with the kit step swapped or left out, `probe.mjs`, `sqviews.py`, `mont.py`, `same4.py`,
+`views.json` + `photos/` = the proof cameras and frames).
+
+## Keys added
+| key | value | what it draws |
+|---|---|---|
+| `xg` | `side at w d rise wall gable roofCol win` | cross gable: a gabled box on an eaves wall, ridge at right angles, buried in the main roof where its ridge meets the slope; flush (`d` 0, drawn 0.12 m proud so the planes never coincide), a bay, or an L/T arm (long `d`); its gable takes `gable`/`gableSty`, its roof the main roof's material; `win` rows on its front (storeys, attic, loft). The main roof loses its eaves overhang, as facades2 already does for wings |
+| `wings` | per rectangle: `ridge street/across`, `rh`, `h`, `roof gable/hip/flat` | the roof of each rectangle the game splits an 8+ corner outline into (`--sides` lists them) |
+| `noTree` | `true`, a side, or metres | generated trees (LiDAR list + trees2) in the plot front / within r m are never planted: no crown, no trunk collision |
+| `noFence` | `true` or a side | the generated garden boundary in that plot front goes (drawing, props2 hedge pieces, collision) |
+| `roof2` | `at [from,to] side col sty` | a panel 4 cm over part of a gable roof in another colour/material |
+| `walls` | `{side: {col, sty}}` | one wall and its gable triangle in another colour/texture |
+| `shut` | colour | shutters beside every storey window the kit draws |
+| `winShape` | now also `{side: shape}` | window size per wall |
+
+Fences without a key: a street file's `fences` polyline removes every generated garden segment (the 5-value `hedgeSegs`) with both
+ends within 1.5 m of it and parallel (|cos| > 0.9): out of `hedgeSegs` (so out of collision, dogs and foxes), out of `P2.yh`
+(props2's hedge rows) and out of the merged double-sided fence meshes (vertical triangles and hedge tops on the segment). This runs
+at the start of `buildExtra`, which the town calls inside `buildWorld` once `world` is set and before walls and hedge rows are made.
+A described `hedge` with `col` tints its props2 pieces to that colour. On today's streets 47 generated segments go.
+
+## Why 8+ corner outlines "were refused", and what was wrong
+Nothing in the code refused them: `add_kit.py` had a check on `tags.parts`, but `street_ids.Town` reads only the OSM tag table, which
+never holds the parts (`rasData.lp`), so the check never fired; the README said such houses were skipped, and the describing agents
+believed it. What really happened on such houses: the game draws the outline as 2-3 LiDAR rectangles (`lp`) whose walls stand up to
+0.25 m in or out of the OSM edges, while the kit masked automatic windows only within 5 cm of the OSM line and put its own 3 cm in
+front of it. So on c2464/c2466 most walls kept their automatic windows and the kit's windows were hidden inside or floated in front;
+gable rows, dormers and chimneys only knew the largest rectangle. Now (outlines with 8+ corners and 2+ rectangles only, so older
+descriptions draw exactly as before): every rectangle wall on an OSM edge (parallel, within 0.6 m, overlapping) is masked, windows,
+shutters and doors go 3 cm in front of the rectangle wall at their own position, `ext`/`balc` on the nearest rectangle wall, gable
+rows/`dorm`/`xg` use the roof of the rectangle the wall belongs to. Still not on such houses: the plinth follows the OSM outline
+(changing it would have changed c2027's existing plinth), so it is hidden where a rectangle wall stands outside; `chim` and `roof2`
+use the largest rectangle; 5-7 corner outlines behave as before (two existing descriptions, c1629 and c2337, depend on that).
+
+## Proof houses (Vilniaus g., `pipeline/kit/looks/vilniaus.json`)
+| id | keys | against the photo |
+|---|---|---|
+| c2462 | `xg` left (the eaves wall to Vilniaus g.) at 0.25, 3.8 m, flush, rise 0.9, windows [1,1]; `noTree: true` | the flush cross gable with attic window at the NW end of the street wall now stands where frame 2429974844115834 has it; the three generated trees on the lawn to Bažnyčios g. are gone (the 2026-05 photo shows lilacs, no trees). Ground-floor window count under the gable is a guess. In frame 859445 the stored box frames the neighbour (camera 10-30 m off); c2462 is the grey house at its right edge, whose street-side gable is this cross gable |
+| c2464 | `wings` all three along the street, the NW one lower (rh 2.6) | was three gables to the street with the middle one tallest; now one stepped roof along the street with its tall gable at the SE end, as the photo from the SE shows. The real roof is one continuous slope; the rectangles still step a little |
+| c2465 | `roof2` NW half both slopes dark blue sheet | the photo's new blue-metal half over the old asbestos: reads right from the street. The NW half's brown boarded wall is not sayable (walls are per side, not per half) |
+| c2466 | `wings` SE two rectangles 2 storeys (h 5.4, rh 3), NW one as it was, all ridges along the street | was three gables to the street; now a tall part at the SE end with its gable to the SE and a lower long roof to the NW, as in frames 1178399790939227 / 939227. Its upper storey is the street look's grey `wall2`, the photo's is cream (base look, not mine) |
+The describing agent's c2465 "cross gable" is not in its frames as far as I can see (the yellow gable is the house's own end); none added.
+
+## Numbers (final build, 29 described houses on today's streets, test with 40)
+- Triangles: 42 per described house on average in the test (40 houses; 1,691 added, kit mesh 1,004); a cross gable is 18 building
+  triangles + 2 per window, `wings` changes triangles but adds none, `roof2` 2 per slope, shutters 4 per window.
+- Draw calls: kit adds exactly one mesh (the kit mesh, no shadow, static matrix), as before; fence and tree removal only remove.
+  `test_perf.mjs` start view 610 calls / 5.03 M triangles (budget 620 / 5.4).
+- Page: kit step adds 35,791 B (was 18,199): +17.6 KB code; data 2,377 B for 29 houses (old kit on the same files 1,992 B):
+  the four proof houses' new keys are 385 B, about 96 B per house.
+
+## Proof sheets
+`pipeline/kit/sheets/kit2/same_angle_<id>.jpg` (photo | v70 | before kit 2 = live chain with the old kit | kit 2, same camera and box)
+and `square_<id>.jpg` (square-on and 45-degree views of the changed walls, before kit 2 | kit 2). Mapillary camera positions are
+10-30 m off, so the same-angle views of c2462 show the house from the Bažnyčios g. corner rather than from the photo's spot.
+
+## Tests (final build = build.sh, 29 described houses)
+- `work/test_kit.mjs fin.html base.html fin2.html old.html`: all PASS: two builds byte-identical; 8,277 houses without keys
+  unchanged; every one of the 25 descriptions valid before kit 2 has the same building and kit triangles as with the old kit
+  (hash per house; the 4 proof houses with new keys excluded); invalid values of every key (old and new) ignored with one warning;
+  each key on the wall it names, from the geometry (cross gable drawn on the eaves wall at `at` with its windows 3 cm in front and
+  refused on the gable end; wing ridges along the asked direction at the asked rise; flat wing flat; `walls` colour and texture;
+  `roof2` panels; shutters; per-wall window width; no tree left in a `noTree` zone, no garden segment in a `noFence` zone; win,
+  door, plinth, chim, gable, frame on c2466, 8 corners); fences (47 generated segments cut on today's streets, none left within
+  1.5 m of a described fence, none of them in props2's hedge rows, none drawn, none in collision, the 13,517 others kept with walls);
+  described hedge colour reaches its pieces; cost.
+- The cost check no longer compares one render's draw calls (that varied by ~50 with traffic and perf2's cull tick): kit must add
+  exactly one mesh to the scene, under 150 triangles per described house, without shadow, static.
+- `test_perf.mjs` ALL PASS (start 610 calls / 5.03 M tris with kit 2, 605 / 5.03 with the old kit, same chain);
+  `test_streets.mjs` no failure, no errors, all 14 streets; `test_solid.mjs` all passed.
+- Pages are opened one at a time on Metal; `pipeline/kit/sheets/kit2/build_with.sh out.html old|kit|none` builds the chain with
+  the old kit, the live one or none.
+
+## Not done
+- Close-board fence: `fences` styles are checked by `add_streets.py` (`FENCES`), not mine; a new style name needs a line there.
+  (The street-side drawing would be a few lines in `fence2`.)
+- Glazed veranda keeping its frame colour (c2022) and the windowless clad shop box with a glazed corner (c7170, c2908): the first
+  needs the frame tint in the building material's shader (extensions are building-mesh, not kit-mesh), the second a new facade
+  style; neither fits in a few lines.
+- Plinth on 8+ corner houses still follows the OSM line (see above). `wings` cannot merge rectangles: a real single roof over
+  three rectangles is drawn as three stepped roofs (c2464).
+- c2465's brown boarded NW half (wall material per half wall); c2466's cream upper storey (base look `wall2`).
+
+## kit 2, second round (after the street passes)
+- `partsOnTheRightWall` miscounted windows on outlines the game splits into rectangles (c2027 "want 8 got 5"): it measured against
+  the OSM line. It now finds the wall triangle actually drawn behind each window or door (3 / 4.5 cm behind it, facing the same way)
+  and counts storey windows on styled walls, attic windows on gable triangles; a part with no wall behind it is "floating" (fail).
+- `oldDescriptionsUnchanged` compared live descriptions, which street agents had since changed. It now compares the old kit with the
+  live kit on a frozen fixture: `pipeline/kit/sheets/kit2/old/fixture/` (the 25 descriptions that existed when kit 2 started, and the
+  street-look ids they need; `add_kit.py --streets` reads those), built by `old/fixture.sh base.html old.html new.html`.
+- Kit fault found while restoring c2923 (12 edges): a `win` row of `[0]` on a short OSM edge did not blank it, because the rectangle
+  wall drawn over that edge runs past it and its triangles' centres lie elsewhere. On 8+ corner outlines a wall triangle is now masked
+  when it overlaps the edge by 0.3 m (before: when its centre lay on it). No live description changed by it (whole-mesh hash of the live
+  descriptions, old kit vs new, identical).
+- `xg` drawing nothing: c3451's bay was on the street wall while its look's `ridge` was `across`, so the wall was a gable end and the kit
+  refused it with "has no roof slope over it" (in the console, not silent, but unclear). The message now says "is a gable end; a cross
+  gable needs an eaves wall". Also, on outlines of 5-7 corners split into rectangles an `xg` only looked at the largest rectangle; it now
+  takes any rectangle with an eaves wall on that edge. c3519's hip `wings` did change the two small rectangles (the test checks their
+  rise and ridge); they stand at the back and side, hidden by the main block from every camera the agent had.
+- Restored: c2984 wing 1 `rh` 1.8 (the agent's value before the test; the game caps it at 1.26 on that 1.8 m wing, so it draws the same),
+  c2714 `win` front [4] (from the agent's scratch copy; the frames show mostly its gable end, so the count is the agent's, not
+  re-checked), c2923's per-wall windows (`winShape` wide, 2 rows of 8/7/3/3/5/3 ribbon windows on edges 2/5/8/9/10/11, the short jogs
+  blank; from the agent's script e13): the same-angle render now shows the ribbon windows of frames 950989774021969 / 1692676051896343.
+  Not restored: c3451's `xg` (its wings now make the street wall an eaves wall, but the agent's final reading is a lower wing, not a bay),
+  c3519's wings (no evidence in the frames either way).

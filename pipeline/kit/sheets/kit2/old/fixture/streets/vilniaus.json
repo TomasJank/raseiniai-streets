@@ -1,0 +1,135 @@
+{
+ "street": "Vilniaus g.",
+ "looks": {
+  "c2462": {
+   "wall": [
+    0.56,
+    0.6,
+    0.68
+   ],
+   "roof": [
+    0.25,
+    0.27,
+    0.32
+   ],
+   "sty": "plank",
+   "windows": true,
+   "pitched": true,
+   "hip": false,
+   "h": 3.4,
+   "rh": 3.4,
+   "roofSty": "sheet",
+   "ridge": "street"
+  },
+  "c2463": {
+   "wall": [
+    0.76,
+    0.75,
+    0.68
+   ],
+   "roof": [
+    0.2,
+    0.26,
+    0.38
+   ],
+   "sty": "plank",
+   "windows": true,
+   "pitched": true,
+   "hip": false,
+   "h": 2.9,
+   "rh": 2.8,
+   "roofSty": "sheet",
+   "ridge": "street"
+  },
+  "c2465": {
+   "wall": [
+    0.85,
+    0.78,
+    0.58
+   ],
+   "roof": [
+    0.42,
+    0.42,
+    0.41
+   ],
+   "sty": "plank",
+   "windows": true,
+   "pitched": true,
+   "hip": false,
+   "h": 2.8,
+   "rh": 2.8,
+   "roofSty": "asbestos",
+   "ridge": "street"
+  },
+  "c2027": {
+   "wall": [
+    0.75,
+    0.72,
+    0.67
+   ],
+   "sty": "brick",
+   "windows": true,
+   "roof": [
+    0.28,
+    0.28,
+    0.3
+   ]
+  },
+  "c2022": {
+   "wall": [
+    0.2,
+    0.17,
+    0.14
+   ],
+   "roof": [
+    0.27,
+    0.27,
+    0.29
+   ],
+   "sty": "plank",
+   "windows": true,
+   "pitched": true,
+   "hip": false,
+   "h": 3.0,
+   "rh": 4.2,
+   "ridge": "across"
+  },
+  "c2514": {
+   "wall": [
+    0.76,
+    0.69,
+    0.56
+   ],
+   "roof": [
+    0.32,
+    0.17,
+    0.14
+   ],
+   "sty": "brick",
+   "windows": true,
+   "pitched": true,
+   "hip": false,
+   "roofSty": "tiles"
+  },
+  "c2914": {
+   "wall": [
+    0.88,
+    0.82,
+    0.62
+   ],
+   "roof": [
+    0.5,
+    0.5,
+    0.48
+   ],
+   "sty": "plank",
+   "windows": true,
+   "pitched": true,
+   "hip": false,
+   "h": 3.0,
+   "rh": 3.6,
+   "roofSty": "asbestos",
+   "ridge": "across"
+  }
+ }
+}

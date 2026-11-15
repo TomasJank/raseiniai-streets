@@ -1,0 +1,58 @@
+{
+ "street": "Ston\u0173 g.",
+ "looks": {
+  "c2331": {
+   "wall": [
+    0.8,
+    0.76,
+    0.62
+   ],
+   "sty": "silicate",
+   "windows": true,
+   "pitched": true,
+   "hip": false,
+   "h": 3.6,
+   "rh": 4.4,
+   "ridge": "across",
+   "roofSty": "asbestos"
+  },
+  "c2332": {
+   "wall": [
+    0.82,
+    0.52,
+    0.36
+   ],
+   "sty": "plaster",
+   "windows": true,
+   "pitched": true,
+   "hip": false,
+   "h": 3.3,
+   "rh": 3.0
+  },
+  "c2334": {
+   "wall": [
+    0.74,
+    0.77,
+    0.74
+   ],
+   "sty": "plank",
+   "windows": true,
+   "pitched": true,
+   "hip": false,
+   "h": 3.2,
+   "rh": 3.4,
+   "blankGable": true,
+   "roofSty": "sheet"
+  },
+  "c2337": {
+   "wall": [
+    0.8,
+    0.78,
+    0.72
+   ],
+   "sty": "plaster",
+   "windows": true,
+   "h": 3.2
+  }
+ }
+}
