@@ -6,7 +6,7 @@ const [file]=process.argv.slice(2);
 const dir=new URL('.',import.meta.url).pathname;
 let h=fs.readFileSync(file,'utf8');const o='function drawMini(){';
 if(h.split(o).length!==2)throw new Error('hook');
-const api=`window.R=x=>+x.toFixed(4);window.__t={get world(){return world},get player(){return player},get ENV(){return ENV},get snd(){return snd},get AC(){return AC},get drv(){return drv},get tod(){return tod},set tod(v){tod=v},
+const api=`window.R=x=>+x.toFixed(4);window.__t={get world(){return world},get bands(){return typeof d3Bands==='function'?d3Bands(player.car):[0,8,15,22,29,37,99]},get player(){return player},get ENV(){return ENV},get snd(){return snd},get AC(){return AC},get drv(){return drv},get tod(){return tod},set tod(v){tod=v},
 KEY,driveCar,walk,updateAudio,resetToRoad,syncCar,collideCar,get smoke(){return smoke},get GY(){return GY},
 step(n,dt=.033,each){for(let i=0;i<n;i++){driveCar(player.car,dt);updateAudio(true);if(each)each(i,dt);}}};`;
 fs.writeFileSync(dir+'_drive.html',h.replace(o,api+o));
@@ -43,9 +43,11 @@ await check('curbBounceDecays',()=>{const T=__t,c=T.player.car,W=T.world;T.step(
 
 await check('engineFreqRisesWithSpeed',()=>{const T=__t,c=T.player.car,out={};
   // rpm is a sawtooth across gears: it must rise with speed inside a gear and fall back at each shift
-  for(const v of[2,4.5,7,10,13.5,17,20,24]){c.speed=v;T.KEY.KeyW=true;for(let i=0;i<50;i++)T.updateAudio(true);out[v]=[R(T.drv.eo),T.drv.gear];}
+  // speeds from the car's own gear bands: a quarter and three quarters into gears 1-3, so each pair sits inside one gear
+  const B=T.bands,at=(g,k)=>R(B[g]+(B[g+1]-B[g])*k),[a1,b1,a2,b2,a3,b3]=[at(0,.3),at(0,.8),at(1,.25),at(1,.75),at(2,.25),at(2,.75)];
+  for(const v of[a1,b1,a2,b2,a3,b3]){c.speed=v;T.KEY.KeyW=true;for(let i=0;i<50;i++)T.updateAudio(true);out[v]=[R(T.drv.eo),T.drv.gear];}
   T.KEY.KeyW=false;const f=(a,b)=>out[a][0]<out[b][0];
-  return{ok:f(2,4.5)&&f(4.5,7)&&f(10,13.5)&&f(17,20)&&out[10][0]<out[7][0]&&out[17][1]>out[10][1],freqAndGearBySpeed:out};});
+  return{ok:f(a1,b1)&&f(a2,b2)&&f(a3,b3)&&out[a2][0]<out[b1][0]&&out[a3][0]<out[b2][0]&&out[a2][1]>out[b1][1]&&out[a3][1]>out[a2][1],bands:B.map(R),freqAndGearBySpeed:out};});
 
 await check('gearShiftCutsTorque',()=>{const T=__t,c=T.player.car;c.speed=0;T.KEY.KeyW=true;let g0=T.drv.gear,seen=[],cut=0;
   for(let i=0;i<500;i++){c.speed=i*.08;T.updateAudio(true);if(T.drv.gear!==g0){g0=T.drv.gear;seen.push(g0);}if(T.drv.shiftT>0)cut++;}

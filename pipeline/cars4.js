@@ -7,11 +7,16 @@
 // The target comes from a uniform (moving cars) or the per-instance colour (parked cars).
 // A model whose paint is one flat material is stored with that paint grey (M.own is its real colour), so on it every colour is exact.
 // Detailed models carry two versions: the .bin is the distant one, a deflated close-up one is unpacked after the world shows and drawn within 40 m.
+// underside colours (cars4Under): floor, exhaust, engine, arch liner (mud), tank, axle; a vertex with u >= 2 takes colour u-2
+const CARS4_UNDER=[0x2a2b2d,0x58534c,0x161718,0x4a3b2b,0x3c3d40,0x36373a];
+const cars4UnderFrag=sh=>{sh.fragmentShader=sh.fragmentShader.replace('#include <alphamap_fragment>','#include <alphamap_fragment>\nif(vMapUv.x>1.5){vec3 C['+CARS4_UNDER.length+']=vec3[]('+
+  CARS4_UNDER.map(h=>{const c=new THREE.Color(h);return'vec3('+[c.r,c.g,c.b].map(v=>v.toFixed(4)).join()+')';}).join()+');diffuseColor.rgb=C[int(vMapUv.x)-2];}');};
 function cars4Paint(tex,mask,base,inst,col=0xffffff){
-  const m=new THREE.MeshLambertMaterial({map:tex,vertexColors:inst});if(!mask)return m;
+  const m=new THREE.MeshLambertMaterial({map:tex,vertexColors:inst});
+  if(!mask){m.customProgramCacheKey=()=>'cars4under'+(inst?'i':'');m.onBeforeCompile=cars4UnderFrag;return m;}
   const u={uMask:{value:mask},uBase:{value:new THREE.Color(...base)},uPaint:{value:new THREE.Color(col)}};m.userData.paint=u.uPaint.value;
   m.customProgramCacheKey=()=>'cars4paint'+(inst?'i':'');
-  m.onBeforeCompile=sh=>{Object.assign(sh.uniforms,u);
+  m.onBeforeCompile=sh=>{Object.assign(sh.uniforms,u);cars4UnderFrag(sh);
     sh.fragmentShader=sh.fragmentShader.replace('#include <common>','#include <common>\nuniform sampler2D uMask;uniform vec3 uBase,uPaint;')
       .replace('#include <color_fragment>',`{vec3 T=${inst?'vColor.rgb':'uPaint'};if(T.r+T.g+T.b<2.99){float k=texture2D(uMask,vMapUv).r,L=dot(diffuseColor.rgb,vec3(.3,.59,.11))/max(dot(uBase,vec3(.3,.59,.11)),.03);
         diffuseColor.rgb=mix(diffuseColor.rgb,mix(T*min(L,1.6),vec3(dot(diffuseColor.rgb,vec3(.3,.59,.11))),smoothstep(1.4,2.6,L)),k);}}`);};
@@ -23,6 +28,51 @@ const cars4Colour=h=>{let t=CARS4_PALETTE.reduce((a,c)=>a+c[1],0)*h;for(const[c,
 // a model whose photo paint only takes dark (or light) colours cleanly shows its own colour instead of the others
 const cars4Tone=(F,c)=>{const t=F.M&&F.M.tone,l=((c>>16&255)*.3+(c>>8&255)*.59+(c&255)*.11)/255;return t==='dark'&&l>.45||t==='light'&&l<.3?0xffffff:c;};
 const cars4Bytes=id=>{const s=atob(document.getElementById(id).textContent.trim()),b=new Uint8Array(s.length);for(let i=0;i<s.length;i++)b[i]=s.charCodeAt(i);return b;};
+// Underside: the converted shells are open below (made to be seen from above), so a flipped car showed its cabin and its
+// wheels hanging on nothing. Added to the body part of both versions at load: a floor pan at sill height inset from the
+// body's sides, notched at the wheels, mud wheel-arch liners and inner walls, an axle beam per axle, an engine block,
+// a fuel tank ahead of the rear axle, an exhaust with a muffler on the left. Every face points down or outward and is
+// single sided, so from above (and through the windows) nothing changes. Vehicles with wheels fused in (fixed) get none.
+function cars4Under(q,M){
+  if(!M.wheels)return q;
+  const S=q.P,[zf,zr]=M.axles,t=M.track,r=M.r,hw=M.dims[1]/2,P=[],N=[],U=[],I=[],n0=S.length/3;
+  // sill bottom: the lowest body point out at the sides between the arches
+  let ys=1e9;for(let i=0;i<S.length;i+=3)if(Math.abs(S[i])>hw*.8&&S[i+2]<zf-r-.2&&S[i+2]>zr+r+.2)ys=Math.min(ys,S[i+1]);
+  const yF=Math.min(Math.max(ys<1e9?ys+.04:r*.7,.12),r-.04),dd=Math.min(.12,yF-.08);
+  // the body's half width low down, per 10 cm along the car
+  const z0=-M.dims[0]/2-.1,nb=Math.ceil((M.dims[0]+.2)/.1),wb=new Float32Array(nb);
+  for(let i=0;i<S.length;i+=3)if(S[i+1]<yF+.3){const k=Math.floor((S[i+2]-z0)/.1);if(k>=0&&k<nb)wb[k]=Math.max(wb[k],Math.abs(S[i]));}
+  const wAt=z=>{const k=Math.floor((z-z0)/.1);let w=1e9;for(let j=k-1;j<=k+1;j++)w=Math.min(w,j>=0&&j<nb?wb[j]:0);return w;};
+  // arch liner radius: just inside the fender lip (the nearest body point above the hub, out at the wheel)
+  const xi=t-.2,arch=M.axles.map(a=>{let d=1e9;for(let i=0;i<S.length;i+=3){const x=Math.abs(S[i]),y=S[i+1],e=Math.hypot(y-r,S[i+2]-a);if(x>t-.15&&y>r&&e>r+.02)d=Math.min(d,e);}
+    const R=Math.min(Math.max(d-.01,r+.03),r+.14),a0=Math.asin(Math.max(-.9,(yF-r)/R));return{a,R,a0,h:R*Math.cos(a0),xo:Math.max(t+.05,wAt(a)-.02)};});
+  const put=(v,n,c)=>{P.push(...v);N.push(...n);U.push(2.5+c,.5);};
+  // a polygon (fan) whose face points along `out`
+  const poly=(V,out,c)=>{const n=new THREE.Vector3().subVectors(new THREE.Vector3(...V[1]),new THREE.Vector3(...V[0])).cross(new THREE.Vector3().subVectors(new THREE.Vector3(...V[2]),new THREE.Vector3(...V[0])));
+    if(n.dot(new THREE.Vector3(...out))<0)V=V.slice().reverse();const nn=new THREE.Vector3(...out).normalize().toArray(),b=n0+P.length/3;
+    for(const v of V)put(v,nn,c);for(let k=1;k<V.length-1;k++)I.push(b,b+k,b+k+1);};
+  // a box without its top (hidden under the floor)
+  const box=(x0,x1,y0,y1,za,zb,c)=>{const v=(x,y,z)=>[x,y,z];poly([v(x0,y0,za),v(x1,y0,za),v(x1,y0,zb),v(x0,y0,zb)],[0,-1,0],c);
+    poly([v(x0,y0,za),v(x0,y1,za),v(x0,y1,zb),v(x0,y0,zb)],[-1,0,0],c);poly([v(x1,y0,za),v(x1,y1,za),v(x1,y1,zb),v(x1,y0,zb)],[1,0,0],c);
+    poly([v(x0,y0,za),v(x1,y0,za),v(x1,y1,za),v(x0,y1,za)],[0,0,za<zb?-1:1],c);poly([v(x0,y0,zb),v(x1,y0,zb),v(x1,y1,zb),v(x0,y1,zb)],[0,0,za<zb?1:-1],c);};
+  // floor: stations every 20 cm and at the arch edges, between the ends of the body's low part
+  let zA=1e9,zB=-1e9;for(let k=0;k<nb;k++)if(wb[k]>.3){zA=Math.min(zA,z0+k*.1);zB=Math.max(zB,z0+k*.1+.1);}zA+=.12;zB-=.12;
+  const st=[];for(let z=zA;z<zB;z+=.2)st.push(z);st.push(zB);for(const A of arch)st.push(A.a-A.h-.001,A.a-A.h+.001,A.a+A.h-.001,A.a+A.h+.001);
+  const zs=st.filter(z=>z>=zA&&z<=zB).sort((a,b)=>a-b),fw=z=>{let w=wAt(z)-.05;for(const A of arch)if(Math.abs(z-A.a)<A.h)w=Math.min(w,xi);return w;};
+  for(let k=0;k+1<zs.length;k++){const a=zs[k],b=zs[k+1],wa=fw(a),wc=fw(b);if(wa<.2||wc<.2||b-a<1e-4)continue;poly([[-wa,yF,a],[wa,yF,a],[wc,yF,b],[-wc,yF,b]],[0,-1,0],0);}
+  // wheel arches: a liner over each wheel and an inner wall facing it
+  for(const A of arch)for(const sx of[-1,1]){const n=8,arc=[];for(let k=0;k<=n;k++){const g=A.a0+(Math.PI-2*A.a0)*k/n;arc.push([r+A.R*Math.sin(g),A.a+A.R*Math.cos(g)]);}
+    for(let k=0;k<n;k++){const[y1,z1]=arc[k],[y2,z2]=arc[k+1];poly([[sx*xi,y1,z1],[sx*A.xo,y1,z1],[sx*A.xo,y2,z2],[sx*xi,y2,z2]],[0,r-(y1+y2)/2,A.a-(z1+z2)/2],3);}
+    poly([[sx*xi,yF,A.a],...arc.map(([y,z])=>[sx*xi,y,z])],[sx,0,0],3);}
+  for(const a of M.axles)box(-(t-.1),t-.1,r-.035,r+.035,a-.04,a+.04,5);
+  box(-.32,.32,yF-dd,yF+.2,zf-.3,Math.min(zf+.42,zB),2);
+  const tz=zr+arch[1].h+.05;box(-.2,.48,yF-dd*.6,yF+.02,tz,Math.min(tz+.5,zf-arch[0].h-.35),4);
+  const xe=-Math.min(.4,t-.32);box(xe-.13,xe+.13,yF-dd,yF-.01,zr-.2,Math.max(zr-.72,zA+.05),1);
+  // the tail pipe ends a little behind the floor, where the body is still wide enough around it
+  let ze=Math.max(zA-.08,-M.dims[0]/2+.06);while(wAt(ze)<.08-xe&&ze<zA+1)ze+=.05;box(xe-.025,xe+.025,yF-.07,yF-.02,zf-.3,ze,1);
+  const nv=n0+P.length/3,cat=(A,B,T)=>{const o=new T(A.length+B.length);o.set(A);o.set(B,A.length);return o;};
+  return{P:cat(S,P,Float32Array),N:cat(q.N,N,Float32Array),U:cat(q.U,U,Float32Array),I:cat(q.I,I,nv>65535?Uint32Array:Uint16Array),under:I.length/3};
+}
 // the two parts of a .bin (body, wheel) as geometries, and the parked twin: the four wheels baked into the body
 function cars4Geos(b,M){
   const dv=new DataView(b.buffer,b.byteOffset,b.byteLength);let o=0;
@@ -31,12 +81,13 @@ function cars4Geos(b,M){
     return{P,N,U,I};};
   const geo=q=>{const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(q.P,3));g.setAttribute('normal',new THREE.BufferAttribute(q.N,3));
     g.setAttribute('uv',new THREE.BufferAttribute(q.U,2));g.setAttribute('color',new THREE.BufferAttribute(new Float32Array(q.P.length).fill(1),3));g.setIndex(new THREE.BufferAttribute(q.I,1));g.userData.keep=true;return g;};
-  const B=part(),W=part();
+  const B=cars4Under(part(),M),W=part();
   const lot={P:[],N:[],U:[],I:[]};const add=(q,f)=>{const n=lot.P.length/3;for(let i=0;i<q.P.length;i+=3){const[x,y,z]=f(q.P[i],q.P[i+1],q.P[i+2]);lot.P.push(x,y,z);const[a,c,d]=f(q.N[i],q.N[i+1],q.N[i+2],1);lot.N.push(a,c,d);}
     for(const u of q.U)lot.U.push(u);for(const k of q.I)lot.I.push(k+n);};
   add(B,(x,y,z)=>[x,y,z]);
   if(W.I.length)for(const z of M.axles)for(const sx of[-1,1])add(W,(x,y,zz,n)=>n?[sx*x,y,sx*zz]:[sx*x+sx*M.track,y+M.r,sx*zz+z]);
-  return{paint:geo(B),wheel:W.I.length?geo(W):null,lot:geo({P:new Float32Array(lot.P),N:new Float32Array(lot.N),U:new Float32Array(lot.U),I:new Uint32Array(lot.I)})};
+  const paint=geo(B);paint.userData.under=B.under||0;
+  return{paint,wheel:W.I.length?geo(W):null,lot:geo({P:new Float32Array(lot.P),N:new Float32Array(lot.N),U:new Float32Array(lot.U),I:new Uint32Array(lot.I)})};
 }
 function cars4Model(key,M){
   const G=cars4Geos(cars4Bytes('asset_cars4_'+key),M);

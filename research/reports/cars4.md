@@ -282,3 +282,52 @@ left in the chain for the integrator to decide.
 
 In the game: `review/police/chase.jpg` (one star, the cop 12 m behind the player, top-down camera),
 `review/police/street.jpg` (a cop car on Vilniaus g.), `review/police/sheet.jpg` (the review sheet).
+
+## Underbody (2026-11-15): "flipped, you look into the cabin"
+
+The converted shells are made to be seen from above, and the hidden-geometry cull (views from 3 degrees up) dropped what
+little underside the downloads had, so a car on its roof showed an open shell, floating seat backs and wheels on nothing.
+
+**Run time, not the conversion.** Regenerating is byte-identical (checked: `sedan79` and `e90` rebuilt into a scratch
+folder match `pipeline/cars4/` byte for byte), so the conversion was possible. It was not chosen because a baked floor
+needs flat colours in each atlas: a model with no swatch cell (all its parts textured) would get a new slot, and the
+converter's quarter-splitting would halve one of its photo images; and every .bin and .jpg would change, so every
+earlier review sheet would go stale. At run time it costs no page data, only code (~5 KB of `cars4.js`).
+
+**What `cars4Under` (in `cars4.js`, run on the body part of every .bin, close-up and distant) adds**, for every model with
+separate wheels (all traffic models, the police car, the route bus):
+- a floor pan at sill height (lowest body point out at the sides between the arches, +4 cm, so the sill hides it from the
+  side), 5 cm inside the body's low half width per 10 cm, from 12 cm inside the low body's ends, notched at the wheels;
+- per wheel a mud-coloured liner (8 segments) just inside the fender lip (the nearest body point above the hub) and an
+  inner wall facing the wheel, so the arch reads closed from the side and from below;
+- an axle beam per axle at hub height from tyre to tyre, an engine/gearbox block at the front, a fuel tank ahead of the
+  rear axle, a muffler behind the rear axle and a pipe from the engine to just behind the floor, on the left.
+
+Colours are flat (`CARS4_UNDER`): a vertex with u >= 2 takes colour u-2 in the paint shader (every cars4 material, the
+police livery and the parked instances included). Every face points down or outward and is single sided, so from above
+and through the windows nothing changes. It is merged into the body geometry: no new draw call, mesh or texture. It is
+inside the body's silhouette, so the shadow keeps its shape; its triangles do go through the shadow pass with the body.
+Size: 158 to 170 triangles per model and version (about 300 vertices), lowest point 13 to 28 cm above the ground.
+Not done: `kamaz` and `ps1_bus` (wheels fused in the body, they only stand, they can never be flipped).
+
+**Review** (`research/assets/vehicles/cars4/review/underbody/`, gitignored): `detailed.jpg` and `lowpoly_police_bus.jpg`,
+one row per model: on its roof from behind and from the side, v73 before and this build after, the distant version from
+60 m, and right way up after, from the low chase camera, nose up on a crest, and from the on-foot camera.
+Tools: `underbody.mjs page.html outdir` (shots), `underbody_sheet.py beforedir afterdir outdir` (sheets).
+
+**Test** (`work/test_cars4.mjs`): new `undersideClosed`: for all 22 models with wheels, both versions, a ray upward from
+below the centre and below each axle hits the car; no underside vertex is below 3 cm or outside the body (its length, and
+its half width within 15 cm along the car, or the narrower of the nearest widths fore and aft where a van's flat side has
+no vertex near); at most 300 underside triangles. `detailedModelsSwitchByDistance` now counts its 15,500 / 2,600 budgets
+without the underside (the converted model's budget), the underside under its own ceiling of 300.
+
+**Still visible that should not be:** the downloads' own underside pieces (some suspension, the Primera's red floor
+texture, the Accord's light underbody plate) show on top of the new floor where they hang lower than it; the exhaust tip
+shows below the rear bumper from the low chase camera (as on a real car); `wheelsTurnAndSteer` fails when the stolen
+car happens to be a detailed model, the same on v73 (it took an E46 there: 0 wheel instances), so not caused by this.
+
+**Gates** (page 32,048,845 B with every step's current files; two builds byte-identical): `test_cars4` **PASS** (with
+`undersideClosed`: 22 models, 158 to 170 underside triangles each); `test_perf` **PASS** on the fifth run: the draw calls
+are the same as without this change (605 at the start, shadow pass +160 triangles), and its "4x slower CPU steps down
+within 25 s" check fails on some runs both with and without this change (a build with the old `cars4.js` failed 2 of 3);
+`test_takepark` **PASS**; `test_solid` **PASS**.

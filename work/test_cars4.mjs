@@ -12,7 +12,7 @@ const o='function drawMini(){';
 let h=fs.readFileSync(file,'utf8');if(h.split(o).length!==2)throw new Error('hook');
 const api=`window.__t={enterExit,get heat(){return heat},set heat(v){heat=v},set paused(v){mapOpen=v},set sinkS(v){sinkS=v},get world(){return world},get player(){return player},
 get CARS2(){return CARS2},get CARS4(){return CARS4},get CARS4_FLEET(){return CARS4_FLEET},get PARKED2(){return PARKED2},get bus(){return bus},get placeBus(){return placeBus},get CARS4_STATIC(){return CARS4_STATIC},get CARS4_POLICE(){return CARS4_POLICE},skodaGeo,flash,copRed,copBlue,copOff,get LL(){return LL},get collideCar(){return collideCar},get PARKED(){return PARKED},get LOT_GEOS(){return LOT_GEOS},get TRAFFIC_GEOS(){return TRAFFIC_GEOS},get cops(){return cops},get ENV(){return ENV},
-driveCar,syncCar,resetToRoad,get makeCarMesh(){return makeCarMesh},makeCop,spawnCop,dent,breakLamps,fixCar,lampsSet,carLamps,get carOverlap(){return carOverlap},parkedNear,inWater,worldGroup,renderer,scene,camera,get GY(){return GY},
+THREE,driveCar,syncCar,resetToRoad,get makeCarMesh(){return makeCarMesh},makeCop,spawnCop,dent,breakLamps,fixCar,lampsSet,carLamps,get carOverlap(){return carOverlap},parkedNear,inWater,worldGroup,renderer,scene,camera,get GY(){return GY},
 step(n,dt=.033){for(let i=0;i<n&&player.car;i++)driveCar(player.car,dt);},
 shot(from,to){camera.position.set(...from);camera.lookAt(...to);camera.updateMatrixWorld();const f=scene.fog;scene.fog=null;renderer.render(scene,camera);scene.fog=f;return renderer.domElement.toDataURL('image/jpeg',.9);}};`;
 fs.writeFileSync(dir+'_cars4.html',h.replace(o,api+o));
@@ -132,13 +132,30 @@ await check('standingVehiclesAreSolid',()=>{const T=__t,r={};let ok=true;
 await check('detailedModelsSwitchByDistance',async()=>{const T=__t,L=Object.values(T.CARS4.models).filter(F=>F.M.lod);if(!L.length)return{ok:true,models:0};
   for(let i=0;i<300&&!T.CARS4.hi;i++)await new Promise(r=>setTimeout(r,100));if(!T.CARS4.hi)return{ok:false,why:'close-up versions never arrived'};
   const tri=g=>g.index.count/3,over=[];
-  for(const F of L){const hi=tri(F.hi.paint)+4*tri(F.hi.wheel),lo=tri(F.paint)+4*tri(F.wheel);if(hi>15500||lo>2600||hi<=lo)over.push([F.key,hi,lo]);}
+  // the budgets are the converted model's; the underside added at load (undersideClosed) has its own ceiling of 300
+  for(const F of L){const ua=F.hi.paint.userData.under||0,ub=F.paint.userData.under||0,hi=tri(F.hi.paint)+4*tri(F.hi.wheel)-ua,lo=tri(F.paint)+4*tri(F.wheel)-ub;if(hi>15500||lo>2600||hi<=lo||ua>300||ub>300)over.push([F.key,hi,lo,ua,ub]);}
   const F=L[0],pc=T.player.car,g=T.makeCarMesh(0x888888,F),c={g,x:pc.x+25,z:pc.z+25,h:0,speed:0,steer:0,wx:pc.x+25,wz:pc.z+25,spin:0};T.worldGroup.add(g);T.syncCar(c);
   const y=T.GY(c.x,c.z),body=g.userData.body.children[0],look=d=>{T.camera.position.set(c.x+d,y+1.5,c.z);T.camera.lookAt(c.x,y+.7,c.z);T.camera.updateMatrixWorld();T.renderer.render(T.scene,T.camera);T.renderer.render(T.scene,T.camera);};
   look(12);const near=body.geometry===F.hi.paint,nearWheels=F.instHi.count;look(70);const far=body.geometry===F.paint,farWheels=F.inst.count;
   look(12);T.dent(c,1,0,.2);look(70);const dentStays=body.geometry!==F.paint&&body.geometry!==F.hi.paint;T.fixCar(c);look(70);const back=body.geometry===F.paint;T.worldGroup.remove(g);
   const parkedHi=T.PARKED2.filter(m=>m.geometry.userData.cars4hi).length,farLast=!T.PARKED2[T.PARKED2.length-1].geometry.userData.cars4;
   return{ok:!over.length&&near&&nearWheels>=4&&far&&farWheels>=4&&dentStays&&back&&parkedHi>0&&parkedHi<=L.length&&farLast,models:L.length,overBudget:over,nearIsCloseUp:near,nearWheels,farIsDistant:far,farWheels,dentKept:dentStays,repaired:back,parkedCloseUpMeshes:parkedHi};});
+
+// every model with wheels (traffic, police, route bus), both versions, has an underside: a ray upward from below the centre
+// and from below each axle hits the car, and no underside part (u >= 2) reaches below the tyres' contact plane or outside
+// the body (the length, and the body's own half width within 15 cm along the car)
+await check('undersideClosed',async()=>{const T=__t,C=T.CARS4,r={};let ok=true;for(let i=0;i<300&&!C.hi;i++)await new Promise(r=>setTimeout(r,100));
+  const TH=T.THREE,Fs=[...Object.values(C.models),C.police,C.bus].filter(F=>F&&F.M.wheels),rc=new TH.Raycaster(),mat=new TH.MeshBasicMaterial({side:TH.DoubleSide});
+  for(const F of Fs)for(const[v,G]of[['far',F.paint],['near',F.hi&&F.hi.paint]]){if(!G)continue;const a=G.attributes.position.array,u=G.attributes.uv.array,m=new TH.Mesh(G,mat);
+    const hits=[0,...F.axles].map(z=>{rc.set(new TH.Vector3(0,-1,z),new TH.Vector3(0,1,0));return rc.intersectObject(m).length>0;});
+    const zs=[],xs=[];for(let i=0;i<u.length/2;i++)if(u[i*2]<1.5){zs.push(a[i*3+2]);xs.push(Math.abs(a[i*3]));}
+    const half=new Map();zs.forEach((z,i)=>{const k=Math.round(z/.05);half.set(k,Math.max(half.get(k)||0,xs[i]));});
+    // where a sparse body (a van's flat side) has no vertex within 15 cm, the narrower of the nearest widths fore and aft
+    const ks=[...half.keys()].sort((a,b)=>a-b),wAt=z=>{const k0=Math.round(z/.05);let w=0;for(let k=k0-3;k<=k0+3;k++)w=Math.max(w,half.get(k)||0);if(w)return w;
+      const lo=ks.filter(k=>k<k0).pop(),hi=ks.find(k=>k>k0);return lo==null||hi==null?0:Math.min(half.get(lo),half.get(hi));};
+    let n=0,low=1e9,out=0;for(let i=0;i<u.length/2;i++)if(u[i*2]>1.5){n++;const x=Math.abs(a[i*3]),y=a[i*3+1],z=a[i*3+2];low=Math.min(low,y);if(x>wAt(z)+.005||Math.abs(z)>F.len/2)out++;}
+    const good=hits.every(Boolean)&&n>0&&low>.03&&!out&&G.userData.under<=300;if(!good)ok=false;r[F.key+'_'+v]={hits,underVerts:n,underTris:G.userData.under,lowest:+low.toFixed(3),outside:out};}
+  return{ok,models:Fs.length,...r};});
 
 // the police car: the Octavia II model with police set, liveried, four wheels that spin and steer, its bar on this roof flashing,
 // close-up and distant versions by distance, and never a civilian car (traffic, car parks, the mix)

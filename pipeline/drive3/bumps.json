@@ -1,0 +1,10 @@
+[
+ {"id": "osm1201326587",  "kind": "table", "lat": 55.3772915, "lon": 23.120251,  "zebra": true,  "teeth": false, "src": "OSM node 1201326587 traffic_calming=table", "frame": "1024812559510273"},
+ {"id": "osm2027048698",  "kind": "hump",  "lat": 55.3827664, "lon": 23.1069008, "zebra": true,  "teeth": false, "src": "OSM node 2027048698 traffic_calming=hump, crossing:markings=zebra", "frame": null},
+ {"id": "osm4005481715",  "kind": "table", "lat": 55.3848237, "lon": 23.1225554, "zebra": true,  "teeth": false, "src": "OSM node 4005481715 traffic_calming=table, crossing:markings=zebra", "frame": "3312910682222529"},
+ {"id": "osm5825696875",  "kind": "table", "lat": 55.3730475, "lon": 23.1272647, "zebra": true,  "teeth": true,  "src": "OSM node 5825696875 traffic_calming=table, crossing", "frame": "1988549821988735"},
+ {"id": "osm6952294986",  "kind": "table", "lat": 55.3707693, "lon": 23.1203642, "zebra": true,  "teeth": false, "src": "OSM node 6952294986 traffic_calming=table, crossing=marked", "frame": null},
+ {"id": "osm13814300916", "kind": "table", "lat": 55.3826995, "lon": 23.1183037, "zebra": true,  "teeth": false, "src": "OSM node 13814300916 traffic_calming=table, crossing:markings=zebra", "frame": "1163964859027861"},
+ {"id": "osm14209512326", "kind": "table", "lat": 55.3854304, "lon": 23.1249331, "zebra": false, "teeth": true,  "src": "OSM node 14209512326 traffic_calming=table", "frame": "838805405300681"},
+ {"id": "sign7",          "kind": "table", "lat": 55.385592,  "lon": 23.112766,  "zebra": false, "teeth": true,  "src": "Mapillary: 5 warning--road-bump--g1 signs round 55.38559,23.11283; the raised table's white triangle line seen ~10 m ahead in frame 995539349807449 (heading 151)", "frame": "995539349807449"}
+]
