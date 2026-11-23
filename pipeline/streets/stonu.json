@@ -177,11 +177,7 @@
         0.16
       ],
       "sty": "plank",
-      "windows": true,
-      "pitched": true,
-      "hip": false,
-      "h": 3.4,
-      "rh": 3.0
+      "windows": true
     },
     "c2195": {
       "wall": [

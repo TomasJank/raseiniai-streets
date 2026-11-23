@@ -255,7 +255,13 @@ lands on the wall it names.
   gives 1.26 m. A low wing behind or beside the main block may not be seen from the street at all; check it square-on first. `--sides` names walls by the nearest street; on a corner house the eaves side may be `left` or `right`.
 - A cross gable seen at the very end of a wall is often just the main gable end seen at an angle: check the photo of the eaves side.
 - `wings` counted in the wrong order: use the wing numbers `--sides` prints, not the order you see them in the photo.
-- `wings` on a house of 4 corners: its roof is the street look's `ridge`, `rh` and `hip`.
+- `wings` on a house of 4 corners: its roof is the street look's `ridge`, `rh` and `hip`; a one-entry `wings` (`[{"roof":"gable"}]`)
+  only to override a single-slope LiDAR roof (next point).
+- `pitched` (with `h`, `rh`) in a look on a house whose LiDAR fit is a single slope, or on an outline of 5+ corners the game draws whole:
+  the walls keep the LiDAR's sloping tops (or the whole outline) while the roof sits on its rectangle at `h`, so it floats over the low
+  wall and the high wall pokes through it (c2707, 2026-11-15). The page warns "kit: looks that pitch a roof their walls do not carry";
+  `test_kit` (`roofsRestOnWalls`) fails on it. If a photo shows the roof, give that rectangle a wing with `roof` (and `h`, `rh`);
+  otherwise delete `pitched`, `hip`, `h`, `rh`, `ridge` from the look and let the game's measured roof stand.
 - On a split outline, `win` rows above a wall's storeys go on the rectangle wall standing at that position when it is taller
   (the upstairs window of a two-storey wing on a one-storey street wall); elsewhere they are dropped with a warning.
 - What cannot be said yet: the roof direction of a four-corner house (that is the street look's `ridge`), per-window size or

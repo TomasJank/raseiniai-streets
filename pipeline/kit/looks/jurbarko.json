@@ -114,5 +114,12 @@
    "roof": "lean",
    "glazed": true
   }
+ },
+ "c1624": {
+  "wings": [
+   {
+    "roof": "gable"
+   }
+  ]
  }
 }

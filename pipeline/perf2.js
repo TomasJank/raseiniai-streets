@@ -69,3 +69,17 @@ const _gfxRender=gfxRender;
 gfxRender=function(){scene.updateMatrixWorld();scene.matrixWorldAutoUpdate=false;_gfxRender();scene.matrixWorldAutoUpdate=true;};
 const _perfTick=perfTick;
 perfTick=function(dt){_perfTick(dt);if(perfT===.25)perfCull();const G=window.__GFX||{};if(G.level==null&&G.auto!==false)perfAuto();};
+// F2: readout for reports from other PCs. Frame time far above JS time = the graphics card is the limit; about equal = the CPU.
+{let el,F=[],J=[],t0=0,last=0,gpu;const raf=requestAnimationFrame,med=a=>a.sort((x,y)=>x-y)[a.length>>1]||0;
+  addEventListener('keydown',e=>{if(e.code!=='F2')return;e.preventDefault();if(el){el.hidden=!el.hidden;return;}
+    el=document.body.appendChild(document.createElement('pre'));el.id='perfDbg';
+    el.style.cssText='position:fixed;left:8px;top:8px;z-index:99;margin:0;padding:6px 8px;max-width:90vw;white-space:pre-wrap;background:#000c;color:#fff;font:12px/1.4 monospace;pointer-events:none';
+    const gl=renderer.getContext(),x=gl.getExtension('WEBGL_debug_renderer_info');gpu=gl.getParameter(x?x.UNMASKED_RENDERER_WEBGL:gl.RENDERER);
+    // the loop asks for its next frame by the global name each frame, so it picks this up on its own
+    window.requestAnimationFrame=cb=>raf(t=>{const a=performance.now();cb(t);const b=performance.now();if(last)F.push(a-last);J.push(b-a);last=a;
+      if(b-t0<500||el.hidden)return;t0=b;const worst=Math.max(...F),f=med(F),c=renderer.domElement,m=performance.memory;
+      el.textContent=`${f?Math.round(1000/f):0} fps · frame ${f.toFixed(1)} ms (worst ${worst.toFixed(0)}) · JS ${med(J).toFixed(1)} ms
+quality ${PERF.level}/5 · ${c.width}x${c.height} · pixel ratio ${renderer.getPixelRatio()} of ${devicePixelRatio}
+${gpu}
+${navigator.hardwareConcurrency||'?'} cores · ${navigator.deviceMemory||'?'} GB${m?' · heap '+Math.round(m.usedJSHeapSize/2**20)+' MB':''}
+${navigator.userAgent}`;F=[];J=[];});});}

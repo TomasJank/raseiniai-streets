@@ -142,7 +142,7 @@
    0.325
   ],
   "tris": 2100,
-  "wheelTris": 100,
+  "wheelTris": 99,
   "uvOut": 0,
   "base": [
    0.502,
@@ -152,7 +152,7 @@
   "own": 1059923,
   "lod": {
    "tris": 11000,
-   "wheelTris": 899
+   "wheelTris": 900
   },
   "seen": {
    "body": [
@@ -161,7 +161,7 @@
    ],
    "wheel": [
     1759,
-    1613
+    1614
    ]
   },
   "images": 0,
@@ -171,7 +171,7 @@
   "mask": true,
   "author": "dirocris",
   "credit": "Honda Accord",
-  "pageBytes": 250864
+  "pageBytes": 250240
  },
  "aero_bus": {
   "key": "aero_bus",
@@ -1455,7 +1455,7 @@
    -1.337
   ],
   "track": 0.697,
-  "r": 0.278,
+  "r": 0.281,
   "wheels": true,
   "lamps": [
    [
@@ -1497,7 +1497,7 @@
    0.179
   ],
   "tris": 2099,
-  "wheelTris": 103,
+  "wheelTris": 99,
   "uvOut": 0,
   "base": [
    0.595,
@@ -1525,7 +1525,7 @@
   "mask": true,
   "author": "lionsharp",
   "credit": "Fiat Punto",
-  "pageBytes": 295644
+  "pageBytes": 295328
  },
  "sedan79": {
   "key": "sedan79",

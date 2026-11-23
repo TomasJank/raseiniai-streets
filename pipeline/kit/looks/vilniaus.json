@@ -425,5 +425,12 @@
  },
  "c1417": {
   "winSize": "small"
+ },
+ "c7618": {
+  "wings": [
+   {
+    "roof": "gable"
+   }
+  ]
  }
 }

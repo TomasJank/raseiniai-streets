@@ -86,11 +86,7 @@
     0.39
    ],
    "sty": "wood",
-   "windows": false,
-   "pitched": true,
-   "hip": false,
-   "h": 2.2,
-   "rh": 1.1
+   "windows": false
   },
   "c7401": {
    "wall": [
@@ -120,11 +116,7 @@
     0.66
    ],
    "sty": "plaster",
-   "windows": true,
-   "pitched": true,
-   "h": 6.4,
-   "hip": false,
-   "rh": 2.6
+   "windows": true
   },
   "c5407": {
    "wall": [

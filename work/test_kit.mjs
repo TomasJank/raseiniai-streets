@@ -4,6 +4,7 @@
 // (pipeline/kit/sheets/kit2/old/fixture.sh base.html fixOld.html fixNew.html): every house must get the same triangles in both.
 // Into a copy of kit.html the test adds one house with only invalid values, copies of a full description onto 28 more houses
 // (40 in all), one house with every kit-2 key, and wings, windows, a door, plinth and chimney on c2466 (8 corners, 3 rectangles).
+// kit.html is also opened as built, to check that every described house's roof rests on its walls (roofsRestOnWalls).
 // Pages are opened one at a time (Metal); auto quality is off.
 import {createRequire} from 'module';import fs from 'fs';import path from 'path';
 const require=createRequire('/Users/tomasjankauskas/Desktop/Projects/career-ops/');
@@ -57,6 +58,47 @@ const kitKeys=P=>run(P,()=>typeof KIT==='undefined'?{}:KIT,null);
 const cost=P=>run(P,()=>{const km=worldGroup.children.find(o=>o.name==='kit'),bld=worldGroup.children.find(o=>o.geometry&&o.geometry.attributes.sty&&o.castShadow);
   return{meshes:worldGroup.children.length,bld:bld.geometry.attributes.position.count/3,kit:km?km.geometry.attributes.position.count/3:0,kitShadow:km?km.castShadow:null,kitStatic:km?!km.matrixAutoUpdate:null,houses:typeof KIT==='undefined'?0:Object.keys(KIT).length,
     segs:(world.hedgeSegs||[]).filter(q=>q.length===5).map(q=>q.slice(0,4))};},null);
+// roofs resting on their walls, per described house (runs in the page; __rec from REC): along every wall standing on the ground, every
+// 0.5 m, the roof over a point 15 cm inside it, its plane taken back to the wall line, against the wall's top there (gable included):
+// floats = roof more than 6 cm above the wall top (unless its eaves 0.3 m out come down to it), poke = wall more than 0.3 m above the
+// nearest roof, noRoof = nothing over it; out = a roof corner outside the outline and more than 1.15 m from every wall
+const roofSweep=ids=>{
+  const A=worldGroup.children.find(q=>q.geometry&&q.geometry.attributes.sty&&q.castShadow).geometry.attributes,P=A.position.array,N=A.normal.array,out={};
+  const V=(v,k)=>[P[(v+k)*3],P[(v+k)*3+1],P[(v+k)*3+2]];
+  for(const id of ids){const R=__rec[id],rec=FX.recs.find(r=>r.id===id);if(!R||!rec)continue;
+    const T=[];for(const [v0,v1] of R)for(let v=v0;v<v1;v+=3)T.push(v);if(!T.length)continue;
+    let yb=1e9;for(const v of T)for(let k=0;k<3;k++)yb=Math.min(yb,P[(v+k)*3+1]);
+    const roofs=[],planes=new Map(),F=[];
+    for(const v of T){const ny=N[v*3+1],p=[V(v,0),V(v,1),V(v,2)];
+      if(ny>.2){const [a,b,c]=p,d=(b[0]-a[0])*(c[2]-a[2])-(c[0]-a[0])*(b[2]-a[2]);if(Math.abs(d)>1e-6)roofs.push({p,d});}
+      else if(Math.abs(ny)<.05){const nx=N[v*3],nz=N[v*3+2],l=Math.hypot(nx,nz),n=[nx/l,nz/l],o=p[0][0]*n[0]+p[0][2]*n[1],k=Math.round(Math.atan2(n[1],n[0])*200)+','+Math.round(o*20);
+        (planes.get(k)||planes.set(k,{n,o,t:[],g:[]}).get(k)).t.push(p);if(Math.min(p[0][1],p[1][1],p[2][1])<yb+.05)planes.get(k).g.push(p);}}
+    // roof height over (x,z): every roof triangle covering it, its plane evaluated at (wx,wz) (the wall line)
+    const over=(x,z,wx,wz)=>{const ys=[];for(const {p:[a,b,c],d} of roofs){const l1=((b[0]-x)*(c[2]-z)-(c[0]-x)*(b[2]-z))/d,l2=((c[0]-x)*(a[2]-z)-(a[0]-x)*(c[2]-z))/d,l3=1-l1-l2;
+      if(l1<-1e-4||l2<-1e-4||l3<-1e-4)continue;
+      const e1=[b[0]-a[0],b[1]-a[1],b[2]-a[2]],e2=[c[0]-a[0],c[1]-a[1],c[2]-a[2]],nn=[e1[1]*e2[2]-e1[2]*e2[1],e1[2]*e2[0]-e1[0]*e2[2],e1[0]*e2[1]-e1[1]*e2[0]];
+      ys.push(a[1]-(nn[0]*(wx-a[0])+nn[2]*(wz-a[2]))/nn[1]);}return ys;};
+    const bad={floats:[],poke:[],noRoof:[]};
+    for(const Q of planes.values()){if(!Q.g.length)continue;const u=[-Q.n[1],Q.n[0]],tt=q=>q[0]*u[0]+q[2]*u[1];
+      // top of the wall (with its gable triangle) at t along the plane
+      const top=t=>{let m=-1e9;for(const p of Q.t)for(let k=0;k<3;k++){const a=p[k],b=p[(k+1)%3],ta=tt(a),tb=tt(b);if((t-ta)*(t-tb)>0||ta===tb)continue;m=Math.max(m,a[1]+(b[1]-a[1])*(t-ta)/(tb-ta));}return m;};
+      // each wall once (its two triangles share the span); 0.6 m clear of its corners, where a hip facet covers the point inside
+      const iv=[...new Map(Q.g.map(p=>{const ts=p.map(tt),a=Math.min(...ts),b=Math.max(...ts);return[a.toFixed(2)+','+b.toFixed(2),[a,b]];})).values()];
+      for(const [t0,t1] of iv)for(let t=t0+.6;t<=t1-.6;t+=.5){const y=top(t);if(y<-1e8)continue;
+        const wx=u[0]*t+Q.n[0]*Q.o,wz=u[1]*t+Q.n[1]*Q.o,ys=over(wx-Q.n[0]*.15,wz-Q.n[1]*.15,wx,wz);
+        if(!ys.length){bad.noRoof.push([+wx.toFixed(1),+wz.toFixed(1),+(y-yb).toFixed(2)]);continue;}
+        const r=ys.reduce((m,q)=>Math.abs(q-y)<Math.abs(m-y)?q:m);
+        // a gap under an overhang is hidden when the eaves 0.3 m out come down to the wall top
+        if(r-y>.06&&over(wx+Q.n[0]*.3,wz+Q.n[1]*.3,wx+Q.n[0]*.3,wz+Q.n[1]*.3).some(q=>q<=y+.03))continue;
+        if(r-y>.06)bad.floats.push([+wx.toFixed(1),+wz.toFixed(1),+(r-y).toFixed(2)]);else if(y-r>.3)bad.poke.push([+wx.toFixed(1),+wz.toFixed(1),+(y-r).toFixed(2)]);}}
+    // roof corners more than 1 m (1.15: door canopies stand 1.1 m out) from every wall standing on the ground and outside the outline
+    const G=[...planes.values()].flatMap(Q=>Q.g.map(p=>{const s=p.filter(q=>q[1]<yb+.05);return s.length>=2?[s[0],s[1]]:null;}).filter(Boolean));
+    const dseg=(x,z,a,b)=>{const dx=b[0]-a[0],dz=b[2]-a[2],l=dx*dx+dz*dz||1,t=Math.max(0,Math.min(1,((x-a[0])*dx+(z-a[2])*dz)/l));return Math.hypot(x-a[0]-dx*t,z-a[2]-dz*t);};
+    const out1=[];for(const {p} of roofs)for(const q of p){if(pip(q[0],q[2],rec.pts))continue;const d=Math.min(...G.map(([a,b])=>dseg(q[0],q[2],a,b)));if(d>1.15)out1.push([+q[0].toFixed(1),+q[2].toFixed(1),+d.toFixed(2)]);}
+    const f={};for(const k in bad)if(bad[k].length>=2)f[k]={n:bad[k].length,max:Math.max(...bad[k].map(q=>q[2])),at:bad[k][0]};
+    if(out1.length)f.out={n:out1.length,max:Math.max(...out1.map(q=>q[2])),at:out1[0]};
+    if(Object.keys(f).length)out[id]=f;}
+  return out;};
 // base first, then the kit page; each closed before the next opens
 const base=await open(prep(baseF));const hb=await hashes(base),cb=await cost(base);await base.p.close();
 const kit=await open(kitPage);
@@ -192,10 +234,19 @@ ok('hedgeColour',hc.none||hc.got&&hc.got.every((v,j)=>Math.abs(v-hc.want[j])<.03
 const ck=await cost(kit);await kit.p.close();
 const added=(ck.bld-cb.bld)+ck.kit,per=added/(ck.houses-1);
 ok('cost',ck.meshes-cb.meshes===1&&per<150&&ck.kitShadow===false&&ck.kitStatic,{meshesAdded:ck.meshes-cb.meshes,addedTris:added,perHouse:+per.toFixed(1),kitMeshTris:ck.kit,houses:ck.houses-1});
+// every described house of the real build (street looks and kit entries, unmodified page): roofs rest on their walls (c2707, 2026-11-15)
+{const rp=await open(prep(kitF)),sw=await run(rp,src=>{const ids=[...new Set([...Object.keys(LOOK),...Object.keys(typeof KIT==='undefined'?{}:KIT)])];
+    return{n:ids.filter(id=>__rec[id]).length,bad:eval('('+src+')')(ids)};},roofSweep.toString());
+  await rp.p.close();ok('roofsRestOnWalls',sw.n>400&&!Object.keys(sw.bad).length,{houses:sw.n,bad:sw.bad});}
 // every description that was valid for the kit before kit 2 draws the same triangles with the live kit (frozen fixture)
-if(oldF&&fixF){const nw=await open(prep(fixF)),hn=await hashes(nw),KN=await kitKeys(nw);await nw.p.close();
-  const od=await open(prep(oldF)),ho=await hashes(od),KO=await kitKeys(od);await od.p.close();
-  const ids=Object.keys(KO),ch=ids.filter(id=>ho[id]!==hn[id]),all=Object.keys(ho).filter(id=>ho[id]!==hn[id]);
-  ok('oldDescriptionsUnchanged',ids.length>0&&Object.keys(KN).length===ids.length&&ch.length===0&&all.length===0,{described:ids.length,changed:ch,otherChanged:all.slice(0,5)});}
+// except the houses the live kit refuses to draw with a roof their walls do not carry: those must have been broken with the old kit
+// (roofSweep flags them there) and be whole now
+if(oldF&&fixF){const nw=await open(prep(fixF)),hn=await hashes(nw),KN=await kitKeys(nw);
+  const fixd=await run(nw,()=>[...new Set(KIT_WARN.filter(w=>/single-slope LiDAR roof|pitched roof needs four corners/.test(w)).map(w=>w.split(/[.:]/)[0]))],null);
+  const sweep=P=>run(P,([src,ids])=>eval('('+src+')')(ids),[roofSweep.toString(),fixd]),now=await sweep(nw);await nw.p.close();
+  const od=await open(prep(oldF)),ho=await hashes(od),KO=await kitKeys(od),was=await sweep(od);await od.p.close();
+  const ids=Object.keys(KO),ch=ids.filter(id=>ho[id]!==hn[id]&&!fixd.includes(id)),all=Object.keys(ho).filter(id=>ho[id]!==hn[id]&&!fixd.includes(id));
+  ok('oldDescriptionsUnchanged',ids.length>0&&Object.keys(KN).length===ids.length&&ch.length===0&&all.length===0&&fixd.every(id=>was[id]&&!now[id]),
+    {described:ids.length,changed:ch,otherChanged:all.slice(0,5),repaired:fixd,brokenBefore:fixd.filter(id=>was[id]),brokenNow:Object.keys(now)});}
 await br.close();for(const f of fs.readdirSync(path.dirname(path.resolve(kitF))).filter(f=>f.startsWith('_kt_')))fs.unlinkSync(path.join(path.dirname(path.resolve(kitF)),f));
 console.log(fails.length?'FAIL '+fails.join(' '):'PASS kit');process.exit(fails.length?1:0);

@@ -3,7 +3,7 @@
 // Large parts (extensions, closed porches, porch roofs, balconies, dormers, cross gables) go into the merged building mesh and cast
 // shadows; small ones (window and door panels, steps, plinth, chimneys, shutters) into one extra mesh without shadows.
 // A window is a patch of the facade atlas: the wall it sits on loses its automatic windows (the facades2 face mask).
-const KIT_S={pos:[],col:[],nor:[],uv:[],sty:[],tr:[],tx:[],cs:-1,tn:NOTONE},KIT_WARN=[],KIT_DONE=new Set(),KIT_PI=new Map();let kitWarned=false,KIT_TREES=0;
+const KIT_S={pos:[],col:[],nor:[],uv:[],sty:[],tr:[],tx:[],cs:-1,tn:NOTONE},KIT_WARN=[],KIT_LOOKW=new Set(),KIT_DONE=new Set(),KIT_PI=new Map();let kitWarned=false,KIT_TREES=0;
 const KIT_DOOR={single:[.95,2.1,[.36,.23,.15]],double:[1.5,2.1,[.36,.23,.15]],glass:[1.0,2.15,[.26,.32,.38]],garage:[2.6,2.15,[.8,.8,.78]]};
 const KIT_SHAPE={normal:1,wide:1.7,narrow:.7},KIT_EXT_STY=['plaster','brick','silicate','plank','panel','corrugated','sheet','none'];
 const kitN=(v,a,b)=>typeof v==='number'&&v>=a&&v<=b,kitC=v=>Array.isArray(v)&&v.length===3&&v.every(x=>kitN(x,0,1));
@@ -265,6 +265,9 @@ function kitHalfHip(B,v0,p,s,f){
 const KIT_AT=new Map();let KIT_B=null;
 {const prev=addBuilding;addBuilding=function(B,p,s){
   const K=s&&s.rid&&typeof KIT!=='undefined'&&KIT[s.rid];
+  // a look that pitches a part the LiDAR fits with one slope (`tops`) or an outline of 5+ corners the game does not split: the walls
+  // follow the LiDAR or the whole outline while the roof covers its own rectangle at h (floating, walls through it). Said, not changed.
+  if(!K&&s&&s.rid&&s.pitched&&(s.tops||p.length!==4)&&typeof LOOK!=='undefined'&&LOOK[s.rid])KIT_LOOKW.add(s.rid);
   if(!K||KIT_DONE.has(s.rid)||!s.wall)return prev(B,p,s);
   if(!KIT_AT.has(s.rid)){KIT_AT.set(s.rid,B.pos.length/3);KIT_PI.set(s.rid,0);}KIT_B=B;
   const k=KIT_PI.get(s.rid);KIT_PI.set(s.rid,k+1);
@@ -274,6 +277,11 @@ const KIT_AT=new Map();let KIT_B=null;
   // a cross gable sits flush on the roof: the main eaves overhang would cut through its gable, so it goes (as facades2 does for wings)
   if(Array.isArray(K.xg)&&K.xg.some(kitXgOk))o.noEave=true;
   Object.assign(o,kitWingOv(K.wings,k));
+  // a part drawn pitched keeps no single-slope LiDAR walls (they would stand at 3-6 m under a roof at h: c2707), and an outline of 5+
+  // corners drawn whole gets no pitched roof (addBuilding would roof its first four corners): warned; a wing's `roof` says it outright
+  const pz=o.pitched??s.pitched;
+  if(pz&&o.tops!==null&&s.tops){o.tops=null;KIT_WARN.push(s.rid+'.wings: rectangle '+k+' has a single-slope LiDAR roof; its walls now stop at the eaves under the '+((o.hip??s.hip)?'hip':'gable')+' (give the wing a `roof` and `h`)');}
+  if(pz&&p.length!==4){o.pitched=false;o.hip=false;KIT_WARN.push(s.rid+': a pitched roof needs four corners ('+p.length+' here); drawn as the game measures it');}
   const s2=Object.keys(o).length?Object.assign({},s,o):s,cut=Array.isArray(K.wings)&&kitWingOk(K.wings[k])?kitCut(p,K.wings[k]):null;
   // kit 3: a wing cut short (`d`): its front part keeps the roof, the part behind gets a flat roof at the same eaves
   if(cut){const r=prev(B,cut[0],s2);prev(B,cut[1],Object.assign({},s2,{pitched:false,hip:false,rh:null,rdir:null,ridge:null,chim:null,tops:null,skel:null}));return r;}
@@ -332,9 +340,10 @@ const KIT_AT=new Map();let KIT_B=null;
         for(let j=v;j<v+3;j++){if(Q.col)B.col.splice(j*3,3,...Q.col);if(Q.sty&&B.tx)B.tx[j]=TEXI[Q.sty];}}}
     kitHouse(B,P,Object.assign({},sp,{gable:K.gable||sp.gable}),K,prev,rev,R,big?EG:null,RE,big?(i=>OFa[i]):null,XE,big?(i=>PTa[i]):null);};}
 {const bw=buildWorld;buildWorld=function(ways,meta){
-  for(const k of ['pos','col','nor','uv','sty','tr','tx'])KIT_S[k]=[];KIT_DONE.clear();KIT_AT.clear();KIT_PI.clear();KIT_WARN.length=0;KIT_TREES=0;
+  for(const k of ['pos','col','nor','uv','sty','tr','tx'])KIT_S[k]=[];KIT_DONE.clear();KIT_AT.clear();KIT_PI.clear();KIT_WARN.length=0;KIT_LOOKW.clear();KIT_TREES=0;
   const W=bw(ways,meta);
   if(KIT_WARN.length&&!kitWarned){kitWarned=true;console.warn('kit: ignored '+KIT_WARN.join('; '));}
+  if(KIT_LOOKW.size)console.warn('kit: looks that pitch a roof their walls do not carry (LiDAR single slope or 5+ corners; delete pitched/h/rh or describe the parts): '+[...KIT_LOOKW].join(' '));
   const bm=(worldGroup.children.find(o=>o.geometry&&o.geometry.attributes.sty&&o.castShadow)||{}).material;
   if(KIT_S.pos.length&&bm){
     // the frame colour rides in its own attribute (not `tone`), so tests that look for the building mesh by `tone` still find only that one

@@ -130,11 +130,7 @@
         0.56,
         0.55
       ],
-      "sty": "brick",
-      "pitched": true,
-      "hip": false,
-      "h": 2.8,
-      "rh": 2.4
+      "sty": "brick"
     },
     "c2236": {
       "wall": [
@@ -178,11 +174,7 @@
         0.42,
         0.41
       ],
-      "sty": "brick",
-      "pitched": true,
-      "h": 6.5,
-      "hip": false,
-      "rh": 3.2
+      "sty": "brick"
     },
     "c2124": {
       "wall": [
@@ -423,11 +415,7 @@
         0.31,
         0.33
       ],
-      "sty": "plaster",
-      "pitched": true,
-      "h": 5.1,
-      "hip": true,
-      "rh": 3.2
+      "sty": "plaster"
     },
     "c1923": {
       "wall": [

@@ -90,10 +90,6 @@
    ],
    "sty": "plaster",
    "windows": true,
-   "pitched": true,
-   "hip": false,
-   "h": 5.2,
-   "rh": 3.0,
    "roofSty": "tiles"
   },
   "c2911": {
@@ -361,11 +357,7 @@
     0.29
    ],
    "sty": "plaster",
-   "windows": true,
-   "pitched": true,
-   "hip": false,
-   "h": 6.0,
-   "rh": 3.2
+   "windows": true
   },
   "c2466": {
    "wall": [

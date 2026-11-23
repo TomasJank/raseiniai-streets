@@ -110,5 +110,11 @@ await ctx.close();
 {const {p,ctx}=await open(null);await p.waitForTimeout(15000);const r=await p.evaluate(()=>({level:__t.PERF.level,pr:__t.renderer.getPixelRatio(),ao:__t.GFX.ao}));
   say(r.level===0,'full speed: level stays 0 (needs an idle machine)',r);await ctx.close();}
 say(!errs.length,'no page errors',errs.slice(0,4));
+// F2 readout: shows a frame rate, the card and the level, and the loop keeps running through the swapped requestAnimationFrame
+{const {p,ctx}=await open();await p.keyboard.press('F2');await p.waitForTimeout(1500);
+  const r=await p.evaluate(()=>{const e=document.getElementById('perfDbg');return e&&!e.hidden?e.textContent:null;});
+  const x0=await p.evaluate(()=>__t.world.cars.map(c=>c.x+c.z).join());await p.waitForTimeout(1000);const moved=await p.evaluate(x=>__t.world.cars.map(c=>c.x+c.z).join()!==x,x0);
+  await p.keyboard.press('F2');const hid=await p.evaluate(()=>document.getElementById('perfDbg').hidden);
+  say(!!r&&/^[1-9]\d* fps · frame [\d.]+ ms/.test(r)&&/quality \d\/5 · \d+x\d+/.test(r)&&/ANGLE|Apple|Metal/.test(r)&&moved&&hid,'F2 readout',{r,moved,hid});await ctx.close();}
 await b.close();
 console.log(fails?`${fails} FAILED`:'ALL PASS');process.exit(fails?1:0);

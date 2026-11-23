@@ -67,9 +67,9 @@ function cars4Under(q,M){
   for(const a of M.axles)box(-(t-.1),t-.1,r-.035,r+.035,a-.04,a+.04,5);
   box(-.32,.32,yF-dd,yF+.2,zf-.3,Math.min(zf+.42,zB),2);
   const tz=zr+arch[1].h+.05;box(-.2,.48,yF-dd*.6,yF+.02,tz,Math.min(tz+.5,zf-arch[0].h-.35),4);
-  const xe=-Math.min(.4,t-.32);box(xe-.13,xe+.13,yF-dd,yF-.01,zr-.2,Math.max(zr-.72,zA+.05),1);
-  // the tail pipe ends a little behind the floor, where the body is still wide enough around it
-  let ze=Math.max(zA-.08,-M.dims[0]/2+.06);while(wAt(ze)<.08-xe&&ze<zA+1)ze+=.05;box(xe-.025,xe+.025,yF-.07,yF-.02,zf-.3,ze,1);
+  // the muffler beside the tank and the pipe ending in it: behind the rear axle they hung below the rear bumper, a dark box
+  // in plain sight of the chase camera (the models carry their own tail pipe tips)
+  const xe=-Math.min(.4,t-.32),zm=Math.min(tz+.52,zf-arch[0].h-.35);box(xe-.13,xe+.13,yF-dd,yF-.01,tz,zm,1);box(xe-.025,xe+.025,yF-.07,yF-.02,zf-.3,zm,1);
   const nv=n0+P.length/3,cat=(A,B,T)=>{const o=new T(A.length+B.length);o.set(A);o.set(B,A.length);return o;};
   return{P:cat(S,P,Float32Array),N:cat(q.N,N,Float32Array),U:cat(q.U,U,Float32Array),I:cat(q.I,I,nv>65535?Uint32Array:Uint16Array),under:I.length/3};
 }

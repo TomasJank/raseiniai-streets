@@ -82,7 +82,10 @@
     "rh": 1.0
    },
    {
-    "ridge": "street"
+    "ridge": "across",
+    "h": 3.0,
+    "rh": 5.2,
+    "roof": "gable"
    },
    {
     "ridge": "street",

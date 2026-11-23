@@ -151,7 +151,7 @@ def resolve(T, segs, bid, K, err, street=None, nparts=1):
         err('%s.noFence: want true (the plot between the front wall and the road) or a side' % bid)
     if 'wings' in K:
         W = K['wings']
-        if not isinstance(W, list) or len(W) > nparts or nparts < 2:
+        if not isinstance(W, list) or len(W) > nparts:
             err('%s.wings: want a list of at most %d entries (one per rectangle, `--sides %s` lists them); this house has %d' % (bid, nparts, bid, nparts))
         else:
             lst = []

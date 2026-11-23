@@ -871,11 +871,7 @@
         0.42
       ],
       "sty": "plaster",
-      "windows": true,
-      "pitched": true,
-      "hip": true,
-      "h": 4.1,
-      "rh": 2.0
+      "windows": true
     },
     "c2928": {
       "wall": [

@@ -157,6 +157,29 @@ await check('undersideClosed',async()=>{const T=__t,C=T.CARS4,r={};let ok=true;f
     const good=hits.every(Boolean)&&n>0&&low>.03&&!out&&G.userData.under<=300;if(!good)ok=false;r[F.key+'_'+v]={hits,underVerts:n,underTris:G.userData.under,lowest:+low.toFixed(3),outside:out};}
   return{ok,models:Fs.length,...r};});
 
+// the one wheel drawn at all four corners stands straight: a download posed with steered front wheels gave the Accord (15
+// degrees) and the Punto (25) four turned wheels that stuck out of the body. The tyre is narrowest across when seen along its axle.
+await check('wheelsStraight',()=>{const C=__t.CARS4,r={};let ok=true;
+  for(const F of[...Object.values(C.models),C.police,C.bus].filter(F=>F&&F.M.wheels))for(const[v,W]of[['far',F.wheel],['near',F.hi&&F.hi.wheel]]){if(!W)continue;
+    const a=W.attributes.position.array;let best=[1e9,0];
+    for(let d=-30;d<=30;d+=.5){const c=Math.cos(d*Math.PI/180),s=Math.sin(d*Math.PI/180);let lo=1e9,hi=-1e9;for(let i=0;i<a.length;i+=3){const x=a[i]*c-a[i+2]*s;lo=Math.min(lo,x);hi=Math.max(hi,x);}if(hi-lo<best[0]-1e-6)best=[hi-lo,d];}
+    if(Math.abs(best[1])>2)ok=false;r[F.key+'_'+v]=best[1];}
+  return{ok,yawDeg:r};});
+
+// nothing of the added underside shows from the chase camera (8.2 m behind and 3.4 m up, or 2.3-4 m and 2.72 m up beside a
+// building, up to 50 degrees off the car's axis as it turns), on the version drawn within 40 m: the muffler behind the rear
+// axle hung below the rear bumper. Arch liners and axle beams sit at the wheels and may show; at most 4 other pixels of 320 x 200 per view.
+await check('undersideHiddenFromChase',async()=>{const T=__t,TH=T.THREE,C=T.CARS4,R=T.renderer,r={};let ok=true;for(let i=0;i<300&&!C.hi;i++)await new Promise(r=>setTimeout(r,100));
+  const mat=new TH.ShaderMaterial({vertexShader:'varying float u;void main(){u=uv.x;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
+    fragmentShader:'varying float u;void main(){gl_FragColor=vec4(u>1.5&&floor(u)!=5.&&floor(u)!=7.?1.:0.,0.,0.,1.);}'});
+  const blk=new TH.MeshBasicMaterial({color:0}),rt=new TH.WebGLRenderTarget(320,200),px=new Uint8Array(320*200*4),sc=new TH.Scene(),cam=new TH.PerspectiveCamera(60,1.6,.1,100);sc.background=new TH.Color(0);
+  for(const F of[...Object.values(C.models),C.police].filter(F=>F&&F.M.wheels)){const paint=F.hi?F.hi.paint:F.paint,W=F.hi?F.hi.wheel||F.wheel:F.wheel;
+    sc.clear();sc.add(new TH.Mesh(paint,mat));for(const z of F.axles)for(const x of[-F.track,F.track]){const w=new TH.Mesh(W,blk);w.position.set(x,F.r,z);if(x<0)w.rotation.y=Math.PI;sc.add(w);}
+    let worst=0;for(const[d,y]of[[8.2,3.4],[4,2.72],[2.3,2.72]])for(const yaw of[-50,-25,0,25,50]){const a=yaw*Math.PI/180;cam.position.set(-Math.sin(a)*d,y,-Math.cos(a)*d);cam.lookAt(0,1.3,0);cam.updateMatrixWorld();
+      R.setRenderTarget(rt);R.render(sc,cam);R.readRenderTargetPixels(rt,0,0,320,200,px);R.setRenderTarget(null);let n=0;for(let i=0;i<px.length;i+=4)if(px[i]>128)n++;worst=Math.max(worst,n);}
+    if(worst>4)ok=false;r[F.key+(F.hi?'_near':'_far')]=worst;}
+  rt.dispose();return{ok,worstPixels:r};});
+
 // the police car: the Octavia II model with police set, liveried, four wheels that spin and steer, its bar on this roof flashing,
 // close-up and distant versions by distance, and never a civilian car (traffic, car parks, the mix)
 await check('policeCar',async()=>{const T=__t,F=T.CARS4.police,pc=T.player.car;if(!F)return{ok:false,why:'no police model'};

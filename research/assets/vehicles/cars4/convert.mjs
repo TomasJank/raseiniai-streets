@@ -118,7 +118,11 @@ async function page([glb,m]){
       parts=parts.filter(q=>!q.gone).concat(extra);for(const q of parts)if(!q.geo.boundingBox)q.geo.computeBoundingBox();
       const dy=Math.min(...grp.map(G=>G.b.min.y));if(Math.abs(dy)>1e-4){for(const q of parts){q.geo.translate(0,-dy,0);q.geo.computeBoundingBox();}for(const G of grp){G.c.y-=dy;G.b.translate(new T.Vector3(0,-dy,0));}}
       fit();}
-    const fr=grp.reduce((a,G)=>G.c.x>0&&(!a||G.c.z>a.c.z)?G:a,null);
+    let fr=grp.reduce((a,G)=>G.c.x>0&&(!a||G.c.z>a.c.z)?G:a,null);
+    // a download posed with its front wheels steered: that wheel, drawn at all four corners, sat turned on every one (Accord 15, Punto 25 degrees);
+    // the rear right wheel is straight
+    const rr=grp.reduce((a,G)=>G.c.x>0&&(!a||G.c.z<a.c.z)?G:a,null),wx=G=>G.b?G.b.max.x-G.b.min.x:0;
+    if(rr&&wx(fr)>wx(rr)+.03){console.log('  front wheel steered ('+wx(fr).toFixed(3)+' m across, rear '+wx(rr).toFixed(3)+'): the rear right wheel is the wheel');fr=rr;}
     for(const G of grp)for(const q of G.p)q.wheel=true;
     const wb=new T.Box3();for(const q of fr.p)wb.union(q.geo.boundingBox);const wc=m.legacy?wb.getCenter(new T.Vector3()):fr.c;
     for(const q of fr.p){q.fr=true;q.geo=q.geo.clone().translate(-wc.x,-wc.y,-wc.z);}

@@ -435,10 +435,6 @@
    ],
    "sty": "plank",
    "windows": true,
-   "h": 4.6,
-   "pitched": true,
-   "hip": false,
-   "rh": 3.4,
    "roofSty": "sheet"
   },
   "c1624": {
@@ -453,11 +449,7 @@
     0.65
    ],
    "sty": "silicate",
-   "windows": true,
-   "pitched": true,
-   "hip": false,
-   "h": 4.8,
-   "rh": 3.2
+   "windows": true
   },
   "c1629": {
    "wall": [
@@ -696,11 +688,7 @@
     0.62
    ],
    "sty": "plaster",
-   "windows": true,
-   "pitched": true,
-   "hip": false,
-   "h": 4.6,
-   "rh": 3.2
+   "windows": true
   },
   "c1858": {
    "wall": [
@@ -709,11 +697,7 @@
     0.52
    ],
    "sty": "silicate",
-   "windows": true,
-   "pitched": true,
-   "hip": false,
-   "h": 4.9,
-   "rh": 3.4
+   "windows": true
   },
   "c1874": {
    "wall": [

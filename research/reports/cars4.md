@@ -331,3 +331,39 @@ car happens to be a detailed model, the same on v73 (it took an E46 there: 0 whe
 are the same as without this change (605 at the start, shadow pass +160 triangles), and its "4x slower CPU steps down
 within 25 s" check fails on some runs both with and without this change (a build with the old `cars4.js` failed 2 of 3);
 `test_takepark` **PASS**; `test_solid` **PASS**.
+
+## Accord wheels (2026-11-15): "honda civic ratai klišė"
+
+The owner's screenshot (dark blue Accord from the chase camera, turning left in a car park): the left wheels stood out of the
+body, the front-left one fully clear of the wing; and a dark box hung below the rear bumper. Two separate faults.
+
+**Wheels: the download's front wheels are steered.** The Accord file (#2362) is posed with its front wheels turned about 15
+degrees. The converter takes the front-right wheel as the one wheel the game draws at all four corners, so every Accord
+wheel stood turned 15 degrees, steering or not; with the left side's half turn, the left wheels showed their tread sideways
+past the body (the rear-left by about a tyre's width from behind). The rears also "steered" and the fronts steered from a
+crooked rest. Not v74: the wheel came with the Accord's conversion in v68, and v73 looks the same. Every model was measured
+(the yaw at which the wheel is narrowest across): the **Fiat Punto (`punto1`) had it too, 25 degrees**; all others 0.
+Fix (`convert.mjs`): when the front-right wheel is more than 3 cm wider across than the rear-right one, the rear-right wheel
+(straight) is the wheel. Only `accord7` and `punto1` regenerate (their `.bin`, `_hi.bin` and fleet entries; textures and
+masks byte-identical; Punto tyre radius 0.278 -> 0.281). Re-running the converter on every other model gives the same files, except the textures and masks of the two
+`legacy` models (`audi80`, `primera`), which the unchanged converter does not reproduce either; they were left as they are.
+
+**Box below the bumper: the v74 underbody's muffler.** `cars4Under` put the muffler behind the rear axle and the tail pipe
+past the floor. On every model the muffler's bottom was below the rear bumper's bottom (Accord close-up: muffler 9-20 cm,
+bumper 20 cm), so the chase camera saw it. The muffler now sits beside the fuel tank ahead of the rear axle and the pipe ends
+in it; nothing added is behind the rear axle (the models keep their own tail pipe tips). Introduced by v74.
+
+**Tests** (`work/test_cars4.mjs`): `wheelsStraight` (every model with wheels, both versions: the drawn wheel's narrowest
+yaw within 2 degrees; v74: accord7 -15, punto1 -25) and `undersideHiddenFromChase` (the version drawn within 40 m, rendered
+from the chase camera's distances and heights at up to 50 degrees off axis: at most 4 underside pixels of 320 x 200 other
+than the arch liners and axle beams, which sit at the wheels; v74: 5 to 35 on every model, from the exhaust; now 0 to 4).
+
+**Review**: `review/accord/before_after.jpg` (v73 | v74 | fixed: behind-left steering left and straight, low behind, chase,
+and the Punto). The distant versions still show a few underside pixels from 2-4 m (engine, axle through their coarse
+shells); they are only drawn beyond 40 m.
+
+**Gates** (page 32,062,979 B with every step's current files; two builds byte-identical): `test_cars4` all pass but
+`wheelsTurnAndSteer` (0 wheel instances counted on the stolen car, 3 of 4 runs, any model; the same on v74, which also fails
+`wheelsStraight` and `undersideHiddenFromChase`); a scratch run of the same steps shows the stolen car drawing its 4 wheels,
+so it reads as the check's timing, not the game. `test_drive3` PASS (one earlier run failed `pedCrossesBumps` on one bump,
+the rerun passed; nothing here touches it), `test_carsound` 15/15, `test_perf` ALL PASS.

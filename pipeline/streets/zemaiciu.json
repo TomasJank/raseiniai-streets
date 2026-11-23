@@ -813,11 +813,7 @@
     0.4
    ],
    "sty": "brick",
-   "windows": false,
-   "h": 2.7,
-   "pitched": true,
-   "hip": false,
-   "rh": 1.0
+   "windows": false
   },
   "c4473": {
    "wall": [
@@ -905,11 +901,7 @@
     0.38
    ],
    "sty": "brick",
-   "windows": false,
-   "h": 3.0,
-   "pitched": true,
-   "hip": false,
-   "rh": 1.2
+   "windows": false
   },
   "c3350": {
    "wall": [

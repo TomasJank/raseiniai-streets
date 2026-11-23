@@ -232,3 +232,40 @@ one-storey houses are oversized town-wide in the same way: about 20-30 % too wid
 - `halfHip` only on houses the game draws as one rectangle; `chim` on split outlines still uses the largest rectangle's ridge.
 - On four-corner houses whose LiDAR rectangle stands a few cm off the OSM line, kit windows can sit 1.3 cm (not 3 cm) in front
   of the wall; the test now allows 2 cm (pre-existing behaviour of the kit's offset rule, not changed to keep old houses identical).
+
+# roofbug: the floating roof near the police station (2026-11-15)
+
+## What it was
+The owner's screenshot is c2707 (Maironio g. 18, 60 m from c2158), rectangle (wing) 1, the 8.2 m NE end of its street front. The
+game's LiDAR fits that rectangle with a single slope (`tops` 3.2 m at the NE wall to 6.1 m at the inner wall). The street look set
+`pitched` (h 5.0, rh 3.4, ridge street) and the kit wing only `ridge`, so `addBuilding` drew both: walls to the LiDAR `tops` (the dark
+"wedge" with windows on its sloping top) and a gable at h = 5.0 m over the rectangle, 1.8 m above the low wall and under the high one.
+`facades2` clears `tops` only when a look says `pitched: false`. The description was also wrong on its own: the photo
+(2584711671923916) shows a steep gable to the street, ridge across, eaves about 3 m, top about 8.2 m (the LiDAR's top).
+
+## Fix
+- c2707: look h 3.0, rh 5.2, ridge across; wing 1 `{"ridge":"across","h":3.0,"rh":5.2,"roof":"gable"}` (wings 0 and 2, the low annex,
+  unchanged). The photo's gable window is not drawn: on a split outline the kit centres gable rows on the whole OSM edge, so a window
+  centred on one rectangle's gable is refused ("does not fit"); left for later.
+- kit.js: on a described house, a part drawn pitched keeps no LiDAR `tops` (walls stop at the eaves under its roof), and an outline of
+  5+ corners drawn whole gets no pitched roof (addBuilding roofed its first four corners); both are warned (`kit: ignored c….wings:
+  rectangle k has a single-slope LiDAR roof …`) unless a wing's `roof` says it. Looks without kit keys are only warned
+  (`kit: looks that pitch a roof their walls do not carry: …`), never redrawn, so houses without kit keys stay identical.
+- add_kit.py: `wings` is accepted on a four-corner house too (one entry), so a photo's gable can override a single-slope LiDAR fit.
+
+## The sweep (`roofsRestOnWalls` in work/test_kit.mjs)
+Every described house (street looks and kit entries, 477 drawn) on the build as made: along each wall standing on the ground, every
+0.5 m, the roof over a point 15 cm inside, its plane taken back to the wall line, against the wall's top (gable included): roof more
+than 6 cm above it (unless the eaves 0.3 m out reach down to it), wall more than 0.3 m above the roof, no roof at all, and roof corners
+more than 1.15 m from every wall outside the outline (door canopies are 1.1 m). On v74 it flags 17 houses, all one cause: `pitched`
+over LiDAR `tops` (16) or over an unsplit 8-corner skeleton outline (c1622). It flags none after the fix. The fixture check now allows
+a house to change only when the live kit warns about it, the sweep flags it on the old kit and not on the new (c2707 only).
+
+## Houses
+- From photos: c2707 (above), c7618 (black cottage, "gable end to the road" in kit-vilniaus: wing `roof gable`), c1624 ("pale yellow
+  gable house": look roof keys deleted, wing 0 `roof gable` at the LiDAR height, the annex keeps its measured lean-to).
+- Fallback, roof not told by any photo (look keys `pitched hip h rh ridge` deleted, the game's measured roof): c7174, c3752, c1622,
+  c1850, c1858, c5129, c7400, c2189, c2913, c3590, c4552, c1835, c2205, c2270; and c2467 (drawn by the lmvil3 model, deleted so the
+  fallback house is whole if the model is missing).
+- Sheets: `pipeline/kit/sheets/roofbug/c2707.jpg` (v74 | fixed, owner's viewpoint and four sides), `sweep.jpg` (the 16 others, four
+  diagonal views each; several of those views are blocked by trees or framed off the house).
